@@ -10,6 +10,8 @@ class GlobalText extends StatelessWidget {
   final double lineHeight;
   final String fontFamily;
   final VoidCallback? onTap;
+  final int? maxLines; // Tambahkan maxLines
+  final TextOverflow overflow; // Tambahkan overflow
 
   const GlobalText({
     super.key,
@@ -21,6 +23,8 @@ class GlobalText extends StatelessWidget {
     this.lineHeight = 1.2,
     this.fontFamily = 'Poppins',
     this.onTap,
+    this.maxLines, // Default null berarti unlimited
+    this.overflow = TextOverflow.ellipsis, // Default: elipsis
   });
 
   @override
@@ -28,6 +32,8 @@ class GlobalText extends StatelessWidget {
     final textWidget = Text(
       text,
       textAlign: textAlign,
+      maxLines: maxLines, // Gunakan maxLines
+      overflow: overflow, // Gunakan overflow
       style: TextStyle(
         fontSize: fontSize.sp,
         fontWeight: fontWeight,
@@ -43,7 +49,7 @@ class GlobalText extends StatelessWidget {
         : textWidget;
   }
 
-  // 🔹 Varian Clickable
+  // 🔹 Semua varian dengan maxLines & overflow
   factory GlobalText.clickable(
     String text, {
     Key? key,
@@ -51,6 +57,8 @@ class GlobalText extends StatelessWidget {
     Color color = Colors.blue,
     TextAlign textAlign = TextAlign.center,
     String fontFamily = 'Poppins',
+    int? maxLines,
+    TextOverflow overflow = TextOverflow.ellipsis,
     required VoidCallback onTap,
   }) {
     return GlobalText(
@@ -61,6 +69,8 @@ class GlobalText extends StatelessWidget {
       color: color,
       textAlign: textAlign,
       fontFamily: fontFamily,
+      maxLines: maxLines,
+      overflow: overflow,
       onTap: onTap,
     );
   }
@@ -73,6 +83,8 @@ class GlobalText extends StatelessWidget {
     TextAlign textAlign = TextAlign.center,
     double lineHeight = 1.2,
     String fontFamily = 'Poppins',
+    int? maxLines,
+    TextOverflow overflow = TextOverflow.ellipsis,
   }) {
     return GlobalText(
       key: key,
@@ -83,6 +95,8 @@ class GlobalText extends StatelessWidget {
       textAlign: textAlign,
       lineHeight: lineHeight,
       fontFamily: fontFamily,
+      maxLines: maxLines,
+      overflow: overflow,
     );
   }
 
@@ -94,6 +108,8 @@ class GlobalText extends StatelessWidget {
     TextAlign textAlign = TextAlign.center,
     double lineHeight = 1.2,
     String fontFamily = 'Poppins',
+    int? maxLines,
+    TextOverflow overflow = TextOverflow.ellipsis,
   }) {
     return GlobalText(
       key: key,
@@ -104,6 +120,8 @@ class GlobalText extends StatelessWidget {
       textAlign: textAlign,
       lineHeight: lineHeight,
       fontFamily: fontFamily,
+      maxLines: maxLines,
+      overflow: overflow,
     );
   }
 
@@ -115,6 +133,8 @@ class GlobalText extends StatelessWidget {
     TextAlign textAlign = TextAlign.center,
     double lineHeight = 1.2,
     String fontFamily = 'Poppins',
+    int? maxLines,
+    TextOverflow overflow = TextOverflow.ellipsis,
   }) {
     return GlobalText(
       key: key,
@@ -125,6 +145,8 @@ class GlobalText extends StatelessWidget {
       textAlign: textAlign,
       lineHeight: lineHeight,
       fontFamily: fontFamily,
+      maxLines: maxLines,
+      overflow: overflow,
     );
   }
 
@@ -136,6 +158,8 @@ class GlobalText extends StatelessWidget {
     TextAlign textAlign = TextAlign.center,
     double lineHeight = 1.2,
     String fontFamily = 'Poppins',
+    int? maxLines,
+    TextOverflow overflow = TextOverflow.ellipsis,
   }) {
     return GlobalText(
       key: key,
@@ -146,6 +170,8 @@ class GlobalText extends StatelessWidget {
       textAlign: textAlign,
       lineHeight: lineHeight,
       fontFamily: fontFamily,
+      maxLines: maxLines,
+      overflow: overflow,
     );
   }
 
@@ -157,6 +183,8 @@ class GlobalText extends StatelessWidget {
     TextAlign textAlign = TextAlign.center,
     double lineHeight = 1.2,
     String fontFamily = 'Poppins',
+    int? maxLines,
+    TextOverflow overflow = TextOverflow.ellipsis,
   }) {
     return GlobalText(
       key: key,
@@ -167,6 +195,8 @@ class GlobalText extends StatelessWidget {
       textAlign: textAlign,
       lineHeight: lineHeight,
       fontFamily: fontFamily,
+      maxLines: maxLines,
+      overflow: overflow,
     );
   }
 
@@ -178,6 +208,8 @@ class GlobalText extends StatelessWidget {
     TextAlign textAlign = TextAlign.center,
     double lineHeight = 1.2,
     String fontFamily = 'Poppins',
+    int? maxLines,
+    TextOverflow overflow = TextOverflow.ellipsis,
   }) {
     return GlobalText(
       key: key,
@@ -188,6 +220,8 @@ class GlobalText extends StatelessWidget {
       textAlign: textAlign,
       lineHeight: lineHeight,
       fontFamily: fontFamily,
+      maxLines: maxLines,
+      overflow: overflow,
     );
   }
 }

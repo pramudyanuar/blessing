@@ -28,4 +28,10 @@ class Images {
 
   // Login
   static const String login = "assets/images/login.webp";
+
+  // Student Menu
+  static const String studentMain = "assets/images/banner-mainStudent.png";
+
+  // Error
+  static const String notFound = "assets/lottie/not_found.lottie";
 }

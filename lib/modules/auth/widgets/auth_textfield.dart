@@ -6,12 +6,14 @@ class AuthTextField extends StatelessWidget {
   final String label;
   final String hintText;
   final bool isPassword;
+  final TextEditingController? controller;
 
   const AuthTextField({
     super.key,
     required this.label,
     required this.hintText,
     this.isPassword = false,
+    this.controller,
   });
 
   @override
@@ -21,22 +23,23 @@ class AuthTextField extends StatelessWidget {
       children: [
         GlobalText.bold(
           label,
-          fontSize: 16,
+          fontSize: 16.sp,
         ),
         SizedBox(height: 8.h),
         Container(
           decoration: BoxDecoration(
-            color: Color(0xFFF5F5F5),
+            color: const Color(0xFFF5F5F5),
             borderRadius: BorderRadius.circular(25.r),
             boxShadow: [
               BoxShadow(
                 color: Colors.black26,
                 blurRadius: 4,
-                offset: Offset(0, 2),
+                offset: const Offset(0, 2),
               ),
             ],
           ),
           child: TextField(
+            controller: controller,
             obscureText: isPassword,
             decoration: InputDecoration(
               hintText: hintText,
@@ -54,7 +57,8 @@ class AuthTextField extends StatelessWidget {
                   EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
               suffixIcon: isPassword
                   ? IconButton(
-                      icon: Icon(Icons.visibility_off, color: Colors.grey),
+                      icon:
+                          const Icon(Icons.visibility_off, color: Colors.grey),
                       onPressed: () {},
                     )
                   : null,

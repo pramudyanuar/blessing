@@ -1,4 +1,4 @@
-import 'package:blessing/core/utils/route_utils.dart';
+import 'package:blessing/core/utils/app_routes.dart';
 import 'package:get/get.dart';
 
 class SplashController extends GetxController {
@@ -10,6 +10,6 @@ class SplashController extends GetxController {
 
   void _navigateToOnboarding() async {
     await Future.delayed(const Duration(seconds: 2));
-    Get.toNamed(NavigationRoutes.onboarding);
+    Get.toNamed(AppRoutes.onboarding);
   }
 }

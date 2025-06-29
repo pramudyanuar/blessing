@@ -1,6 +1,6 @@
 import 'package:blessing/core/constants/images.dart';
 import 'package:blessing/core/constants/string.dart';
-import 'package:blessing/core/utils/route_utils.dart';
+import 'package:blessing/core/utils/app_routes.dart';
 import 'package:get/get.dart';
 
 class OnboardingController extends GetxController {
@@ -22,6 +22,6 @@ class OnboardingController extends GetxController {
 
   void completeOnboarding() async {
     // await _prefs.setFirstTime(false);
-    Get.offAllNamed(NavigationRoutes.login);
+    Get.offAllNamed(AppRoutes.login);
   }
 }

@@ -11,8 +11,7 @@ import 'package:blessing/core/global_components/global_text.dart';
 
 class OnboardingScreen extends StatelessWidget {
   OnboardingScreen({super.key});
-  final OnboardingController controller = Get.put(OnboardingController());
-
+  final OnboardingController controller = Get.find<OnboardingController>();
   final PageController pageController = PageController();
   final ValueNotifier<int> currentIndex = ValueNotifier(0);
   final ValueNotifier<double> buttonScale = ValueNotifier(1.0);
@@ -95,7 +94,7 @@ class OnboardingScreen extends StatelessWidget {
 
               SizedBox(height: 20.h),
 
-              // Tombol Continue
+              // Button Continue
               ValueListenableBuilder<double>(
                 valueListenable: buttonScale,
                 builder: (context, scale, child) {

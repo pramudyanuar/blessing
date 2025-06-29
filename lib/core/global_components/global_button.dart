@@ -33,21 +33,32 @@ class GlobalButton extends StatelessWidget {
           ),
           elevation: 0,
         ),
-        child: isLoading
-            ? SizedBox(
-                width: 24.w,
-                height: 24.h,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          transitionBuilder: (Widget child, Animation<double> animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: ScaleTransition(scale: animation, child: child),
+            );
+          },
+          child: isLoading
+              ? SizedBox(
+                  key: const ValueKey('loading'),
+                  width: 24.w,
+                  height: 24.h,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : GlobalText.medium(
+                  text,
+                  key: const ValueKey('text'),
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontFamily: 'Inter',
                 ),
-              )
-            : GlobalText.medium(
-                text,
-                fontSize: 18,
-                color: Colors.white,
-                fontFamily: 'Inter',
-              ),
+        ),
       ),
     );
   }
