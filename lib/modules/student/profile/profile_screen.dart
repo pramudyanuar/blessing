@@ -116,14 +116,7 @@ class ProfileScreen extends StatelessWidget {
               SizedBox(height: 12.h),
               // Tombol
               Obx(() => isInitialSetup
-                  ? GlobalButton(
-                      text: 'Submit',
-                      onPressed: controller.saveProfile,
-                      height: 44.h,
-                      width: double.infinity,
-                      isLoading: controller.isLoading.value,
-                    )
-                  : Row(
+                  ? Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         GlobalButton(
@@ -141,7 +134,15 @@ class ProfileScreen extends StatelessWidget {
                           height: 40.h,
                         ),
                       ],
-                    )),
+                    )
+                  : GlobalButton(
+                    text: 'Submit',
+                    onPressed: controller.saveProfile,
+                    height: 44.h,
+                    width: double.infinity,
+                    isLoading: controller.isLoading.value,
+                  )
+                ),
               SizedBox(height: 12.h),
             ],
           ),

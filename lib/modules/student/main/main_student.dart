@@ -16,7 +16,7 @@ class MainStudent extends StatelessWidget {
       appBar: StudentAppBar(
         name: "John Doe",
         classInfo: "Kelas 12 IPA",
-        profileImageUrl: "https://example.com/profile.jpg",
+        profileImageUrl: "",
       ),
       body: SingleChildScrollView(
         child: SafeArea(
