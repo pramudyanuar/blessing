@@ -1,4 +1,3 @@
-import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/core/utils/app_routes.dart'; // <-- 1. IMPORT RUTE
 import 'package:blessing/modules/student/profile/controllers/profile_controller.dart';
@@ -21,9 +20,10 @@ class StudentAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.c1,
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
       elevation: 3,
-      shadowColor: Colors.black.withOpacity(0.1),
+      shadowColor: Colors.black.withOpacity(0.4),
       toolbarHeight: 65.h,
       // 3. Bungkus Row dengan GestureDetector
       title: GestureDetector(

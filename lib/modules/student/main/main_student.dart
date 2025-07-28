@@ -24,7 +24,7 @@ class MainStudent extends StatelessWidget {
             padding: EdgeInsets.all(12.h),
             child: Column(
               children: [
-ClipRRect(
+                  ClipRRect(
                     borderRadius:
                         BorderRadius.circular(12), // Semua sudut akan membulat
                     child: Container(
