@@ -1,4 +1,5 @@
 import 'package:blessing/core/constants/color.dart';
+import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/modules/student/quiz_attempt/controller/quiz_attempt_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,6 +13,7 @@ class QuestionNavigationDrawer extends StatelessWidget {
     final controller = Get.find<QuizAttemptController>();
 
     return Drawer(
+      backgroundColor: Colors.white,
       child: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(16.w),
@@ -70,9 +72,12 @@ class QuestionNavigationDrawer extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(double.infinity, 48.h),
-                  backgroundColor: Colors.green,
+                  backgroundColor: const Color.fromARGB(255, 46, 141, 49),
                 ),
-                child: const Text("Selesai"),
+                child: GlobalText.medium(
+                  "Kirim Jawaban",
+                  color: Colors.white,
+                ),
               )
             ],
           ),

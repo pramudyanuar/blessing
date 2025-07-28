@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:blessing/core/constants/color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -94,7 +95,7 @@ class CourseCard extends StatelessWidget {
                   "Lihat Detail",
                   style: TextStyle(
                     fontSize: 13.sp,
-                    color: Colors.blue,
+                    color: AppColors.c2,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

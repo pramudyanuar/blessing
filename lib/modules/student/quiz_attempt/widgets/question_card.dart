@@ -37,11 +37,12 @@ class QuestionCard extends StatelessWidget {
             return Obx(() {
               final isSelected = controller.userAnswers[questionIndex] == index;
               return Card(
+                color: isSelected ? AppColors.c4 : Colors.white,
                 elevation: isSelected ? 4 : 1,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12.r),
                   side: BorderSide(
-                    color: isSelected ? AppColors.c2 : Colors.grey.shade300,
+                    color: isSelected ? AppColors.c3 : Colors.grey.shade300,
                     width: isSelected ? 2 : 1,
                   ),
                 ),

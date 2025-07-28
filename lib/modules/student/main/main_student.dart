@@ -24,21 +24,28 @@ class MainStudent extends StatelessWidget {
             padding: EdgeInsets.all(12.h),
             child: Column(
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black
-                            .withOpacity(0.2),
-                        offset: Offset(2, 2), 
-                        blurRadius: 0, 
-                        spreadRadius:
-                            0.5, 
+ClipRRect(
+                    borderRadius:
+                        BorderRadius.circular(12), // Semua sudut akan membulat
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white, // atau apapun sesuai kebutuhan
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            offset: Offset(2, 2),
+                            blurRadius: 0,
+                            spreadRadius: 0.5,
+                          ),
+                        ],
                       ),
-                    ],
+                      child: Image.asset(
+                        Images.studentMain,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
-                  child: Image.asset(Images.studentMain, fit: BoxFit.cover),
-                ),
+
                 SizedBox(height: 16.h),
                 CustomSearchBar(),
                 SizedBox(height: 16.h),

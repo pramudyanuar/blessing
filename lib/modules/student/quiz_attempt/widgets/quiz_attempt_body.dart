@@ -1,3 +1,5 @@
+import 'package:blessing/core/constants/color.dart';
+import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/modules/student/quiz_attempt/controller/quiz_attempt_controller.dart';
 import 'package:blessing/modules/student/quiz_attempt/widgets/question_card.dart';
 import 'package:flutter/material.dart';
@@ -20,15 +22,25 @@ class QuizAttemptBody extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.arrow_back_ios),
                     onPressed: controller.previousPage,
+                    color: AppColors.c2,
                   ),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.c2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.r),
+                      ),
+                    ),
                     onPressed: () {},
-                    child: Text(
-                        "Soal ${controller.currentQuestionIndex.value + 1}"),
+                    child: GlobalText.medium(
+                      'Soal ${controller.currentQuestionIndex.value + 1}',
+                      color: Colors.white,
+                    ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.arrow_forward_ios),
                     onPressed: controller.nextPage,
+                    color: AppColors.c2,
                   ),
                 ],
               )),

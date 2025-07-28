@@ -21,5 +21,7 @@ class StringText {
     "Pelajari berbagai topik dengan cara \n yang mudah dipahami!",
     "Uji pemahamanmu dengan kuis \n seru dan menantang!",
   ];
-  static const String onBoardingButtonText = "Continue";
+  static const String onBoardingButtonText = "Lanjutkan";
+  static const String skipButtonText = "Lewati";
+  static const String startOnboardingMessage = "Mulai";
 }

@@ -1,3 +1,4 @@
+import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/modules/onboarding/controller/onboarding_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -84,7 +85,7 @@ class OnboardingScreen extends StatelessWidget {
                     controller: pageController,
                     count: controller.images.length,
                     effect: ExpandingDotsEffect(
-                      activeDotColor: Colors.blue,
+                      activeDotColor: AppColors.c2,
                       dotHeight: 5.h,
                       dotWidth: 5.w,
                     ),
@@ -95,32 +96,17 @@ class OnboardingScreen extends StatelessWidget {
               SizedBox(height: 20.h),
 
               // Button Continue
-              ValueListenableBuilder<double>(
-                valueListenable: buttonScale,
-                builder: (context, scale, child) {
-                  return GestureDetector(
-                    onTapDown: (_) => buttonScale.value = 0.95,
-                    onTapUp: (_) {
-                      buttonScale.value = 1.0;
-                      if (currentIndex.value < controller.images.length - 1) {
-                        pageController.nextPage(
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.easeInOut,
-                        );
-                      } else {
-                        controller.completeOnboarding();
-                      }
-                    },
-                    child: AnimatedScale(
-                      scale: scale,
-                      duration: const Duration(milliseconds: 100),
-                      child: GlobalButton(
-                        width: 200.w,
-                        height: 40.h,
-                        text: StringText.onBoardingButtonText,
-                        onPressed: () {
-                          if (currentIndex.value <
-                              controller.images.length - 1) {
+              ValueListenableBuilder<int>(
+                valueListenable: currentIndex,
+                builder: (context, index, _) {
+                  return ValueListenableBuilder<double>(
+                    valueListenable: buttonScale,
+                    builder: (context, scale, _) {
+                      return GestureDetector(
+                        onTapDown: (_) => buttonScale.value = 0.95,
+                        onTapUp: (_) {
+                          buttonScale.value = 1.0;
+                          if (index < controller.images.length - 1) {
                             pageController.nextPage(
                               duration: const Duration(milliseconds: 500),
                               curve: Curves.easeInOut,
@@ -129,8 +115,29 @@ class OnboardingScreen extends StatelessWidget {
                             controller.completeOnboarding();
                           }
                         },
-                      ),
-                    ),
+                        child: AnimatedScale(
+                          scale: scale,
+                          duration: const Duration(milliseconds: 100),
+                          child: GlobalButton(
+                            width: 200.w,
+                            height: 40.h,
+                            text: index < controller.images.length - 1
+                                ? StringText.onBoardingButtonText
+                                : StringText.startOnboardingMessage,
+                            onPressed: () {
+                              if (index < controller.images.length - 1) {
+                                pageController.nextPage(
+                                  duration: const Duration(milliseconds: 500),
+                                  curve: Curves.easeInOut,
+                                );
+                              } else {
+                                controller.completeOnboarding();
+                              }
+                            },
+                          ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),
@@ -152,8 +159,8 @@ class OnboardingScreen extends StatelessWidget {
                     onPressed: () {
                       controller.completeOnboarding();
                     },
-                    child: GlobalText.regular('Skip',
-                        fontSize: 14.sp, color: Colors.blue),
+                    child: GlobalText.regular(StringText.skipButtonText,
+                        fontSize: 14.sp, color: AppColors.c2),
                   ),
                 ),
               );

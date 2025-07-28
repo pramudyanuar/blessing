@@ -13,7 +13,7 @@ class RoleMiddleware extends GetMiddleware {
     // final prefs = SharedPreferences.getInstance();
     // final userRole = prefs.getString('role');
 
-    final userRole = 'student';
+    final userRole = 'student'; // Simulating a user role for demonstration purposes
 
     if (userRole != requiredRole) {
       return RouteSettings(name: AppRoutes.accessDenied);

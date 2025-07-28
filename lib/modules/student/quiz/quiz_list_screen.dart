@@ -1,3 +1,4 @@
+import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/subject_appbar.dart';
 import 'package:blessing/core/utils/app_routes.dart';
@@ -31,6 +32,7 @@ class QuizListScreen extends StatelessWidget {
     final controller = Get.find<QuizListController>();
         
     return BaseWidgetContainer(
+        backgroundColor: AppColors.c5,
         appBar: SubjectAppbar(
           title: title,
           subtitle: subtitle,

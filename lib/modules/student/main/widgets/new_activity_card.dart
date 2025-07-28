@@ -1,3 +1,4 @@
+import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -48,25 +49,25 @@ class NotificationCard extends StatelessWidget {
                 children: [
                   Icon(
                     icon,
-                    color: isRead ? Colors.white70 : Colors.blue,
+                    color: isRead ? Colors.white70 : AppColors.c2,
                     size: 20.sp,
                   ),
                   SizedBox(width: 4.w),
                   GlobalText.bold(
                     title,
                     fontSize: 12.sp,
-                    color: isRead ? Colors.white70 : Colors.blue,
+                    color: isRead ? Colors.white70 : AppColors.c2,
                     fontFamily: 'Inter',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                ],  
+                ],
               ),
               const Spacer(),
               GlobalText.medium(
                 subtitle,
                 fontSize: 10.sp,
-                color: isRead ? Colors.white70 : Colors.blue,
+                color: isRead ? Colors.white70 : AppColors.c2,
                 fontFamily: 'Inter',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -77,7 +78,7 @@ class NotificationCard extends StatelessWidget {
           GlobalText.bold(
             contentTitle,
             fontSize: 20.sp, // Diperbesar
-            color: isRead ? Colors.white : Colors.blue.shade900,
+            color: isRead ? Colors.white : AppColors.c2,
             fontFamily: 'Inter',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

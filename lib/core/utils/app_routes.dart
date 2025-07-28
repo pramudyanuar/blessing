@@ -12,6 +12,9 @@ abstract class AppRoutes {
 
   // Admin Routes
   static const adminMenu = '/admin-menu';
+  static const manageStudent = '/manage-student';
+  static const adminHomepage = '/homepage';
+  static const manageSubject = '/manage-subject';
 
   // Student Routes
   static const studentMenu = '/student-menu';

@@ -17,6 +17,7 @@ class QuizCard extends StatelessWidget {
     final QuizStatus status = quizData['status'];
 
     return Container(
+      height: 60.h,
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       decoration: BoxDecoration(
@@ -71,6 +72,9 @@ class QuizCard extends StatelessWidget {
     } else if (status == QuizStatus.completed) {
       return GlobalText.regular('Completed',
           fontSize: 12.sp, color: Colors.green.shade600);
+    } else if (status == QuizStatus.missed) {
+      return GlobalText.regular('Uncompleted',
+          fontSize: 12.sp, color: Colors.red.shade600);
     }
     return const SizedBox.shrink();
   }
@@ -84,7 +88,7 @@ class QuizCard extends StatelessWidget {
           foregroundColor: Colors.white,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          padding: EdgeInsets.symmetric(horizontal: 18.w),
         ),
         child: GlobalText.medium('Mulai', color: Colors.white),
       );

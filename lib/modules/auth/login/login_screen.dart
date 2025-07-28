@@ -53,7 +53,7 @@ class LoginScreen extends StatelessWidget {
                 SizedBox(height: 30.h),
                 Obx(() => GlobalButton(
                       text: controller.isLoading.value ? 'Loading...' : 'Login',
-                      height: 47.h,
+                      height: 35.h,
                       width: 317.w,
                       onPressed:
                           controller.isLoading.value ? null : controller.login,

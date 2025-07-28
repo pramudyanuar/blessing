@@ -9,6 +9,7 @@ class GlobalButton extends StatelessWidget {
   final double width;
   final double height;
   final bool isLoading;
+  final Color? color; // <-- Tambahkan parameter warna
 
   const GlobalButton({
     super.key,
@@ -17,6 +18,7 @@ class GlobalButton extends StatelessWidget {
     this.width = 300,
     this.height = 60,
     this.isLoading = false,
+    this.color, // <-- Inisialisasi di konstruktor
   });
 
   @override
@@ -27,7 +29,8 @@ class GlobalButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.c2,
+          backgroundColor:
+              color ?? AppColors.c2, // <-- Gunakan warna custom jika ada
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.r),
           ),

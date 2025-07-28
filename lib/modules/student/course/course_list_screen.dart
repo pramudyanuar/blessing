@@ -1,5 +1,7 @@
+import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/subject_appbar.dart';
+import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/modules/student/course/controllers/course_list_controller.dart';
 import 'package:blessing/modules/student/course/widgets/course_card.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +17,7 @@ class CourseListScreen extends StatelessWidget {
     final controller = Get.find<CourseListController>();
 
     return BaseWidgetContainer(
+      backgroundColor: AppColors.c5,
       // Bungkus AppBar dengan Obx agar bisa update secara reaktif
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(180.h),
@@ -45,7 +48,7 @@ class CourseListScreen extends StatelessWidget {
                       onTapDetail: () {
                         // Navigasi ke detail course, tambahkan logika sesuai kebutuhan
                         // Contoh:
-                        // Get.toNamed(AppRoutes.courseDetail, arguments: {...});
+                        Get.toNamed(AppRoutes.courseDetail);
                       },
                     );
                   },
