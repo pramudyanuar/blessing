@@ -1,4 +1,5 @@
 import 'package:blessing/core/constants/color.dart';
+import 'package:blessing/core/global_components/global_button.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/modules/student/quiz_attempt/controller/quiz_attempt_controller.dart';
 import 'package:flutter/material.dart';
@@ -20,9 +21,7 @@ class QuestionNavigationDrawer extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Navigasi Soal",
-                  style:
-                      TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
+              GlobalText.semiBold("Navigasi Soal", fontSize: 14.sp),
               SizedBox(height: 16.h),
               Expanded(
                 child: GridView.builder(
@@ -36,7 +35,6 @@ class QuestionNavigationDrawer extends StatelessWidget {
                     return Obx(() {
                       final isAnswered =
                           controller.userAnswers.containsKey(index);
-                      // TAMBAHKAN LOGIKA INI
                       final isActive =
                           controller.currentQuestionIndex.value == index;
 
@@ -48,14 +46,13 @@ class QuestionNavigationDrawer extends StatelessWidget {
                           foregroundColor:
                               isAnswered ? Colors.white : Colors.black,
                           padding: EdgeInsets.zero,
-                          // Tambahkan style untuk menandai soal yang aktif
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.r),
                             side: isActive
                                 ? BorderSide(
                                     color: Colors.orange.shade700,
-                                    width:
-                                        2.5) // Garis pinggir untuk soal aktif
+                                    width: 2.5,
+                                  )
                                 : BorderSide.none,
                           ),
                         ),
@@ -66,19 +63,15 @@ class QuestionNavigationDrawer extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 16.h),
-              ElevatedButton(
+              GlobalButton(
+                text: "Kirim Jawaban",
                 onPressed: () {
                   // TODO: Logika untuk submit kuis
                 },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 48.h),
-                  backgroundColor: const Color.fromARGB(255, 46, 141, 49),
-                ),
-                child: GlobalText.medium(
-                  "Kirim Jawaban",
-                  color: Colors.white,
-                ),
-              )
+                width: double.infinity,
+                height: 48,
+                color: const Color.fromARGB(255, 46, 141, 49),
+              ),
             ],
           ),
         ),

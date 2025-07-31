@@ -4,7 +4,7 @@ class AdminManageCourseController extends GetxController {
   // Observable state untuk data AppBar
   final RxString title = 'Mata Pelajaran'.obs;
   final RxString subtitle = ''.obs;
-  final RxString classLevel = ''.obs;
+  final RxString classLevel = 'Kelas 10'.obs;
   final RxString imagePath = ''.obs;
 
   // Observable list untuk menyimpan daftar kursus
@@ -34,16 +34,20 @@ class AdminManageCourseController extends GetxController {
       title.value = arguments['title'] ?? 'Mata Pelajaran';
       subtitle.value = arguments['subtitle'] ?? '';
       classLevel.value = arguments['classLevel'] ?? '';
-      // Jika imagePath ada, tambahkan 'detail-' di depan nama file gambarnya
-      if (arguments['imagePath'] != null) {
-        final path = arguments['imagePath'] as String;
+
+      // Periksa imagePath apakah valid
+      final rawImagePath = arguments['imagePath'];
+      if (rawImagePath != null && rawImagePath.toString().isNotEmpty) {
+        final path = rawImagePath as String;
         final lastSlash = path.lastIndexOf('/') + 1;
         final dir = path.substring(0, lastSlash);
         final file = path.substring(lastSlash);
         imagePath.value = dir + 'detail-' + file;
       } else {
-        imagePath.value = 'assets/images/default_banner.png';
+        imagePath.value = 'assets/images/bg-admin-subject.png';
       }
+    } else {
+      imagePath.value = 'assets/images/bg-admin-subject.png';
     }
   }
 }
@@ -54,6 +58,7 @@ class CourseItem {
   final String description;
   final String fileName;
   final String dateText;
+
   CourseItem({
     required this.title,
     required this.description,

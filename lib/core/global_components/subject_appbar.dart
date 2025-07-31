@@ -5,7 +5,6 @@ import 'global_text.dart';
 class SubjectAppbar extends StatelessWidget
     implements PreferredSizeWidget {
   final String title;
-  final String subtitle;
   final String classLevel;
   final String imagePath;
   final VoidCallback? onBack;
@@ -13,7 +12,6 @@ class SubjectAppbar extends StatelessWidget
   const SubjectAppbar({
     super.key,
     required this.title,
-    required this.subtitle,
     required this.classLevel,
     required this.imagePath,
     this.onBack,
@@ -27,7 +25,7 @@ class SubjectAppbar extends StatelessWidget
         child: Stack(
           children: [
             Container(
-              height: 165.h,
+              height: 120.h,
               width: double.infinity,
               decoration: BoxDecoration(
                 color: const Color(0xFF005BD4),
@@ -46,7 +44,7 @@ class SubjectAppbar extends StatelessWidget
               ),
             ),
             Positioned(
-              top: 60.h,
+              top: 50.h,
               left: 16.w,
               right: 16.w,
               child: Column(
@@ -54,14 +52,7 @@ class SubjectAppbar extends StatelessWidget
                 children: [
                   GlobalText.bold(
                     title,
-                    fontSize: 20,
-                    color: Colors.white,
-                    textAlign: TextAlign.left,
-                  ),
-                  SizedBox(height: 4.h),
-                  GlobalText.regular(
-                    subtitle,
-                    fontSize: 14,
+                    fontSize: 20.sp,
                     color: Colors.white,
                     textAlign: TextAlign.left,
                   ),
@@ -75,7 +66,7 @@ class SubjectAppbar extends StatelessWidget
                     ),
                     child: GlobalText.medium(
                       classLevel,
-                      fontSize: 12,
+                      fontSize: 14.sp,
                       color: Colors.white,
                       textAlign: TextAlign.left,
                     ),

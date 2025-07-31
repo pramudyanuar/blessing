@@ -24,14 +24,13 @@ class QuizAttemptBody extends StatelessWidget {
                     onPressed: controller.previousPage,
                     color: AppColors.c2,
                   ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.c2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.r),
-                      ),
+                  Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                    decoration: BoxDecoration(
+                      color: AppColors.c2,
+                      borderRadius: BorderRadius.circular(15.r),
                     ),
-                    onPressed: () {},
                     child: GlobalText.medium(
                       'Soal ${controller.currentQuestionIndex.value + 1}',
                       color: Colors.white,

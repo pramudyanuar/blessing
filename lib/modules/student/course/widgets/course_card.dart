@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:blessing/core/constants/color.dart';
+import 'package:blessing/core/global_components/global_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -49,33 +50,39 @@ class CourseCard extends StatelessWidget {
                   Icon(Icons.menu_book_outlined,
                       size: 18.sp, color: Colors.black87),
                   SizedBox(width: 8.w),
-                  Text(
+                  GlobalText.medium(
                     "Materi Pembelajaran",
-                    style:
-                        TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
+                    fontSize: 12.sp,
+                    textAlign: TextAlign.start,
                   ),
                 ],
               ),
-              Text(
+              GlobalText.light(
                 dateText,
-                style: TextStyle(fontSize: 11.sp, color: Colors.grey),
+                fontSize: 11.sp,
+                color: Colors.grey,
+                textAlign: TextAlign.end,
               ),
             ],
           ),
           SizedBox(height: 12.h),
 
           /// Title
-          Text(
+          GlobalText.bold(
             title,
-            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+            fontSize: 16.sp,
+            textAlign: TextAlign.start,
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: 5.h),
 
           /// Description
-          Text(
+          GlobalText.regular(
             description,
-            style: TextStyle(fontSize: 13.sp, color: Colors.black87),
+            fontSize: 13.sp,
+            color: AppColors.c6,
+            textAlign: TextAlign.start,
           ),
+
           SizedBox(height: 10.h),
 
           /// File name & Detail
@@ -86,39 +93,37 @@ class CourseCard extends StatelessWidget {
                 children: [
                   Icon(Icons.picture_as_pdf, size: 16.sp, color: Colors.red),
                   SizedBox(width: 4.w),
-                  Text(fileName, style: TextStyle(fontSize: 13.sp)),
+                  GlobalText.regular(
+                    fileName,
+                    fontSize: 14.sp,
+                    textAlign: TextAlign.start,
+                  ),
                 ],
               ),
-              GestureDetector(
+              GlobalText.clickable(
+                "Lihat Detail",
+                fontWeight: FontWeight.w700,
+                fontSize: 13.sp,
+                color: AppColors.c3,
                 onTap: onTapDetail,
-                child: Text(
-                  "Lihat Detail",
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    color: AppColors.c2,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
               ),
             ],
           ),
           SizedBox(height: 10.h),
 
           /// Preview Images
-/// Preview Images
           if (previewImages != null && previewImages!.isNotEmpty)
             Padding(
               padding: EdgeInsets.only(top: 12.h),
               child: SizedBox(
-                height:
-                    200.h, // <-- kontrol tinggi tampilan grid agar gambar besar
+                height: 200.h,
                 child: GridView.builder(
                   physics: NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     mainAxisSpacing: 8.h,
                     crossAxisSpacing: 8.w,
-                    childAspectRatio: 1.3, // bisa adjust biar pas proporsinya
+                    childAspectRatio: 1.3,
                   ),
                   itemCount:
                       previewImages!.length > 4 ? 4 : previewImages!.length,
@@ -147,13 +152,10 @@ class CourseCard extends StatelessWidget {
                               color: Colors.black38,
                             ),
                             child: Center(
-                              child: Text(
+                              child: GlobalText.bold(
                                 "See More",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                fontSize: 14,
+                                color: Colors.white,
                               ),
                             ),
                           ),
@@ -163,7 +165,6 @@ class CourseCard extends StatelessWidget {
                 ),
               ),
             ),
-
         ],
       ),
     );

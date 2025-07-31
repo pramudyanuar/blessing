@@ -1,13 +1,10 @@
 import 'package:get/get.dart';
 
 class CourseListController extends GetxController {
-  // Observable state untuk data AppBar
   final RxString title = 'Mata Pelajaran'.obs;
-  final RxString subtitle = ''.obs;
   final RxString classLevel = ''.obs;
   final RxString imagePath = ''.obs;
 
-  // Observable list untuk menyimpan daftar kursus
   final RxList<CourseItem> courses = <CourseItem>[
     CourseItem(
       title: 'Bab 2 : Integral',
@@ -26,15 +23,11 @@ class CourseListController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Ambil argumen yang dikirim dari ClassCard
     final arguments = Get.arguments as Map<String, dynamic>?;
 
-    // Perbarui state dengan data dari argumen
     if (arguments != null) {
       title.value = arguments['title'] ?? 'Mata Pelajaran';
-      subtitle.value = arguments['subtitle'] ?? '';
       classLevel.value = arguments['classLevel'] ?? '';
-      // Jika imagePath ada, tambahkan 'detail-' di depan nama file gambarnya
       if (arguments['imagePath'] != null) {
         final path = arguments['imagePath'] as String;
         final lastSlash = path.lastIndexOf('/') + 1;
@@ -47,6 +40,7 @@ class CourseListController extends GetxController {
     }
   }
 }
+
 
 // Class untuk item kursus
 class CourseItem {

@@ -16,7 +16,6 @@ class QuizListScreen extends StatelessWidget {
     // Ambil argumen dari Get.arguments jika ada
     final arguments = Get.arguments as Map<String, dynamic>?;
     final title = arguments?['title'] ?? 'Matematika Minat';
-    final subtitle = arguments?['subtitle'] ?? 'SMA 1 Jakarta - A';
     final classLevel = arguments?['classLevel'] ?? 'Kelas 10';
     final imagePath = arguments?['imagePath'] != null
         ? (() {
@@ -35,7 +34,6 @@ class QuizListScreen extends StatelessWidget {
         backgroundColor: AppColors.c5,
         appBar: SubjectAppbar(
           title: title,
-          subtitle: subtitle,
           classLevel: classLevel,
           imagePath: imagePath,
         ),

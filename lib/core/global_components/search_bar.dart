@@ -4,11 +4,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class CustomSearchBar extends StatelessWidget {
   final double width;
   final double height;
+  final String hintText;
 
   const CustomSearchBar({
     super.key,
     this.width = 358,
     this.height = 50,
+    this.hintText = "Cari Mata Pelajaran/kuis",
   });
 
   @override
@@ -40,7 +42,7 @@ class CustomSearchBar extends StatelessWidget {
           Expanded(
             child: TextField(
               decoration: InputDecoration(
-                hintText: "Cari Mata Pelajaran/kuis",
+                hintText: hintText,
                 hintStyle: TextStyle(
                   color: Colors.grey,
                   fontSize: 14.sp,

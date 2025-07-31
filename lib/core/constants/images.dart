@@ -34,4 +34,10 @@ class Images {
 
   // Error
   static const String notFound = "assets/lottie/not_found.lottie";
+
+  // Confirmation Dialog
+  static const String confirmationDialog = "assets/images/confirmation-bg.png";
+
+  // admin 
+  static const String adminMainSubject = "assets/images/bg-admin-subject.png";
 }

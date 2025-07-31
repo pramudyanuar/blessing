@@ -54,6 +54,7 @@ class GlobalText extends StatelessWidget {
     String text, {
     Key? key,
     double fontSize = 16,
+    FontWeight fontWeight = FontWeight.w500,
     Color color = Colors.blue,
     TextAlign textAlign = TextAlign.center,
     String fontFamily = 'Poppins',
@@ -65,7 +66,7 @@ class GlobalText extends StatelessWidget {
       key: key,
       text: text,
       fontSize: fontSize.sp,
-      fontWeight: FontWeight.w500,
+      fontWeight: fontWeight,
       color: color,
       textAlign: textAlign,
       fontFamily: fontFamily,

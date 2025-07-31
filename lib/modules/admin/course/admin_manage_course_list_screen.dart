@@ -21,7 +21,6 @@ class AdminManageCourseListScreen extends StatelessWidget {
         preferredSize: Size.fromHeight(180.h),
         child: Obx(() => SubjectAppbar(
               title: controller.title.value,
-              subtitle: controller.subtitle.value,
               classLevel: controller.classLevel.value,
               imagePath: controller.imagePath.value,
             )),

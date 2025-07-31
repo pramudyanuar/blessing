@@ -1,5 +1,7 @@
 import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
+import 'package:blessing/core/global_components/search_bar.dart';
+import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/modules/admin/manage_student/controller/admin_manage_student_controller.dart';
 import 'package:blessing/modules/admin/manage_student/widgets/user_card.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +34,9 @@ class AdminManageStudentScreen extends StatelessWidget {
                   return UserCard(
                     userName: student['nama']!,
                     userClass: student['kelas']!,
-                    onTap: () => print("Tapped on ${student['nama']}"),
+                    onTap: () => {
+                      Get.toNamed(AppRoutes.detailStudent)
+                    },
                     onOptionsTap: () => print("Options for ${student['nama']}"),
                   );
                 },
@@ -92,36 +96,22 @@ class AdminManageStudentScreen extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Cari siswa...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.grey.shade100,
-                contentPadding: EdgeInsets.symmetric(vertical: 10.h),
-              ),
+            child: CustomSearchBar(
+              height: 33.h,
+              width: 358.w,
+              hintText: "Cari Siswa",
             ),
           ),
-          SizedBox(width: 10.w),
-          IconButton(
-            style: IconButton.styleFrom(
-                backgroundColor: AppColors.c2,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r))),
-            icon: const Icon(Icons.filter_list, color: Colors.white),
-            onPressed: () {},
-          ),
+          SizedBox(width: 8.w),
           IconButton(
             style: IconButton.styleFrom(
                 backgroundColor: AppColors.c2,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.r))),
             icon: const Icon(Icons.person_add_alt_1, color: Colors.white),
-            onPressed: () {},
+            onPressed: () {
+              Get.toNamed(AppRoutes.addStudent);
+            },
           ),
         ],
       ),

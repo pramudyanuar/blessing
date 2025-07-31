@@ -20,16 +20,15 @@ class CourseListScreen extends StatelessWidget {
       backgroundColor: AppColors.c5,
       // Bungkus AppBar dengan Obx agar bisa update secara reaktif
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(180.h),
+        preferredSize: Size.fromHeight(120.h),
         child: Obx(() => SubjectAppbar(
               title: controller.title.value,
-              subtitle: controller.subtitle.value,
               classLevel: controller.classLevel.value,
               imagePath: controller.imagePath.value,
             )),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.only(bottom: 20.h),
+        padding: EdgeInsets.only(bottom: 10.h),
         child: Column(
           children: [
             // Konten di sini idealnya juga dinamis dari controller

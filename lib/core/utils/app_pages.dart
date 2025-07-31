@@ -5,8 +5,12 @@ import 'package:blessing/modules/admin/homepage/bindings/admin_homepage_binding.
 import 'package:blessing/modules/admin/homepage/admin_homepage_screen.dart';
 import 'package:blessing/modules/admin/main/bindings/main_admin_binding.dart';
 import 'package:blessing/modules/admin/main/main_admin.dart';
+import 'package:blessing/modules/admin/manage_student/add_student_screen.dart';
+import 'package:blessing/modules/admin/manage_student/bindings/add_student_bindings.dart';
 import 'package:blessing/modules/admin/manage_student/bindings/admin_manage_student_binding.dart';
 import 'package:blessing/modules/admin/manage_student/admin_manage_student_screen.dart';
+import 'package:blessing/modules/admin/manage_student/bindings/detail_student_bindings.dart';
+import 'package:blessing/modules/admin/manage_student/detail_student_screen.dart';
 import 'package:blessing/modules/admin/subject/admin_manage_subject_main_screen.dart';
 import 'package:blessing/modules/admin/subject/bindings/subject_bindings.dart';
 import 'package:blessing/modules/auth/login/bindings/login_binding.dart';
@@ -91,6 +95,18 @@ class AppPages {
         AdminManageSubjectBinding(),
         AdminManageCourseListBinding(),
       ],
+      middlewares: [RoleMiddleware(requiredRole: 'admin')],
+    ),
+    GetPage(
+      name: AppRoutes.detailStudent,
+      page: () => DetailStudentScreen(),
+      binding: DetailStudentBinding(),
+      middlewares: [RoleMiddleware(requiredRole: 'admin')],
+    ),
+    GetPage(
+      name: AppRoutes.addStudent,
+      page: () => AddStudentScreen(),
+      binding: AddStudentBindings(),
       middlewares: [RoleMiddleware(requiredRole: 'admin')],
     ),
 

@@ -2,6 +2,7 @@ import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_button.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/modules/student/profile/controllers/profile_controller.dart';
+import 'package:blessing/core/global_components/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -70,52 +71,57 @@ class ProfileScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // --- Field Nama Lengkap ---
                         GlobalText.medium('Nama Lengkap', fontSize: 14),
                         SizedBox(height: 8.h),
-                        TextField(
+                        CustomTextField(
                           controller: controller.fullNameController,
-                          decoration: _inputDecoration(
-                              'Masukkan nama lengkap anda',
-                              Icons.person_outline),
+                          hintText: 'Masukkan nama lengkap anda',
+                          icon: Icons.person_outline,
                         ),
                         SizedBox(height: 16.h),
-                        // --- Field Kelas ---
                         GlobalText.medium('Kelas', fontSize: 14),
                         SizedBox(height: 8.h),
                         Obx(() => DropdownButtonFormField<String>(
-                              dropdownColor:
-                                  Colors.white, // Latar belakang list dropdown
+                              dropdownColor: Colors.white,
                               value: controller.selectedClass.value,
-                              decoration: _inputDecoration(
-                                  'Pilih kelas anda', Icons.book_outlined),
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(Icons.book_outlined),
+                                hintText: 'Pilih kelas anda',
+                                hintStyle:
+                                    TextStyle(color: Colors.grey.shade500),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  borderSide: BorderSide.none,
+                                ),
+                                filled: true,
+                                fillColor: const Color(0xFFF5F6FA),
+                              ),
                               items: controller.classOptions
                                   .map((kelas) => DropdownMenuItem(
-                                      value: kelas, child: Text(kelas)))
+                                        value: kelas,
+                                        child: Text(kelas),
+                                      ))
                                   .toList(),
                               onChanged: (value) {
                                 controller.selectedClass.value = value;
                               },
                             )),
                         SizedBox(height: 16.h),
-                        // --- Field Asal Sekolah ---
                         GlobalText.medium('Asal Sekolah', fontSize: 14),
                         SizedBox(height: 8.h),
-                        TextField(
+                        CustomTextField(
                           controller: controller.schoolController,
-                          decoration: _inputDecoration(
-                              'Masukkan asal sekolah anda',
-                              Icons.school_outlined),
+                          hintText: 'Masukkan asal sekolah anda',
+                          icon: Icons.school_outlined,
                         ),
                         SizedBox(height: 16.h),
-                        // --- Field Tanggal Lahir ---
                         GlobalText.medium('Tanggal Lahir', fontSize: 14),
                         SizedBox(height: 8.h),
-                        TextField(
+                        CustomTextField(
                           controller: controller.birthDateController,
+                          hintText: 'DD/MM/YYYY',
+                          icon: Icons.calendar_today_outlined,
                           keyboardType: TextInputType.datetime,
-                          decoration: _inputDecoration(
-                              'DD/MM/YYYY', Icons.calendar_today_outlined),
                         ),
                       ],
                     ),
@@ -167,20 +173,6 @@ class ProfileScreen extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  InputDecoration _inputDecoration(String hintText, IconData icon) {
-    return InputDecoration(
-      prefixIcon: Icon(icon),
-      hintText: hintText,
-      hintStyle: TextStyle(color: Colors.grey.shade500),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: BorderSide.none,
-      ),
-      filled: true,
-      fillColor: const Color(0xFFF5F6FA),
     );
   }
 }

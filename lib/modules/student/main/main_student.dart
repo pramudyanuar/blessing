@@ -2,7 +2,7 @@ import 'package:blessing/core/constants/images.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/modules/student/main/widgets/class_list.dart';
 import 'package:blessing/modules/student/main/widgets/new_activity.dart';
-import 'package:blessing/modules/student/main/widgets/search_bar.dart';
+import 'package:blessing/core/global_components/search_bar.dart';
 import 'package:blessing/modules/student/main/widgets/student_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
