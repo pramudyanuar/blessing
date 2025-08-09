@@ -41,7 +41,10 @@ class AdminHomepageScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.c2,
-        onPressed: () {},
+        onPressed: () {
+          // Aksi untuk menambahkan subjek baru
+          Get.toNamed(AppRoutes.adminCreateSubject);
+        },
         child: const Icon(Icons.add, color: AppColors.c1,),
       ),
     );
@@ -49,7 +52,7 @@ class AdminHomepageScreen extends StatelessWidget {
 
   Widget _buildKelasFilter(AdminHomepageController controller) {
     // ... (Tidak ada perubahan di method ini)
-    return SingleChildScrollView(
+    return SingleChildScrollView( 
       scrollDirection: Axis.horizontal,
       child: Obx(
         () => Row(

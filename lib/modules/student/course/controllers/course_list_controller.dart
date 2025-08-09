@@ -1,4 +1,41 @@
+// lib/modules/student/course/controllers/course_list_controller.dart
+
+import 'package:blessing/core/utils/app_routes.dart';
+import 'package:blessing/modules/student/course/widgets/course_card.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+class CourseItem {
+  final CardType cardType;
+  final String title;
+  final String dateText;
+
+  // Properti Materi
+  final String? description;
+  final String? fileName;
+  final List<Widget>? previewImages;
+  final VoidCallback? onTapDetail;
+
+  // Properti Kuis
+  final List<String>? quizDetails;
+  final bool isCompleted;
+  final int? score;
+  final VoidCallback? onStart;
+
+  CourseItem({
+    required this.cardType,
+    required this.title,
+    required this.dateText,
+    this.description,
+    this.fileName,
+    this.previewImages,
+    this.onTapDetail,
+    this.quizDetails,
+    this.isCompleted = false,
+    this.score,
+    this.onStart,
+  });
+}
 
 class CourseListController extends GetxController {
   final RxString title = 'Mata Pelajaran'.obs;
@@ -6,17 +43,35 @@ class CourseListController extends GetxController {
   final RxString imagePath = ''.obs;
 
   final RxList<CourseItem> courses = <CourseItem>[
+    // Contoh Kuis Belum Dikerjakan
     CourseItem(
-      title: 'Bab 2 : Integral',
-      description: 'Materi lengkap tentang integral.',
-      fileName: 'integral.pdf',
-      dateText: '12 Juni 2025',
+      cardType: CardType.quiz,
+      title: 'Quiz 7',
+      dateText: '3 hari yang lalu',
+      quizDetails: ['Waktu Pengerjaan : 10 Menit', 'Jumlah Soal : 20 Soal'],
+      isCompleted: false,
+      onStart: () {
+        Get.snackbar("Info", "Membuka halaman kuis...");
+      },
     ),
+    // Contoh Kuis Sudah Dikerjakan
     CourseItem(
-      title: 'Bab 1 : Turunan',
-      description: 'Materi lengkap tentang turunan.',
-      fileName: 'turunan.pdf',
-      dateText: '5 Juni 2025',
+      cardType: CardType.quiz,
+      title: 'Quiz 6',
+      dateText: '5 hari yang lalu',
+      quizDetails: ['Waktu Pengerjaan : 10 Menit', 'Jumlah Soal : 20 Soal'],
+      isCompleted: true,
+      score: 98,
+    ),
+    // Contoh Materi
+    CourseItem(
+      cardType: CardType.material,
+      title: 'Bab 5 : Geometri Ruang',
+      description:
+          'Materi lengkap tentang bangun ruang sisi datar dan lengkung.',
+      fileName: 'geometri.pdf',
+      dateText: '1 minggu yang lalu',
+      onTapDetail: () => Get.toNamed(AppRoutes.courseDetail),
     ),
   ].obs;
 
@@ -24,7 +79,6 @@ class CourseListController extends GetxController {
   void onInit() {
     super.onInit();
     final arguments = Get.arguments as Map<String, dynamic>?;
-
     if (arguments != null) {
       title.value = arguments['title'] ?? 'Mata Pelajaran';
       classLevel.value = arguments['classLevel'] ?? '';
@@ -33,25 +87,10 @@ class CourseListController extends GetxController {
         final lastSlash = path.lastIndexOf('/') + 1;
         final dir = path.substring(0, lastSlash);
         final file = path.substring(lastSlash);
-        imagePath.value = dir + 'detail-' + file;
+        imagePath.value = '${dir}detail-$file';
       } else {
         imagePath.value = 'assets/images/default_banner.png';
       }
     }
   }
-}
-
-
-// Class untuk item kursus
-class CourseItem {
-  final String title;
-  final String description;
-  final String fileName;
-  final String dateText;
-  CourseItem({
-    required this.title,
-    required this.description,
-    required this.fileName,
-    required this.dateText,
-  });
 }

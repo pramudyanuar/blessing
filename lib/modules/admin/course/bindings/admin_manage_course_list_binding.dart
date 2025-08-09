@@ -4,6 +4,6 @@ import 'package:get/get.dart';
 class AdminManageCourseListBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<AdminManageCourseController>(() => AdminManageCourseController());
+    Get.lazyPut<AdminManageCourseListController>(() => AdminManageCourseListController());
   }
 }

@@ -1,6 +1,11 @@
 import 'package:blessing/core/middlewares/role_middleware.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/modules/admin/course/bindings/admin_manage_course_list_binding.dart';
+import 'package:blessing/modules/admin/course/bindings/create_quiz_bindings.dart';
+import 'package:blessing/modules/admin/course/create_quiz_screen.dart';
+import 'package:blessing/modules/admin/course/quiz_result_screen.dart';
+import 'package:blessing/modules/admin/course/upload_course_screen.dart';
+import 'package:blessing/modules/admin/homepage/admin_manage_subject.dart';
 import 'package:blessing/modules/admin/homepage/bindings/admin_homepage_binding.dart';
 import 'package:blessing/modules/admin/homepage/admin_homepage_screen.dart';
 import 'package:blessing/modules/admin/main/bindings/main_admin_binding.dart';
@@ -26,8 +31,8 @@ import 'package:blessing/modules/student/course_detail/bindings/course_detail_bi
 import 'package:blessing/modules/student/course_detail/course_detail_screen.dart';
 import 'package:blessing/modules/student/profile/bindings/profile_binding.dart';
 import 'package:blessing/modules/student/quiz_attempt/bindings/quiz_attempt_binding.dart';
-import 'package:blessing/modules/student/quiz/bindings/quiz_list_binding.dart';
 import 'package:blessing/modules/student/quiz_attempt/quiz_attempt_screen.dart';
+import 'package:blessing/modules/student/quiz_attempt/quiz_result_screen.dart';
 import 'package:blessing/modules/student/subject/bindings/subject_bindings.dart';
 import 'package:blessing/modules/student/subject/subject_main_screen.dart';
 import 'package:blessing/modules/student/main/main_student.dart';
@@ -109,6 +114,29 @@ class AppPages {
       binding: AddStudentBindings(),
       middlewares: [RoleMiddleware(requiredRole: 'admin')],
     ),
+    GetPage(
+      name: AppRoutes.adminCreateCourse,
+      page: () => const UploadCourseScreen(),
+      // binding: AdminManageCourseListBinding(),
+      middlewares: [RoleMiddleware(requiredRole: 'admin')],
+    ),
+    GetPage(
+      name: AppRoutes.adminCreateQuiz,
+      page: () => CreateQuizScreen(), // Placeholder for quiz creation
+      binding: CreateQuizBindings(),
+      middlewares: [RoleMiddleware(requiredRole: 'admin')],
+    ),
+    GetPage(
+      name: AppRoutes.adminCreateSubject,
+      page: () => ManageSubject(),
+      // binding: AdminManageCourseListBinding(),
+      middlewares: [RoleMiddleware(requiredRole: 'admin')],
+    ),
+    GetPage(
+      name: AppRoutes.adminQuizResult,
+      page: () => AdminQuizResultScreen(),
+      middlewares: [RoleMiddleware(requiredRole: 'admin')],
+    ),
 
     /// Student-only
     GetPage(
@@ -128,7 +156,6 @@ class AppPages {
       bindings: [
         SubjectBinding(),
         CourseListBinding(),
-        QuizListBinding(),
       ],
       middlewares: [
         RoleMiddleware(requiredRole: 'student'),
@@ -146,6 +173,10 @@ class AppPages {
       binding: CourseDetailBinding(),
       middlewares: [RoleMiddleware(requiredRole: 'student')],
     ),
-
+    GetPage(
+      name: AppRoutes.quizResult,
+      page: () => const QuizResultScreen(),
+      middlewares: [RoleMiddleware(requiredRole: 'student')],
+    ),
   ];
 }

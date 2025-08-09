@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DetailField extends StatelessWidget {
-  final IconData? icon; // icon opsional
+  final IconData? icon;
   final String title;
   final String value;
   final bool isEdit;
@@ -48,7 +48,8 @@ class DetailField extends StatelessWidget {
             controller: textController,
             hintText: title,
             enabled: isEdit,
-            fillColor: AppColors.c5,
+            fillColor: isEdit ? Colors.white : AppColors.c5,
+            borderColor: isEdit ? AppColors.c2 : Colors.transparent,
           ),
         ],
       ),
