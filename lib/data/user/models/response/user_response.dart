@@ -1,5 +1,3 @@
-// lib/data/user/models/response/user_response.dart
-
 class UserResponse {
   final String id;
   final String? username;
@@ -7,6 +5,7 @@ class UserResponse {
   final int? gradeLevel;
   final String? role;
   final DateTime? birthDate;
+  final String? token;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -17,24 +16,29 @@ class UserResponse {
     this.gradeLevel,
     this.role,
     this.birthDate,
+    this.token,
     this.createdAt,
     this.updatedAt,
   });
 
-  factory UserResponse.fromJson(Map<String, dynamic> json) => UserResponse(
-        id: json["id"],
-        username: json["username"],
-        email: json["email"],
-        gradeLevel: json["grade_level"],
-        role: json["role"],
-        birthDate: json["birth_date"] == null
-            ? null
-            : DateTime.parse(json["birth_date"]),
-        createdAt: json["created_at"] == null
-            ? null
-            : DateTime.parse(json["created_at"]),
-        updatedAt: json["updated_at"] == null
-            ? null
-            : DateTime.parse(json["updated_at"]),
-      );
+  factory UserResponse.fromJson(Map<String, dynamic> json) {
+    final data = json['data'] ?? json;
+    return UserResponse(
+      id: data["id"],
+      username: data["username"],
+      email: data["email"],
+      gradeLevel: data["grade_level"],
+      role: data["role"],
+      birthDate: data["birth_date"] == null
+          ? null
+          : DateTime.parse(data["birth_date"]),
+      token: data["token"],
+      createdAt: data["created_at"] == null
+          ? null
+          : DateTime.parse(data["created_at"]),
+      updatedAt: data["updated_at"] == null
+          ? null
+          : DateTime.parse(data["updated_at"]),
+    );
+  }
 }

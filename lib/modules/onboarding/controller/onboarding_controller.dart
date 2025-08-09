@@ -2,13 +2,13 @@ import 'package:blessing/core/constants/images.dart';
 import 'package:blessing/core/constants/string.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:get/get.dart';
+import 'package:blessing/core/utils/cache_util.dart';
 
 class OnboardingController extends GetxController {
   var currentIndex = 0.obs;
-  // final SharedPreferencesUtils _prefs = SharedPreferencesUtils();
+  final CacheUtil _cacheUtil = CacheUtil();
 
   final List<String> images = Images.onboardingImages;
-
   final List<String> titles = StringText.onboardingTitles;
   final List<String> descriptions = StringText.onboardingDescriptions;
 
@@ -21,7 +21,7 @@ class OnboardingController extends GetxController {
   }
 
   void completeOnboarding() async {
-    // await _prefs.setFirstTime(false);
+    await _cacheUtil.setData('isFirstTime', false);
     Get.offAllNamed(AppRoutes.login);
   }
 }
