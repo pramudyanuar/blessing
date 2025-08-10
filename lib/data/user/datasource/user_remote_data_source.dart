@@ -96,4 +96,30 @@ class UserDataSource {
       return null;
     }
   }
+
+  Future<bool> logout() async {
+    try {
+      final response = await _httpManager.restRequest(
+        url: Endpoints.logoutUser,
+        method: HttpMethods.post,
+      );
+
+      if (response['statusCode'] == 200) {
+        debugPrint('logout DataSource response: ${response['data']}');
+
+        final rawValue = response['data']?['data'];
+        final result =
+            rawValue == true || rawValue.toString().toLowerCase() == 'true';
+
+        debugPrint('Logout successful: $result');
+        return result;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      debugPrint('logout DataSource error: $e');
+      return false;
+    }
+  }
+
 }

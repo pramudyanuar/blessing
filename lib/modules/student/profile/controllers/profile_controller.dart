@@ -1,3 +1,5 @@
+import 'package:blessing/data/user/repository/user_repository_impl.dart';
+import 'package:blessing/main.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:blessing/core/utils/app_routes.dart'; // Untuk navigasi
@@ -6,6 +8,9 @@ import 'package:blessing/core/utils/app_routes.dart'; // Untuk navigasi
 enum ProfileMode { initialSetup, edit }
 
 class ProfileController extends GetxController {
+
+  final _userRepository = Get.find<UserRepository>();
+  
   // --- State untuk UI ---
   final fullNameController = TextEditingController();
   final schoolController = TextEditingController();
@@ -83,8 +88,15 @@ class ProfileController extends GetxController {
     });
   }
 
-  void logout() {
-    // Tambahkan logika logout di sini (hapus token, dll)
-    Get.offAllNamed(AppRoutes.login);
+  Future<void> logout() async {
+    final isSuccess = await _userRepository.logout();
+
+    if (isSuccess) {
+      await secureStorageUtil.deleteAccessToken();
+      await secureStorageUtil.deleteUserRole();
+      Get.offAllNamed(AppRoutes.login);
+    } else {
+      Get.snackbar('Logout Gagal', 'Terjadi kesalahan saat logout. Coba lagi.');
+    }
   }
 }

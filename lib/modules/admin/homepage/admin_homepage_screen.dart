@@ -1,5 +1,6 @@
 import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
+import 'package:blessing/core/global_components/global_confirmation_dialog.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/modules/admin/homepage/controller/admin_homepage_controller.dart';
 import 'package:blessing/modules/admin/homepage/widgets/subject_card.dart';
@@ -20,6 +21,28 @@ class AdminHomepageScreen extends StatelessWidget {
         title: _buildKelasFilter(controller),
         backgroundColor: Colors.white,
         elevation: 1.0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout, color: Colors.red),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return GlobalConfirmationDialog(
+                    message: 'Apakah Anda yakin ingin logout?',
+                    onYes: () {
+                      Navigator.of(context).pop();
+                      controller.logout();
+                    },
+                    onNo: () {
+                      Navigator.of(context).pop();
+                    },
+                  );
+                },
+              );
+            },
+          ),
+        ],
       ),
       body: Obx(
         () => ListView.separated(

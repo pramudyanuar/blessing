@@ -24,4 +24,8 @@ class UserRepository {
   Future<UserResponse?> getCurrentUser() {
     return _dataSource.getCurrentUser();
   }
+
+  Future<bool> logout() {
+    return _dataSource.logout();
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_button.dart';
+import 'package:blessing/core/global_components/global_confirmation_dialog.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/modules/student/profile/controllers/profile_controller.dart';
 import 'package:blessing/core/global_components/custom_text_field.dart';
@@ -142,7 +143,26 @@ class ProfileScreen extends StatelessWidget {
                             SizedBox(width: 16.w),
                             GlobalButton(
                               text: 'Logout',
-                              onPressed: controller.logout,
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return GlobalConfirmationDialog(
+                                      message:
+                                          'Apakah Anda yakin ingin logout?',
+                                      onYes: () {
+                                        Navigator.of(context)
+                                            .pop(); // tutup dialog
+                                        controller.logout();
+                                      },
+                                      onNo: () {
+                                        Navigator.of(context)
+                                            .pop(); // tutup dialog
+                                      },
+                                    );
+                                  },
+                                );
+                              },
                               width: 0.32.sw,
                               height: 35.h,
                               color: Colors.red,

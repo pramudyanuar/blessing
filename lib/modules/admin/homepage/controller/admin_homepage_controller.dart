@@ -1,7 +1,13 @@
+import 'package:blessing/core/utils/app_routes.dart';
+import 'package:blessing/data/user/repository/user_repository_impl.dart';
+import 'package:blessing/main.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AdminHomepageController extends GetxController {
+
+  final UserRepository _userRepository = UserRepository();
+  
   // --- STATE UNTUK FILTER KELAS ---
   var selectedKelas = 7.obs;
   final List<int> kelasList = [7, 8, 9]; // Disederhanakan untuk contoh
@@ -46,4 +52,17 @@ class AdminHomepageController extends GetxController {
     // Ambil data dari map, atau list kosong jika tidak ada
     displayedSubjects.value = _allSubjects[kelas] ?? [];
   }
+
+  Future<void> logout() async {
+    final isSuccess = await _userRepository.logout();
+
+    if (isSuccess) {
+      await secureStorageUtil.deleteAccessToken();
+      await secureStorageUtil.deleteUserRole();
+      Get.offAllNamed(AppRoutes.login);
+    } else {
+      Get.snackbar('Logout Gagal', 'Terjadi kesalahan saat logout. Coba lagi.');
+    }
+  }
+
 }
