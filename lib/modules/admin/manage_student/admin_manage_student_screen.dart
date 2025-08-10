@@ -27,19 +27,31 @@ class AdminManageStudentScreen extends StatelessWidget {
           _buildSearchAndFilter(),
           Expanded(
             child: Obx(
-              () => ListView.builder(
-                itemCount: controller.filteredStudents.length,
-                itemBuilder: (context, index) {
-                  final student = controller.filteredStudents[index];
-                  return UserCard(
-                    userName: student['nama']!,
-                    userClass: student['kelas']!,
-                    onTap: () => {
-                      Get.toNamed(AppRoutes.detailStudent)
-                    },
-                    onOptionsTap: () => print("Options for ${student['nama']}"),
-                  );
+              () => RefreshIndicator(
+                onRefresh: () async {
+                  await controller.fetchStudents();
                 },
+                child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: controller.filteredStudents.length,
+                  itemBuilder: (context, index) {
+                    final student = controller.filteredStudents[index];
+                    return UserCard(
+                      userName: student['nama']!,
+                      userClass: student['kelas']!,
+                      onTap: () {
+                        Get.toNamed(
+                          AppRoutes.detailStudent,
+                          arguments: {
+                            'id': student['id'],
+                          },
+                        );
+                      },
+                      onOptionsTap: () =>
+                          print("Options for ${student['nama']}"),
+                    );
+                  },
+                ),
               ),
             ),
           ),
@@ -91,6 +103,8 @@ class AdminManageStudentScreen extends StatelessWidget {
   }
 
   Widget _buildSearchAndFilter() {
+    final controller = Get.find<AdminManageStudentController>();
+
     return Padding(
       padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
       child: Row(
@@ -100,6 +114,9 @@ class AdminManageStudentScreen extends StatelessWidget {
               height: 33.h,
               width: 358.w,
               hintText: "Cari Siswa",
+              onChanged: (value) {
+                controller.setSearchQuery(value);
+              },
             ),
           ),
           SizedBox(width: 8.w),

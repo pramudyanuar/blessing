@@ -1,12 +1,10 @@
-// lib/data/user/models/request/update_user_request.dart
-
 class UpdateUserRequest {
   final String? username;
   final String? email;
   final String? password;
   final String? phoneNumber;
   final String? gradeLevel;
-  final DateTime? birthDate;
+  final String? birthDate; // Ubah jadi String
   final String? avatarUrl;
 
   UpdateUserRequest({
@@ -15,7 +13,7 @@ class UpdateUserRequest {
     this.password,
     this.phoneNumber,
     this.gradeLevel,
-    this.birthDate,
+    this.birthDate, // kirim string format tanggal di sini
     this.avatarUrl,
   });
 
@@ -26,7 +24,7 @@ class UpdateUserRequest {
     if (password != null) data['password'] = password;
     if (phoneNumber != null) data['phone_number'] = phoneNumber;
     if (gradeLevel != null) data['grade_level'] = gradeLevel;
-    if (birthDate != null) data['birth_date'] = birthDate!.toIso8601String();
+    if (birthDate != null) data['birth_date'] = birthDate; // string langsung
     if (avatarUrl != null) data['avatar_url'] = avatarUrl;
     return data;
   }

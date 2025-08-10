@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 
 class AdminHomepageController extends GetxController {
 
-  final UserRepository _userRepository = UserRepository();
+  final _userRepository = Get.find<UserRepository>();
   
   // --- STATE UNTUK FILTER KELAS ---
   var selectedKelas = 7.obs;

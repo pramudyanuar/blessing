@@ -1,5 +1,6 @@
 import 'package:blessing/core/services/endpoints.dart';
 import 'package:blessing/core/services/http_manager.dart';
+import 'package:blessing/data/core/models/paging_response.dart';
 import 'package:blessing/data/user/models/request/login_user_request.dart';
 import 'package:blessing/data/user/models/request/register_user_request.dart';
 import 'package:blessing/data/user/models/request/update_user_request.dart';
@@ -53,28 +54,52 @@ class UserDataSource {
     }
   }
 
-  Future<UserResponse?> updateUser(
-      String userId, UpdateUserRequest data) async {
+  Future<UserResponse?> getUserById(String userId) async {
     try {
       final response = await _httpManager.restRequest(
-        url: "${Endpoints.updateUser}/$userId",
+        url: Endpoints.getUserById.replaceFirst('{id}', userId),
+        method: HttpMethods.get,
+      );
+
+      if (response['statusCode'] == 200) {
+        debugPrint('getUserById DataSource response: ${response['data']}');
+        return UserResponse.fromJson(response['data']);
+      } else {
+        debugPrint(
+            'getUserById DataSource failed: ${response['statusMessage']}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('getUserById DataSource error: $e');
+      return null;
+    }
+  }
+
+  Future<UserResponse?> updateUserAdmin(
+      String userId, UpdateUserRequest data) async {
+    try {
+      final url = Endpoints.updateUserForAdmin.replaceFirst('{id}', userId);
+
+      final response = await _httpManager.restRequest(
+        url: url,
         method: HttpMethods.put,
         body: data.toJson(),
       );
 
       if (response['statusCode'] == 200) {
-        debugPrint('updateUser DataSource response: ${response['data']}');
+        debugPrint('updateUserAdmin DataSource response: ${response['data']}');
         return UserResponse.fromJson(response['data']);
       } else {
         debugPrint(
-            'updateUser DataSource failed: ${response['statusMessage']}');
+            'updateUserAdmin DataSource failed: ${response['statusMessage']}');
         return null;
       }
     } catch (e) {
-      debugPrint('updateUser DataSource error: $e');
+      debugPrint('updateUserAdmin DataSource error: $e');
       return null;
     }
   }
+
 
   Future<UserResponse?> getCurrentUser() async {
     try {
@@ -93,6 +118,84 @@ class UserDataSource {
       }
     } catch (e) {
       debugPrint('getCurrentUser DataSource error: $e');
+      return null;
+    }
+  }
+
+  Future<({List<UserResponse> users, PagingResponse paging})?> getAllUsers({
+    int page = 1,
+    int size = 9,
+  }) async {
+    try {
+      final response = await _httpManager.restRequest(
+        url: '${Endpoints.getAllUsers}?page=$page&size=$size',
+        method: HttpMethods.get,
+      );
+
+      if (response['statusCode'] == 200) {
+        debugPrint('getAllUsers DataSource response: ${response['data']}');
+
+        final users = (response['data']['data'] as List)
+            .map((e) => UserResponse.fromJson(e))
+            .toList();
+
+        final paging = PagingResponse.fromJson(response['data']['paging']);
+
+        return (users: users, paging: paging);
+      } else {
+        debugPrint(
+            'getAllUsers DataSource failed: ${response['statusMessage']}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('getAllUsers DataSource error: $e');
+      return null;
+    }
+  }
+
+
+  Future<List<UserResponse>> getAllUsersComplete() async {
+    List<UserResponse> allUsers = [];
+    int page = 1;
+    const int size = 100; // maksimal size
+
+    while (true) {
+      final result = await getAllUsers(page: page, size: size);
+      if (result == null) break;
+
+      allUsers.addAll(result.users);
+
+      // Kalau data yang diterima kurang dari size berarti sudah akhir halaman
+      if (result.users.length < size) {
+        break;
+      } else {
+        page++;
+      }
+    }
+
+    return allUsers;
+  }
+
+
+  Future<UserResponse?> deleteUserAdmin(String userId) async {
+    try {
+      final url = Endpoints.deleteUserForAdmin.replaceFirst('{id}', userId);
+
+      final response = await _httpManager.restRequest(
+        url: url,
+        method: HttpMethods.delete,
+      );
+
+      if (response['statusCode'] == 200) {
+        debugPrint('deleteUserAdmin DataSource success: ${response['data']}');
+        return UserResponse.fromJson(response['data']);
+      } else {
+        debugPrint(
+            'deleteUserAdmin DataSource failed: ${response['statusMessage']}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('deleteUserAdmin DataSource error: $e');
       return null;
     }
   }

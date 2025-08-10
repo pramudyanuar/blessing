@@ -1,4 +1,5 @@
 
+import 'package:blessing/data/core/models/paging_response.dart';
 import 'package:blessing/data/user/datasource/user_remote_data_source.dart';
 import 'package:blessing/data/user/models/request/login_user_request.dart';
 import 'package:blessing/data/user/models/request/register_user_request.dart';
@@ -17,12 +18,31 @@ class UserRepository {
     return _dataSource.register(request);
   }
 
-  Future<UserResponse?> updateUser(String userId, UpdateUserRequest request) {
-    return _dataSource.updateUser(userId, request);
+  Future<UserResponse?> updateUserAdmin(String userId, UpdateUserRequest request) {
+    return _dataSource.updateUserAdmin(userId, request);
+  }
+
+  Future<UserResponse?> getUserById(String userId) {
+    return _dataSource.getUserById(userId);
   }
 
   Future<UserResponse?> getCurrentUser() {
     return _dataSource.getCurrentUser();
+  }
+
+  Future<({List<UserResponse> users, PagingResponse paging})?> getAllUsers({
+    int page = 1,
+    int size = 9,
+  }) {
+    return _dataSource.getAllUsers(page: page, size: size);
+  }
+
+  Future<List<UserResponse>> getAllUsersComplete() {
+    return _dataSource.getAllUsersComplete();
+  }
+
+  Future<UserResponse?> deleteUserAdmin(String userId) {
+    return _dataSource.deleteUserAdmin(userId);
   }
 
   Future<bool> logout() {

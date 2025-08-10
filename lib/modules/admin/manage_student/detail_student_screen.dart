@@ -1,12 +1,13 @@
-import 'package:blessing/core/constants/color.dart';
-import 'package:blessing/core/global_components/base_widget_container.dart';
-import 'package:blessing/core/global_components/global_button.dart';
-import 'package:blessing/core/global_components/global_text.dart';
-// Impor dialog yang sudah kita buat
-import 'package:blessing/core/global_components/global_confirmation_dialog.dart'; 
+// lib/modules/admin/manage_student/view/detail_student_screen.dart
+
+import 'package:blessing/core/constants/color.dart'; // Pastikan path ini benar
+import 'package:blessing/core/global_components/base_widget_container.dart'; // Pastikan path ini benar
+import 'package:blessing/core/global_components/global_button.dart'; // Pastikan path ini benar
+import 'package:blessing/core/global_components/global_text.dart'; // Pastikan path ini benar
+import 'package:blessing/core/global_components/global_confirmation_dialog.dart'; // Pastikan path ini benar
 import 'package:blessing/modules/admin/manage_student/controller/detail_student_controller.dart';
 import 'package:blessing/modules/admin/manage_student/widgets/detail_field.dart';
-import 'package:blessing/modules/admin/manage_student/widgets/quiz_score_card.dart';
+import 'package:blessing/modules/admin/manage_student/widgets/quiz_score_card.dart'; // Pastikan path ini benar
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -23,14 +24,12 @@ class DetailStudentScreen extends StatelessWidget {
       appBar: AppBar(
         surfaceTintColor: Colors.white,
         leading: Padding(
-          padding:
-              EdgeInsets.only(left: 12.w), // <-- 2. Beri jarak di kiri
+          padding: EdgeInsets.only(left: 12.w),
           child: IconButton(
             icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Get.back(),
           ),
         ),
-        // Atur properti ini untuk mengurangi jarak
         titleSpacing: 0.2,
         leadingWidth: 40.w,
         title: Obx(() => GlobalText.medium(
@@ -45,7 +44,23 @@ class DetailStudentScreen extends StatelessWidget {
                   controller.isEditMode.value ? Icons.save : Icons.edit,
                   color: AppColors.c2,
                 ),
-                onPressed: controller.toggleEditMode,
+                onPressed: () {
+                  if (controller.isEditMode.value) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => GlobalConfirmationDialog(
+                        message: "Apakah Anda yakin ingin menyimpan perubahan?",
+                        onYes: () {
+                          controller.saveChanges();
+                          Navigator.of(context).pop();
+                        },
+                        onNo: () => Navigator.of(context).pop(),
+                      ),
+                    );
+                  } else {
+                    controller.toggleEditMode();
+                  }
+                },
               )),
         ],
       ),
@@ -57,48 +72,55 @@ class DetailStudentScreen extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 40.r,
-                backgroundColor: AppColors.c2,
-                child: Icon(Icons.person, size: 40.sp, color: Colors.white),
+                backgroundColor: AppColors.c2.withOpacity(0.2),
+                child: Icon(Icons.person, size: 40.sp, color: AppColors.c2),
               ),
               SizedBox(height: 16.h),
               GlobalText.bold(controller.name.value, fontSize: 18.sp),
-              SizedBox(height: 16.h),
+              SizedBox(height: 24.h),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12.r),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 5)
+                    ]),
                 child: Column(
                   children: [
-                    SizedBox(height: 12.h),
                     DetailField(
-                      icon: Icons.person,
+                      icon: Icons.person_outline,
                       title: "Nama",
-                      value: controller.name.value,
+                      controller: controller.nameController,
                       isEdit: controller.isEditMode.value,
-                      onChanged: controller.updateName,
                     ),
                     DetailField(
-                      icon: Icons.school,
+                      icon: Icons.school_outlined,
                       title: "Kelas",
-                      value: controller.grade.value,
+                      controller: controller.gradeController,
                       isEdit: controller.isEditMode.value,
-                      onChanged: controller.updateGrade,
+                      keyboardType: TextInputType.text,
                     ),
+                    // DetailField(
+                    //   icon: Icons.location_city_outlined,
+                    //   title: "Asal Sekolah",
+                    //   controller: controller.schoolController,
+                    //   isEdit: controller.isEditMode.value,
+                    // ),
                     DetailField(
-                      icon: Icons.location_city,
-                      title: "Asal Sekolah",
-                      value: controller.school.value,
-                      isEdit: controller.isEditMode.value,
-                      onChanged: controller.updateSchool,
-                    ),
-                    DetailField(
-                      icon: Icons.cake,
+                      icon: Icons.cake_outlined,
                       title: "Tanggal Lahir",
-                      value: controller.birthDate.value,
+                      controller: controller.birthDateController,
                       isEdit: controller.isEditMode.value,
-                      onChanged: controller.updateBirthDate,
+                      readOnly: true,
+                      onTap: () {
+                        if (controller.isEditMode.value) {
+                          controller.selectBirthDate(context);
+                        }
+                      },
                     ),
                   ],
                 ),
@@ -107,9 +129,14 @@ class DetailStudentScreen extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 16.w),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12.r),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 5)
+                    ]),
                 child: Column(
                   children: [
                     Row(
@@ -117,7 +144,9 @@ class DetailStudentScreen extends StatelessWidget {
                       children: [
                         GlobalText.semiBold("Nilai Kuis", fontSize: 16.sp),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            /* TODO: Navigasi ke halaman semua nilai */
+                          },
                           child: GlobalText.medium("Lihat Semua",
                               color: AppColors.c2, fontSize: 14.sp),
                         )
@@ -126,36 +155,32 @@ class DetailStudentScreen extends StatelessWidget {
                     ...controller.quizScores.entries
                         .map((e) => QuizScoreCard(title: e.key, score: e.value))
                         .toList(),
+                    SizedBox(height: 8.h),
                   ],
                 ),
               ),
-              SizedBox(height: 24.h),
+              SizedBox(height: 32.h),
               GlobalButton(
                 text: "Hapus Siswa",
                 onPressed: () {
-                  // --- PEMANGGILAN DIALOG KONFIRMASI ---
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return GlobalConfirmationDialog(
-                        message: "Apakah Anda yakin ingin menghapus siswa ini?",
-                        onYes: () {
-                          // Panggil fungsi hapus dari controller
-                          // controller.deleteStudent();
-                          print("Siswa dihapus!"); 
-                          Navigator.of(context).pop(); // Tutup dialog
-                        },
-                        onNo: () {
-                          // Cukup tutup dialog
+                        message:
+                            "Tindakan ini tidak dapat diurungkan. Apakah Anda yakin ingin menghapus siswa ini?",
+                        onYes: () async {
                           Navigator.of(context).pop();
+                          await controller.deleteStudent();
                         },
+                        onNo: () => Navigator.of(context).pop(),
                       );
                     },
                   );
                 },
                 width: double.infinity,
-                height: 30.h,
                 color: AppColors.c7,
+                // textColor: Colors.white,
               ),
               SizedBox(height: 8.h),
             ],

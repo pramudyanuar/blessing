@@ -70,7 +70,7 @@ void main() {
     );
 
     final UserResponse? response =
-        await userDataSource.updateUser(testUserID, updateUserRequest);
+        await userDataSource.updateUserAdmin(testUserID, updateUserRequest);
 
     expect(response, isNotNull);
     expect(response?.id, equals(testUserID));
