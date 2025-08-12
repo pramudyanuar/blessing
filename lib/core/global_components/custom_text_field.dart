@@ -7,15 +7,18 @@ class CustomTextField extends StatelessWidget {
   final IconData? icon;
   final TextInputType keyboardType;
   final bool enabled;
-
   final String? title;
   final Color? fillColor;
   final Color? textColor;
   final Color? hintColor;
   final Color? iconColor;
   final Color? borderColor;
-
   final IconButton? suffixButton;
+
+  // --- TAMBAHAN PROPERTI BARU ---
+  final bool readOnly;
+  final VoidCallback? onTap;
+  // -----------------------------
 
   const CustomTextField({
     super.key,
@@ -31,6 +34,10 @@ class CustomTextField extends StatelessWidget {
     this.iconColor,
     this.borderColor,
     this.suffixButton,
+    // --- TAMBAHAN DI KONSTRUKTOR ---
+    this.readOnly = false,
+    this.onTap,
+    // --------------------------------
   });
 
   @override
@@ -49,57 +56,70 @@ class CustomTextField extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
         ],
-        Stack(
-          children: [
-            TextField(
-              controller: controller,
-              enabled: enabled,
-              keyboardType: keyboardType,
-              maxLines: hintText.toLowerCase().contains("deskripsi") ? 4 : 1,
-              decoration: InputDecoration(
-                prefixIcon: icon != null
-                    ? Icon(icon, color: iconColor ?? Colors.grey)
-                    : null,
-                hintText: hintText,
-                hintStyle: TextStyle(color: hintColor ?? Colors.grey.shade500),
-                filled: true,
-                fillColor: fillColor ?? const Color(0xFFF5F6FA),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                  borderSide: BorderSide(
-                    color: borderColor ?? Colors.grey.shade300,
-                    width: 1,
+        // Menggunakan GestureDetector untuk menangani onTap pada keseluruhan area
+        // jika readOnly di-set true.
+        GestureDetector(
+          onTap: onTap,
+          child: Stack(
+            children: [
+              TextField(
+                controller: controller,
+                enabled: enabled,
+                keyboardType: keyboardType,
+                // --- MENGGUNAKAN PROPERTI BARU ---
+                readOnly: readOnly,
+                onTap: onTap,
+                // ---------------------------------
+                maxLines: hintText.toLowerCase().contains("deskripsi") ? 4 : 1,
+                decoration: InputDecoration(
+                  prefixIcon: icon != null
+                      ? Icon(icon, color: iconColor ?? Colors.grey)
+                      : null,
+                  hintText: hintText,
+                  hintStyle:
+                      TextStyle(color: hintColor ?? Colors.grey.shade500),
+                  filled: true,
+                  // Ubah warna fill saat disabled/readonly agar lebih jelas
+                  fillColor: enabled && !readOnly
+                      ? (fillColor ?? const Color(0xFFF5F6FA))
+                      : Colors.grey.shade200,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                    borderSide: BorderSide(
+                      color: borderColor ?? Colors.grey.shade300,
+                      width: 1,
+                    ),
                   ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                  borderSide: const BorderSide(
-                    color: Colors.blue,
-                    width: 1.5,
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                    borderSide: const BorderSide(
+                      color: Colors.blue,
+                      width: 1.5,
+                    ),
                   ),
-                ),
-                disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                  borderSide: BorderSide(
-                    color: Colors.grey.shade300,
-                    width: 1,
+                  disabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                    borderSide: BorderSide(
+                      color: Colors.grey.shade300,
+                      width: 1,
+                    ),
                   ),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
                 ),
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  color: textColor ?? Colors.black,
+                ),
               ),
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: textColor ?? Colors.black,
-              ),
-            ),
-            if (suffixButton != null)
-              Positioned(
-                bottom: 8.h,
-                right: 8.w,
-                child: suffixButton!,
-              ),
-          ],
+              if (suffixButton != null)
+                Positioned(
+                  bottom: 8.h,
+                  right: 8.w,
+                  child: suffixButton!,
+                ),
+            ],
+          ),
         ),
       ],
     );

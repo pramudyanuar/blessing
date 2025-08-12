@@ -40,7 +40,7 @@ class StudentAppBar extends StatelessWidget implements PreferredSizeWidget {
           children: [
             CircleAvatar(
               radius: 20.r,
-              backgroundImage: NetworkImage(profileImageUrl),
+              backgroundImage: AssetImage(profileImageUrl),
             ),
             SizedBox(width: 12.w),
             Column(

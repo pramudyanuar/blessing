@@ -100,6 +100,27 @@ class UserDataSource {
     }
   }
 
+  Future<UserResponse?> updateUser(UpdateUserRequest data) async {
+    try {
+      final response = await _httpManager.restRequest(
+        url: Endpoints.updateUser, // ini /api/users
+        method: HttpMethods.put,
+        body: data.toJson(),
+      );
+
+      if (response['statusCode'] == 200) {
+        debugPrint('updateUser DataSource response: ${response['data']}');
+        return UserResponse.fromJson(response['data']);
+      } else {
+        debugPrint(
+            'updateUser DataSource failed: ${response['statusMessage']}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('updateUser DataSource error: $e');
+      return null;
+    }
+  }
 
   Future<UserResponse?> getCurrentUser() async {
     try {

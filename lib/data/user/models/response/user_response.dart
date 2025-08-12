@@ -41,4 +41,18 @@ class UserResponse {
           : DateTime.parse(data["updated_at"]),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "username": username,
+      "email": email,
+      "grade_level": gradeLevel,
+      "role": role,
+      "birth_date": birthDate?.toIso8601String(),
+      "token": token,
+      "created_at": createdAt?.toIso8601String(),
+      "updated_at": updatedAt?.toIso8601String(),
+    };
+  }
 }

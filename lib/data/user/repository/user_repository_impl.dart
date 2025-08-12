@@ -22,6 +22,10 @@ class UserRepository {
     return _dataSource.updateUserAdmin(userId, request);
   }
 
+  Future<UserResponse?> updateUser(UpdateUserRequest request) {
+    return _dataSource.updateUser(request);
+  }
+
   Future<UserResponse?> getUserById(String userId) {
     return _dataSource.getUserById(userId);
   }

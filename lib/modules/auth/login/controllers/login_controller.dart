@@ -1,4 +1,5 @@
 import 'package:blessing/core/utils/app_routes.dart';
+import 'package:blessing/core/utils/cache_util.dart';
 import 'package:blessing/data/user/models/request/login_user_request.dart';
 import 'package:blessing/data/user/repository/user_repository_impl.dart';
 import 'package:blessing/main.dart';
@@ -6,9 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class LoginController extends GetxController {
-  final UserRepository _userRepository = UserRepository();
-  // We no longer need a direct instance of SecureStorage here, but it's fine to keep it
-  // if you use it for other things. The global instance is used by the interceptor.
+  final _userRepository = Get.find<UserRepository>();
 
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -41,6 +40,7 @@ class LoginController extends GetxController {
 
         final userResponse = await _userRepository.getCurrentUser();
 
+        await CacheUtil().setData('user_data', userResponse?.toJson());
         await secureStorageUtil.saveUserRole(userResponse?.role ?? '');
 
         if (userResponse != null && userResponse.role != null) {

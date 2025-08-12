@@ -14,7 +14,6 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ProfileController>();
-    final isInitialSetup = controller.mode == ProfileMode.edit;
 
     return BaseWidgetContainer(
       backgroundColor: const Color(0xFFE9EBF0),
@@ -22,10 +21,9 @@ class ProfileScreen extends StatelessWidget {
         child: Stack(
           children: [
             SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              padding: EdgeInsets.fromLTRB(24.w, 60.h, 24.w, 24.h),
               child: Column(
                 children: [
-                  SizedBox(height: 24.h),
                   GlobalText.bold(
                     'Data Diri Siswa',
                     fontSize: 18.sp,
@@ -42,26 +40,30 @@ class ProfileScreen extends StatelessWidget {
                   Stack(
                     alignment: Alignment.bottomRight,
                     children: [
-                      CircleAvatar(
-                        radius: 50.r,
-                        backgroundImage:
-                            const AssetImage('assets/images/image.png'),
+                      const CircleAvatar(
+                        radius: 50,
+                        backgroundImage: AssetImage('assets/images/image.png'),
                       ),
-                      Container(
-                        padding: EdgeInsets.all(6.r),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF0D47A1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                          size: 18.r,
-                        ),
-                      ),
+                      Obx(() => controller.isEditMode.value
+                          ? InkWell(
+                              onTap: () {
+                                Get.snackbar(
+                                    'Info', 'Fitur ganti foto belum tersedia');
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFF0D47A1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.camera_alt,
+                                    color: Colors.white, size: 18),
+                              ),
+                            )
+                          : const SizedBox.shrink()),
                     ],
                   ),
-                  SizedBox(height: 20.h),
+                  SizedBox(height: 24.h),
                   // Form
                   Container(
                     padding: EdgeInsets.all(16.w),
@@ -69,24 +71,25 @@ class ProfileScreen extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16.r),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GlobalText.medium('Nama Lengkap', fontSize: 14),
-                        SizedBox(height: 8.h),
-                        CustomTextField(
-                          controller: controller.fullNameController,
-                          hintText: 'Masukkan nama lengkap anda',
-                          icon: Icons.person_outline,
-                        ),
-                        SizedBox(height: 16.h),
-                        GlobalText.medium('Kelas', fontSize: 14),
-                        SizedBox(height: 8.h),
-                        Obx(() => DropdownButtonFormField<String>(
+                    child: Obx(() => Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            GlobalText.medium('Nama Lengkap', fontSize: 14),
+                            SizedBox(height: 8.h),
+                            CustomTextField(
+                              enabled: controller.isEditMode.value,
+                              controller: controller.fullNameController,
+                              hintText: 'Masukkan nama lengkap anda',
+                              icon: Icons.person_outline,
+                            ),
+                            SizedBox(height: 16.h),
+                            GlobalText.medium('Kelas', fontSize: 14),
+                            SizedBox(height: 8.h),
+                            DropdownButtonFormField<String>(
                               dropdownColor: Colors.white,
                               value: controller.selectedClass.value,
                               decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.book_outlined),
+                                prefixIcon: const Icon(Icons.book_outlined),
                                 hintText: 'Pilih kelas anda',
                                 hintStyle:
                                     TextStyle(color: Colors.grey.shade500),
@@ -95,92 +98,78 @@ class ProfileScreen extends StatelessWidget {
                                   borderSide: BorderSide.none,
                                 ),
                                 filled: true,
-                                fillColor: const Color(0xFFF5F6FA),
+                                fillColor: controller.isEditMode.value
+                                    ? const Color(0xFFF5F6FA)
+                                    : Colors.grey.shade200,
                               ),
                               items: controller.classOptions
                                   .map((kelas) => DropdownMenuItem(
-                                        value: kelas,
-                                        child: Text(kelas),
-                                      ))
+                                      value: kelas, child: Text(kelas)))
                                   .toList(),
-                              onChanged: (value) {
-                                controller.selectedClass.value = value;
-                              },
-                            )),
-                        SizedBox(height: 16.h),
-                        GlobalText.medium('Asal Sekolah', fontSize: 14),
-                        SizedBox(height: 8.h),
-                        CustomTextField(
-                          controller: controller.schoolController,
-                          hintText: 'Masukkan asal sekolah anda',
-                          icon: Icons.school_outlined,
-                        ),
-                        SizedBox(height: 16.h),
-                        GlobalText.medium('Tanggal Lahir', fontSize: 14),
-                        SizedBox(height: 8.h),
-                        CustomTextField(
-                          controller: controller.birthDateController,
-                          hintText: 'DD/MM/YYYY',
-                          icon: Icons.calendar_today_outlined,
-                          keyboardType: TextInputType.datetime,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  // Tombol
-                  Obx(() => isInitialSetup
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            GlobalButton(
-                              text: 'Simpan',
-                              onPressed: controller.saveProfile,
-                              height: 35.h,
-                              width: 0.32.sw,
-                              isLoading: controller.isLoading.value,
+                              onChanged: controller.isEditMode.value
+                                  ? (value) {
+                                      controller.selectedClass.value = value;
+                                    }
+                                  : null,
                             ),
-                            SizedBox(width: 16.w),
-                            GlobalButton(
-                              text: 'Logout',
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return GlobalConfirmationDialog(
-                                      message:
-                                          'Apakah Anda yakin ingin logout?',
-                                      onYes: () {
-                                        Navigator.of(context)
-                                            .pop(); // tutup dialog
-                                        controller.logout();
-                                      },
-                                      onNo: () {
-                                        Navigator.of(context)
-                                            .pop(); // tutup dialog
-                                      },
-                                    );
-                                  },
-                                );
+                            SizedBox(height: 16.h),
+                            GlobalText.medium('Tanggal Lahir', fontSize: 14),
+                            SizedBox(height: 8.h),
+                            CustomTextField(
+                              enabled: controller.isEditMode.value,
+                              controller: controller.birthDateController,
+                              hintText: 'Pilih tanggal lahir',
+                              icon: Icons.calendar_today_outlined,
+                              readOnly:
+                                  true, // Membuat field tidak bisa diketik
+                              onTap: () {
+                                // Hanya bisa di-tap saat mode edit aktif
+                                if (controller.isEditMode.value) {
+                                  controller.selectBirthDate(context);
+                                }
                               },
-                              width: 0.32.sw,
-                              height: 35.h,
-                              color: Colors.red,
                             ),
                           ],
-                        )
-                      : GlobalButton(
-                          text: 'Submit',
-                          onPressed: controller.saveProfile,
-                          height: 44.h,
-                          width: double.infinity,
-                          isLoading: controller.isLoading.value,
                         )),
+                  ),
+                  SizedBox(height: 24.h),
+
+                  // Tombol Simpan atau Logout
+                  if (controller.mode == ProfileMode.initialSetup)
+                    Obx(() => GlobalButton(
+                          text: 'Simpan dan Lanjutkan',
+                          onPressed: controller.saveProfile,
+                          isLoading: controller.isLoading.value,
+                          width: double.infinity,
+                        ))
+                  else
+                    GlobalButton(
+                      text: 'Logout',
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (dialogContext) => GlobalConfirmationDialog(
+                            message: 'Apakah Anda yakin ingin logout?',
+                            onYes: () {
+                              Navigator.of(dialogContext).pop();
+                              controller.logout();
+                            },
+                            onNo: () => Navigator.of(dialogContext).pop(),
+                          ),
+                        );
+                      },
+                      color: Colors.red.shade700,
+                      width: double.infinity,
+                      height: 40.h,
+                    ),
+
                   SizedBox(height: 12.h),
                 ],
               ),
             ),
-            if (isInitialSetup)
+
+            // Tombol Back (kiri atas)
+            if (controller.mode != ProfileMode.initialSetup)
               Positioned(
                 top: 10.h,
                 left: 10.w,
@@ -189,6 +178,39 @@ class ProfileScreen extends StatelessWidget {
                       color: Colors.black54),
                   onPressed: () => Get.back(),
                 ),
+              ),
+
+            // Tombol Edit/Simpan (kanan atas)
+            if (controller.mode == ProfileMode.edit)
+              Positioned(
+                top: 10.h,
+                right: 10.w,
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Padding(
+                      padding: EdgeInsets.all(12.0),
+                      child: SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator()),
+                    );
+                  }
+                  if (controller.isEditMode.value) {
+                    return IconButton(
+                      icon:
+                          const Icon(Icons.check, color: Colors.blue, size: 28),
+                      onPressed: controller.saveProfile,
+                      tooltip: 'Simpan',
+                    );
+                  } else {
+                    return IconButton(
+                      icon: const Icon(Icons.edit_outlined,
+                          color: Colors.black54),
+                      onPressed: controller.toggleEditMode,
+                      tooltip: 'Edit Profil',
+                    );
+                  }
+                }),
               ),
           ],
         ),

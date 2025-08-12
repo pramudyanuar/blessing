@@ -8,15 +8,10 @@ class AdminHomepageController extends GetxController {
 
   final _userRepository = Get.find<UserRepository>();
   
-  // --- STATE UNTUK FILTER KELAS ---
   var selectedKelas = 7.obs;
-  final List<int> kelasList = [7, 8, 9]; // Disederhanakan untuk contoh
+  final List<int> kelasList = [7, 8, 9]; 
 
-  // --- STATE UNTUK DAFTAR MATA PELAJARAN ---
-  // Daftar mata pelajaran yang akan ditampilkan di UI
   var displayedSubjects = <Map<String, dynamic>>[].obs;
-
-  // Data 'database' contoh. Key adalah kelas, value adalah list mata pelajaran
   final Map<int, List<Map<String, dynamic>>> _allSubjects = {
     7: [
       {'title': 'Matematika', 'icon': Icons.calculate_rounded},

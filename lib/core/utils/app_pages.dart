@@ -29,13 +29,14 @@ import 'package:blessing/modules/splash/splash_screen.dart';
 import 'package:blessing/modules/student/course/bindings/course_list_binding.dart';
 import 'package:blessing/modules/student/course_detail/bindings/course_detail_binding.dart';
 import 'package:blessing/modules/student/course_detail/course_detail_screen.dart';
+import 'package:blessing/modules/student/main/bindings/main_student_bindings.dart';
 import 'package:blessing/modules/student/profile/bindings/profile_binding.dart';
 import 'package:blessing/modules/student/quiz_attempt/bindings/quiz_attempt_binding.dart';
 import 'package:blessing/modules/student/quiz_attempt/quiz_attempt_screen.dart';
 import 'package:blessing/modules/student/quiz_attempt/quiz_result_screen.dart';
 import 'package:blessing/modules/student/subject/bindings/subject_bindings.dart';
 import 'package:blessing/modules/student/subject/subject_main_screen.dart';
-import 'package:blessing/modules/student/main/main_student.dart';
+import 'package:blessing/modules/student/main/main_student_screen.dart';
 import 'package:blessing/modules/student/profile/profile_screen.dart';
 import 'package:get/get.dart';
 
@@ -142,6 +143,7 @@ class AppPages {
     GetPage(
       name: AppRoutes.studentMenu,
       page: () => MainStudent(),
+      binding: MainStudentBindings(),
       middlewares: [RoleMiddleware(requiredRole: 'student')],
     ),
     GetPage(
