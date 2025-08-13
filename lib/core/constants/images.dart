@@ -40,4 +40,4 @@ class Images {
 
   // admin 
   static const String adminMainSubject = "assets/images/bg-admin-subject.png";
-}
+} 

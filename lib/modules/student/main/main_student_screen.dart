@@ -20,10 +20,9 @@ class MainStudent extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: Obx(() => StudentAppBar(
-              name: controller.name.value,
-              classInfo: controller.classInfo.value,
-              profileImageUrl: 'assets/images/image.png'
-            )),
+            name: controller.name.value,
+            classInfo: controller.classInfo.value,
+            profileImageUrl: 'assets/images/image.png')),
       ),
       body: SingleChildScrollView(
         child: SafeArea(
@@ -52,7 +51,13 @@ class MainStudent extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 16.h),
-                CustomSearchBar(),
+                // Connect the search bar to the controller's search method
+                CustomSearchBar(
+                  // Assuming your CustomSearchBar has an `onChanged` property.
+                  // If not, you will need to add it.
+                  onChanged: (query) => controller.onSearchChanged(query),
+                  hintText: 'Cari mata pelajaran...',
+                ),
                 SizedBox(height: 16.h),
                 NewActivity(),
                 ClassList(),

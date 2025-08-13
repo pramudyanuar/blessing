@@ -87,9 +87,27 @@ class CourseListController extends GetxController {
         final lastSlash = path.lastIndexOf('/') + 1;
         final dir = path.substring(0, lastSlash);
         final file = path.substring(lastSlash);
-        imagePath.value = '${dir}detail-$file';
+        final detailPath = '${dir}detail-$file';
+
+        // Daftar gambar detail yang tersedia
+        const availableDetailImages = [
+          'assets/images/detail-akutansi.webp',
+          'assets/images/detail-biologi.webp',
+          'assets/images/detail-ekonomi.webp',
+          'assets/images/detail-fisika.webp',
+          'assets/images/detail-kimia.webp',
+          'assets/images/detail-matematika-minat.webp',
+          'assets/images/detail-matematika-wajib.webp',
+        ];
+
+        // Gunakan gambar detail jika tersedia, kalau tidak gunakan gambar asli
+        if (availableDetailImages.contains(detailPath)) {
+          imagePath.value = detailPath;
+        } else {
+          imagePath.value = path; // Gunakan gambar asli
+        }
       } else {
-        imagePath.value = 'assets/images/default_banner.png';
+        imagePath.value = 'assets/images/bg-admin-subject.png';
       }
     }
   }
