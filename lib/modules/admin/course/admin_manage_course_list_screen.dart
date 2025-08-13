@@ -1,3 +1,5 @@
+// lib/modules/admin/course/screens/course_list_screen.dart
+
 import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/subject_appbar.dart';
@@ -24,6 +26,39 @@ class AdminManageCourseListScreen extends StatelessWidget {
               title: controller.title.value,
               classLevel: controller.classLevel.value,
               imagePath: controller.imagePath.value,
+              // --- PERUBAHAN DI SINI: Tambahkan action untuk edit & delete ---
+              actions: [
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert, color: Colors.white),
+                  onSelected: controller.handleMenuSelection,
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuEntry<String>>[
+                    const PopupMenuItem<String>(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit, color: AppColors.c2),
+                          SizedBox(width: 8),
+                          Text('Ubah Mata Pelajaran'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete_forever, color: Colors.red),
+                          SizedBox(width: 8),
+                          Text('Hapus Mata Pelajaran',
+                              style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+
+              // --- AKHIR PERUBAHAN ---
             )),
       ),
       body: SingleChildScrollView(
@@ -94,7 +129,6 @@ class AdminManageCourseListScreen extends StatelessWidget {
               ),
             ),
             onTap: () {
-              // Aksi unggah materi
               Get.toNamed(AppRoutes.adminCreateCourse);
             },
           ),
@@ -124,13 +158,11 @@ class AdminManageCourseListScreen extends StatelessWidget {
               ),
             ),
             onTap: () {
-              // Aksi buat kuis
               Get.toNamed(AppRoutes.adminCreateQuiz);
             },
           ),
         ],
       ),
-
     );
   }
 }

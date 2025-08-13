@@ -14,7 +14,6 @@ class ClassCard extends StatelessWidget {
     super.key,
     required this.imageUrl,
     required this.subjectName,
-    // Kita bisa berikan nilai default jika datanya seragam
     this.subtitle = 'SMA 1 Jakarta - A',
     this.classLevel = 'Kelas 10',
   });

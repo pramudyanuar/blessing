@@ -24,4 +24,14 @@ class SubjectResponse {
             ? null
             : DateTime.parse(json["updated_at"]),
       );
+
+  // -> TAMBAHKAN METHOD INI
+  // Method untuk mengubah objek menjadi Map<String, dynamic> (untuk proses encoding ke JSON)
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "subject_name": subjectName,
+        // Konversi DateTime menjadi string format ISO 8601 agar kompatibel dengan JSON
+        "created_at": createdAt?.toIso8601String(),
+        "updated_at": updatedAt?.toIso8601String(),
+      };
 }

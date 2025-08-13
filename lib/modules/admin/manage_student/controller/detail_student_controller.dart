@@ -7,7 +7,6 @@ import 'package:blessing/data/user/models/request/update_user_request.dart';
 import 'package:blessing/data/user/models/response/user_response.dart';
 import 'package:intl/intl.dart';
 
-
 class DetailStudentController extends GetxController {
   var isEditMode = false.obs;
 

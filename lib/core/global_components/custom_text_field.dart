@@ -14,11 +14,12 @@ class CustomTextField extends StatelessWidget {
   final Color? iconColor;
   final Color? borderColor;
   final IconButton? suffixButton;
-
-  // --- TAMBAHAN PROPERTI BARU ---
   final bool readOnly;
   final VoidCallback? onTap;
-  // -----------------------------
+
+  // --- TAMBAHAN: VALIDATOR ---
+  final String? Function(String?)? validator;
+  // ---------------------------
 
   const CustomTextField({
     super.key,
@@ -34,9 +35,10 @@ class CustomTextField extends StatelessWidget {
     this.iconColor,
     this.borderColor,
     this.suffixButton,
-    // --- TAMBAHAN DI KONSTRUKTOR ---
     this.readOnly = false,
     this.onTap,
+    // --- TAMBAHAN DI KONSTRUKTOR ---
+    this.validator,
     // --------------------------------
   });
 
@@ -56,19 +58,20 @@ class CustomTextField extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
         ],
-        // Menggunakan GestureDetector untuk menangani onTap pada keseluruhan area
-        // jika readOnly di-set true.
         GestureDetector(
           onTap: onTap,
           child: Stack(
             children: [
-              TextField(
+              // --- PERUBAHAN: DARI TEXTFIELD KE TEXTFORMFIELD ---
+              TextFormField(
                 controller: controller,
                 enabled: enabled,
                 keyboardType: keyboardType,
-                // --- MENGGUNAKAN PROPERTI BARU ---
                 readOnly: readOnly,
                 onTap: onTap,
+                // --- MENGGUNAKAN VALIDATOR ---
+                validator: validator,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 // ---------------------------------
                 maxLines: hintText.toLowerCase().contains("deskripsi") ? 4 : 1,
                 decoration: InputDecoration(
@@ -79,7 +82,6 @@ class CustomTextField extends StatelessWidget {
                   hintStyle:
                       TextStyle(color: hintColor ?? Colors.grey.shade500),
                   filled: true,
-                  // Ubah warna fill saat disabled/readonly agar lebih jelas
                   fillColor: enabled && !readOnly
                       ? (fillColor ?? const Color(0xFFF5F6FA))
                       : Colors.grey.shade200,
@@ -94,6 +96,21 @@ class CustomTextField extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12.r),
                     borderSide: const BorderSide(
                       color: Colors.blue,
+                      width: 1.5,
+                    ),
+                  ),
+                  // Menambahkan border untuk error dan focus error
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                    borderSide: const BorderSide(
+                      color: Colors.red,
+                      width: 1,
+                    ),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                    borderSide: const BorderSide(
+                      color: Colors.red,
                       width: 1.5,
                     ),
                   ),
