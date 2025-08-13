@@ -2,40 +2,14 @@
 
 import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/core/global_components/global_confirmation_dialog.dart';
-import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/data/subject/models/request/update_subject_request.dart';
 import 'package:blessing/data/subject/repository/subject_repository_impl.dart';
-import 'package:blessing/modules/student/course/widgets/course_card.dart';
+import 'package:blessing/modules/admin/course/widgets/course_card.dart';
+// --- PERUBAHAN: Import CourseContentType ---
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class CourseItem {
-  final CardType cardType;
-  final String title;
-  final String dateText;
-  final String? description;
-  final String? fileName;
-  final List<Widget>? previewImages;
-  final VoidCallback? onTapDetail;
-  final List<String>? quizDetails;
-  final bool isCompleted;
-  final int? score;
-  final VoidCallback? onStart;
-
-  CourseItem({
-    required this.cardType,
-    required this.title,
-    required this.dateText,
-    this.description,
-    this.fileName,
-    this.previewImages,
-    this.onTapDetail,
-    this.quizDetails,
-    this.isCompleted = false,
-    this.score,
-    this.onStart,
-  });
-}
+// --- PERUBAHAN: Kelas CourseItem dihapus ---
 
 class AdminManageCourseListController extends GetxController {
   // State untuk UI AppBar
@@ -43,45 +17,37 @@ class AdminManageCourseListController extends GetxController {
   final RxString classLevel = ''.obs;
   final RxString imagePath = ''.obs;
 
-  // --- PERUBAHAN DI SINI: Variabel untuk menyimpan data yang diterima ---
   late final String subjectId;
   late final int kelas;
-  // --- AKHIR PERUBAHAN ---
 
-  // --- PERUBAHAN DI SINI: Tambahkan dependensi dan state untuk edit ---
   final _subjectRepository = Get.find<SubjectRepository>();
   late final TextEditingController editNameController;
-  // --- AKHIR PERUBAHAN ---
 
-  // Daftar materi/kuis (nantinya akan diisi dari API)
-  final RxList<CourseItem> courses = <CourseItem>[
-    // Contoh Kuis Belum Dikerjakan
-    CourseItem(
-      cardType: CardType.quiz,
-      title: 'Quiz 7',
-      dateText: '3 hari yang lalu',
-      quizDetails: ['Waktu Pengerjaan : 10 Menit', 'Jumlah Soal : 20 Soal'],
-      isCompleted: false,
-      onStart: () {
-        Get.snackbar("Info", "Membuka halaman kuis...");
-      },
-    ),
-    // Contoh Materi
-    CourseItem(
-      cardType: CardType.material,
-      title: 'Bab 5 : Geometri Ruang',
-      description:
+  // --- PERUBAHAN: Menggunakan RxList<dynamic> untuk menampung data Map ---
+  final RxList<dynamic> courses = <dynamic>[
+    // Contoh data Kuis dalam bentuk Map
+    {
+      'type': CourseContentType.quiz,
+      'title': 'Quiz 7: Persamaan Kuadrat',
+      'dateText': '3 hari yang lalu',
+      'description': 'Uji pemahamanmu tentang akar-akar persamaan kuadrat.',
+      'timeLimit': 10, // Menggunakan timeLimit sesuai CourseCard baru
+    },
+    // Contoh data Materi dalam bentuk Map
+    {
+      'type': CourseContentType.material,
+      'title': 'Bab 5 : Geometri Ruang',
+      'description':
           'Materi lengkap tentang bangun ruang sisi datar dan lengkung.',
-      fileName: 'geometri.pdf',
-      dateText: '1 minggu yang lalu',
-      onTapDetail: () => Get.toNamed(AppRoutes.courseDetail),
-    ),
+      'fileName': 'geometri.pdf',
+      'dateText': '1 minggu yang lalu',
+      'previewImages': null, // Bisa diisi dengan list widget gambar
+    },
   ].obs;
 
   @override
   void onInit() {
     super.onInit();
-
     final arguments = Get.arguments as Map<String, dynamic>?;
 
     if (arguments != null) {
@@ -91,26 +57,45 @@ class AdminManageCourseListController extends GetxController {
 
       title.value = subjectName;
       classLevel.value = 'Kelas $kelas';
-
-      // --- PERUBAHAN DI SINI: Inisialisasi TextEditingController ---
       editNameController = TextEditingController(text: subjectName);
-      // --- AKHIR PERUBAHAN ---
 
       print('✅ ID Mata Pelajaran: $subjectId');
       print('✅ Kelas: $kelas');
     } else {
       print('❌ Error: Tidak ada data arguments yang diterima. Kembali.');
+      // Tambahkan pengecekan agar tidak error saat hot reload
+      subjectId = '';
+      kelas = 0;
+      editNameController = TextEditingController();
       Get.back();
     }
-
     imagePath.value = 'assets/images/bg-admin-subject.png';
+    // fetchCourseData(); // Panggil fungsi untuk mengambil data dari API di sini
   }
 
-  // --- PERUBAHAN DI SINI: Tambahkan fungsi untuk edit nama mata pelajaran ---
-  void showEditSubjectDialog() {
-    // Pastikan controller direset ke nama saat ini setiap kali dialog dibuka
-    editNameController.text = title.value;
+  /*
+  // --- CONTOH FUNGSI FETCH DATA DARI API ---
+  Future<void> fetchCourseData() async {
+    // Tampilkan loading
+    // Panggil repository untuk get materials dan quizzes berdasarkan subjectId
+    // final materials = await _courseRepository.getMaterials(subjectId);
+    // final quizzes = await _courseRepository.getQuizzes(subjectId);
 
+    // Ubah data model dari API menjadi format Map yang kita butuhkan
+    // final formattedMaterials = materials.map((m) => { 'type': CourseContentType.material, 'title': m.title, ... }).toList();
+    // final formattedQuizzes = quizzes.map((q) => { 'type': CourseContentType.quiz, 'title': q.name, ... }).toList();
+
+    // Gabungkan dan urutkan berdasarkan tanggal
+    final combinedList = [...formattedMaterials, ...formattedQuizzes];
+    combinedList.sort((a, b) => b['date'].compareTo(a['date'])); // contoh sorting
+
+    courses.value = combinedList; // Update list
+    // Hilangkan loading
+  }
+  */
+
+  void showEditSubjectDialog() {
+    editNameController.text = title.value;
     Get.dialog(
       AlertDialog(
         title: const Text('Ubah Nama Mata Pelajaran'),
@@ -138,98 +123,72 @@ class AdminManageCourseListController extends GetxController {
   }
 
   void _performUpdate() {
-    // Tutup dialog dulu, lalu panggil fungsi update
-    if (Get.isDialogOpen!) {
-      Get.back();
-    }
+    if (Get.isDialogOpen!) Get.back();
     updateSubjectName();
   }
 
   Future<void> updateSubjectName() async {
     final newName = editNameController.text.trim();
-
     if (newName.isEmpty) {
-      CustomSnackbar.show(title: 'Error', message: 'Nama mata pelajaran tidak boleh kosong.', isError: true);
+      CustomSnackbar.show(
+          title: 'Error',
+          message: 'Nama mata pelajaran tidak boleh kosong.',
+          isError: true);
       return;
     }
-
     if (newName == title.value) {
       CustomSnackbar.show(
-          title: 'Error', message: 'Nama mata pelajaran tidak boleh sama.', isError: true);
+          title: 'Info',
+          message: 'Tidak ada perubahan pada nama mata pelajaran.',
+          isError: false);
       return;
     }
-
-    // Tampilkan loading indicator
-    Get.dialog(
-      const Center(child: CircularProgressIndicator()),
-      barrierDismissible: false,
-    );
-
-    final request = UpdateSubjectRequest(subjectName: newName,);
+    Get.dialog(const Center(child: CircularProgressIndicator()),
+        barrierDismissible: false);
+    final request = UpdateSubjectRequest(subjectName: newName);
     final result = await _subjectRepository.updateSubject(subjectId, request);
-
-    // Tutup loading indicator
     Get.back();
-
     if (result != null) {
       title.value = result.subjectName!;
       CustomSnackbar.show(
           title: 'Berhasil', message: 'Nama mata pelajaran berhasil diubah.');
-      // Opsional: Kirim sinyal kembali ke halaman sebelumnya bahwa ada update.
-      // Jika halaman sebelumnya perlu refresh list, Anda bisa gunakan:
-      // Get.back(result: true);
+      Get.back(result: true); // Kirim sinyal update ke halaman sebelumnya
     } else {
       CustomSnackbar.show(
-          title: 'Error', message: 'Gagal mengubah nama mata pelajaran.', isError: true);
+          title: 'Error',
+          message: 'Gagal mengubah nama mata pelajaran.',
+          isError: true);
     }
   }
-  // --- AKHIR PERUBAHAN ---
 
-  void showDeleteConfirmationDialog() {
+  void showDeleteConfirmation() {
     Get.dialog(
-      AlertDialog(
-        title: const Text('Konfirmasi Hapus'),
-        content: const Text(
-            'Apakah Anda yakin ingin menghapus mata pelajaran ini? Tindakan ini juga akan menghapus semua materi dan kuis di dalamnya dan tidak dapat diurungkan.'),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Batal'),
-          ),
-          TextButton(
-            onPressed: () {
-              // Tutup dialog konfirmasi, lalu jalankan proses hapus
-              if (Get.isDialogOpen!) {
-                Get.back();
-              }
-              deleteSubject();
-            },
-            child: const Text('Hapus', style: TextStyle(color: Colors.red)),
-          ),
-        ],
+      GlobalConfirmationDialog(
+        message:
+            'Apakah Anda yakin ingin menghapus mata pelajaran ini? Tindakan ini akan menghapus semua materi dan kuis terkait pada SEMUA KELAS dan tidak dapat diurungkan.',
+        noText: 'Batal',
+        yesText: 'Hapus',
+        yesColor: Colors.red,
+        onNo: () => Get.back(),
+        onYes: () {
+          Get.back();
+          deleteSubject();
+        },
       ),
+      barrierDismissible: false,
     );
   }
 
-  /// Menjalankan proses penghapusan mata pelajaran.
   Future<void> deleteSubject() async {
-    // Tampilkan loading indicator
-    Get.dialog(
-      const Center(child: CircularProgressIndicator()),
-      barrierDismissible: false,
-    );
-
+    Get.dialog(const Center(child: CircularProgressIndicator()),
+        barrierDismissible: false);
     final result = await _subjectRepository.deleteSubject(subjectId);
-
-    // Tutup loading indicator
     Get.back();
-
     if (result != null) {
       CustomSnackbar.show(
         title: 'Berhasil',
         message: 'Mata pelajaran "${title.value}" berhasil dihapus.',
       );
-      // Kembali ke halaman daftar mata pelajaran dan kirim sinyal untuk refresh
       Get.back(result: true);
     } else {
       CustomSnackbar.show(
@@ -239,7 +198,6 @@ class AdminManageCourseListController extends GetxController {
       );
     }
   }
-  // --- AKHIR PERUBAHAN ---
 
   void handleMenuSelection(String value) {
     switch (value) {
@@ -252,32 +210,9 @@ class AdminManageCourseListController extends GetxController {
     }
   }
 
-  void showDeleteConfirmation() {
-    Get.dialog(
-      GlobalConfirmationDialog(
-        message:
-            'Apakah Anda yakin ingin menghapus mata pelajaran ini? Tindakan ini akan menghapus semua materi dan kuis terkait pada SEMUA KELAS dan tidak dapat diurungkan.',
-        noText: 'Batal',
-        yesText: 'Hapus',
-        yesColor: Colors.red, // Jadikan tombol hapus berwarna merah
-        onNo: () {
-          Get.back(); // Tutup dialog
-        },
-        onYes: () {
-          Get.back(); // Tutup dialog
-          deleteSubject(); // Lanjutkan proses hapus
-        },
-      ),
-      barrierDismissible: false,
-    );
-  }
-
   @override
   void onClose() {
-    // --- PERUBAHAN DI SINI: Dispose controller ---
-    
     editNameController.dispose();
-    // --- AKHIR PERUBAHAN ---
     super.onClose();
   }
 }

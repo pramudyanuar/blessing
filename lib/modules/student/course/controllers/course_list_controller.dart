@@ -1,78 +1,50 @@
 // lib/modules/student/course/controllers/course_list_controller.dart
 
-import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/modules/student/course/widgets/course_card.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-class CourseItem {
-  final CardType cardType;
-  final String title;
-  final String dateText;
-
-  // Properti Materi
-  final String? description;
-  final String? fileName;
-  final List<Widget>? previewImages;
-  final VoidCallback? onTapDetail;
-
-  // Properti Kuis
-  final List<String>? quizDetails;
-  final bool isCompleted;
-  final int? score;
-  final VoidCallback? onStart;
-
-  CourseItem({
-    required this.cardType,
-    required this.title,
-    required this.dateText,
-    this.description,
-    this.fileName,
-    this.previewImages,
-    this.onTapDetail,
-    this.quizDetails,
-    this.isCompleted = false,
-    this.score,
-    this.onStart,
-  });
-}
 
 class CourseListController extends GetxController {
   final RxString title = 'Mata Pelajaran'.obs;
   final RxString classLevel = ''.obs;
   final RxString imagePath = ''.obs;
 
-  final RxList<CourseItem> courses = <CourseItem>[
-    // Contoh Kuis Belum Dikerjakan
-    CourseItem(
-      cardType: CardType.quiz,
-      title: 'Quiz 7',
-      dateText: '3 hari yang lalu',
-      quizDetails: ['Waktu Pengerjaan : 10 Menit', 'Jumlah Soal : 20 Soal'],
-      isCompleted: false,
-      onStart: () {
-        Get.snackbar("Info", "Membuka halaman kuis...");
-      },
-    ),
-    // Contoh Kuis Sudah Dikerjakan
-    CourseItem(
-      cardType: CardType.quiz,
-      title: 'Quiz 6',
-      dateText: '5 hari yang lalu',
-      quizDetails: ['Waktu Pengerjaan : 10 Menit', 'Jumlah Soal : 20 Soal'],
-      isCompleted: true,
-      score: 98,
-    ),
-    // Contoh Materi
-    CourseItem(
-      cardType: CardType.material,
-      title: 'Bab 5 : Geometri Ruang',
-      description:
+  // Menggunakan RxList<dynamic> untuk menampung data Map dari materi dan kuis.
+  // Nantinya, list ini akan diisi dari hasil panggilan API.
+  final RxList<dynamic> courses = <dynamic>[
+    // Contoh data Kuis Belum Dikerjakan
+    {
+      'id': 'quiz-001', // Contoh ID untuk navigasi
+      'type': CourseContentType.quiz,
+      'title': 'Quiz 7: Vektor',
+      'dateText': '3 hari yang lalu',
+      'description': 'Kuis pemahaman tentang konsep dasar vektor.',
+      'timeLimit': 10,
+      'questionCount': 20,
+      'isCompleted': false, // Kuis ini belum dikerjakan
+    },
+    // Contoh data Kuis Sudah Dikerjakan
+    {
+      'id': 'quiz-002',
+      'type': CourseContentType.quiz,
+      'title': 'Quiz 6: Turunan Fungsi',
+      'dateText': '5 hari yang lalu',
+      'description': 'Kuis tentang aturan rantai dan turunan parsial.',
+      'timeLimit': 15,
+      'questionCount': 15,
+      'isCompleted': true, // Kuis ini sudah selesai
+      'score': 98,
+    },
+    // Contoh data Materi
+    {
+      'id': 'material-001',
+      'type': CourseContentType.material,
+      'title': 'Bab 5 : Geometri Ruang',
+      'description':
           'Materi lengkap tentang bangun ruang sisi datar dan lengkung.',
-      fileName: 'geometri.pdf',
-      dateText: '1 minggu yang lalu',
-      onTapDetail: () => Get.toNamed(AppRoutes.courseDetail),
-    ),
+      'fileName': 'geometri_ruang.pdf',
+      'dateText': '1 minggu yang lalu',
+      'previewImages': null, // Bisa diisi dengan List<Widget> jika ada gambar
+    },
   ].obs;
 
   @override
@@ -82,33 +54,11 @@ class CourseListController extends GetxController {
     if (arguments != null) {
       title.value = arguments['title'] ?? 'Mata Pelajaran';
       classLevel.value = arguments['classLevel'] ?? '';
-      if (arguments['imagePath'] != null) {
-        final path = arguments['imagePath'] as String;
-        final lastSlash = path.lastIndexOf('/') + 1;
-        final dir = path.substring(0, lastSlash);
-        final file = path.substring(lastSlash);
-        final detailPath = '${dir}detail-$file';
-
-        // Daftar gambar detail yang tersedia
-        const availableDetailImages = [
-          'assets/images/detail-akutansi.webp',
-          'assets/images/detail-biologi.webp',
-          'assets/images/detail-ekonomi.webp',
-          'assets/images/detail-fisika.webp',
-          'assets/images/detail-kimia.webp',
-          'assets/images/detail-matematika-minat.webp',
-          'assets/images/detail-matematika-wajib.webp',
-        ];
-
-        // Gunakan gambar detail jika tersedia, kalau tidak gunakan gambar asli
-        if (availableDetailImages.contains(detailPath)) {
-          imagePath.value = detailPath;
-        } else {
-          imagePath.value = path; // Gunakan gambar asli
-        }
-      } else {
-        imagePath.value = 'assets/images/bg-admin-subject.png';
-      }
+      imagePath.value = arguments['imagePath'] ?? 'assets/images/bg-admin-subject.png';
+      // Logika path gambar Anda yang kompleks bisa tetap di sini
     }
+
+    // Panggil fungsi untuk mengambil data dari API di sini.
+    // fetchStudentCourseData(subjectId: arguments['subjectId']);
   }
 }

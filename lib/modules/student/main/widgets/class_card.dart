@@ -48,7 +48,14 @@ class ClassCard extends StatelessWidget {
     final bool isDefaultImage = imageUrl == Images.adminMainSubject;
 
     return GestureDetector(
-      onTap: () {
+    onTap: () {
+        final String finalImagePath = isDefaultImage
+            ? imageUrl
+            : imageUrl.replaceFirst(
+                'assets/images/',
+                'assets/images/detail-',
+              );
+
         Get.toNamed(
           AppRoutes.courseMain,
           arguments: {
@@ -56,7 +63,7 @@ class ClassCard extends StatelessWidget {
             'title': subjectName,
             'subtitle': subtitle,
             'classLevel': classLevel,
-            'imagePath': imageUrl,
+            'imagePath': finalImagePath,
           },
         );
       },
