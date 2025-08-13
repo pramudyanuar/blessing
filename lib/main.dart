@@ -2,6 +2,7 @@ import 'package:blessing/core/config/main_app.dart';
 import 'package:blessing/core/utils/cache_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/date_symbol_data_local.dart'; 
 import 'package:no_screenshot/no_screenshot.dart';
 import 'package:blessing/core/utils/secure_storage_util.dart';
 
@@ -19,6 +20,7 @@ void main() async {
   await secureStorageUtil.init();
   await cacheUtil.init();
   await disableScreenshot();
+  await initializeDateFormatting('id_ID', null); 
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
