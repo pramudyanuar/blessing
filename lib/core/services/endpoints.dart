@@ -37,7 +37,7 @@ class Endpoints {
       _url('/api/admin/courses/{courseId}');
   static final String deleteCourseForAdmin =
       _url('/api/admin/courses/{courseId}');
-  static final String getUserAccessibleCoursesForAdmin =
+  static final String manageAccessibleCoursesForAdmin =
       _url('/api/admin/user-courses');
   static final String createUserCourseForAdmin =
       _url('/api/admin/user-courses');

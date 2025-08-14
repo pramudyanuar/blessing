@@ -1,6 +1,7 @@
 import 'package:blessing/data/core/models/paging_response.dart';
 import 'package:blessing/data/course/datasource/course_remote_datasource.dart';
 import 'package:blessing/data/course/models/response/course_response.dart';
+import 'package:blessing/data/course/models/response/user_course_response.dart';
 import 'package:flutter/foundation.dart';
 
 class CourseRepository {
@@ -72,6 +73,45 @@ class CourseRepository {
       );
     } catch (e) {
       debugPrint('Error in CourseRepository (adminPostCourse): $e');
+      return false;
+    }
+  }
+
+  Future<List<UserCourseResponse>?> adminGetAllUserCoursesByCourseId({
+    required String courseId,
+  }) async {
+    try {
+      // Memanggil metode baru di datasource
+      return await _dataSource.adminGetAllUserCoursesByCourseId(
+        courseId: courseId,
+      );
+    } catch (e) {
+      debugPrint(
+          'Error in CourseRepository (adminGetAllUserCoursesByCourseId): $e');
+      return null;
+    }
+  }
+
+  Future<bool> adminAssignCoursesToUsers({
+    required List<String> userIds,
+    required List<String> courseIds,
+  }) async {
+    try {
+      return await _dataSource.adminAssignCoursesToUsers(
+        userIds: userIds,
+        courseIds: courseIds,
+      );
+    } catch (e) {
+      debugPrint('Error in CourseRepository (adminAssignCoursesToUsers): $e');
+      return false;
+    }
+  }
+
+  Future<bool> adminDeleteUserCourse(String userCourseId) async {
+    try {
+      return await _dataSource.adminDeleteUserCourse(userCourseId);
+    } catch (e) {
+      debugPrint('Error in CourseRepository (adminDeleteUserCourse): $e');
       return false;
     }
   }

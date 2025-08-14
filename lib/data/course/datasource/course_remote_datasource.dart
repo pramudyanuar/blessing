@@ -4,6 +4,7 @@ import 'package:blessing/core/services/endpoints.dart';
 import 'package:blessing/core/services/http_manager.dart';
 import 'package:blessing/data/core/models/paging_response.dart';
 import 'package:blessing/data/course/models/response/course_response.dart';
+import 'package:blessing/data/course/models/response/user_course_response.dart';
 import 'package:flutter/foundation.dart';
 
 class CourseDataSource {
@@ -197,6 +198,149 @@ class CourseDataSource {
       }
     } catch (e) {
       debugPrint('adminPostCourse DataSource error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> adminAssignCoursesToUsers({
+    required List<String> userIds,
+    required List<String> courseIds,
+  }) async {
+    try {
+      final url = Endpoints.createUserCourseForAdmin;
+
+      final body = {
+        "user_ids": userIds,
+        "course_ids": courseIds,
+      };
+
+      final response = await _httpManager.restRequest(
+        url: url,
+        method: HttpMethods.post,
+        body: body,
+      );
+
+      // Biasanya API mengembalikan 200 (OK) atau 201 (Created) untuk operasi POST yang berhasil
+      if (response['statusCode'] == 200 || response['statusCode'] == 201) {
+        debugPrint(
+            'adminAssignCoursesToUsers DataSource success: ${response['data']}');
+        return true;
+      } else {
+        debugPrint(
+            'adminAssignCoursesToUsers DataSource failed: ${response['statusMessage']}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('adminAssignCoursesToUsers DataSource error: $e');
+      return false;
+    }
+  }
+
+  Future<({List<UserCourseResponse> userCourses, PagingResponse paging})?>
+      adminGetUserCoursesByCourseId({
+    required String courseId,
+    int page = 1,
+    int size = 10,
+  }) async {
+    try {
+      final url =
+          '${Endpoints.manageAccessibleCoursesForAdmin}?page=$page&size=$size&course_id=$courseId';
+
+      final response = await _httpManager.restRequest(
+        url: url,
+        method: HttpMethods.get,
+      );
+
+      if (response['statusCode'] == 200) {
+        debugPrint(
+            'adminGetUserCoursesByCourseId DataSource response: ${response['data']}');
+
+        // Parsing list of user-courses dari response['data']['data']
+        final userCourses = (response['data']['data'] as List)
+            .map((e) => UserCourseResponse.fromJson(e))
+            .toList();
+
+        // Parsing data paging dari response['data']['paging']
+        final paging = PagingResponse.fromJson(response['data']['paging']);
+
+        return (userCourses: userCourses, paging: paging);
+      } else {
+        debugPrint(
+            'adminGetUserCoursesByCourseId DataSource failed: ${response['statusMessage']}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('adminGetUserCoursesByCourseId DataSource error: $e');
+      return null;
+    }
+  }
+
+  Future<List<UserCourseResponse>?> adminGetAllUserCoursesByCourseId({
+    required String courseId,
+  }) async {
+    try {
+      final List<UserCourseResponse> allUserCourses = [];
+      int currentPage = 1;
+      int totalPages =
+          1; // Nilai awal, akan diperbarui setelah panggilan pertama
+      const int pageSize = 50; // Ambil 50 item per panggilan agar lebih efisien
+
+      // Lakukan perulangan selama halaman saat ini belum melewati total halaman
+      while (currentPage <= totalPages) {
+        // Panggil metode paginasi yang sudah ada
+        final result = await adminGetUserCoursesByCourseId(
+          courseId: courseId,
+          page: currentPage,
+          size: pageSize,
+        );
+
+        // Jika ada satu halaman yang gagal diambil, gagalkan seluruh proses
+        if (result == null) {
+          debugPrint(
+              'Failed to fetch page $currentPage for course $courseId. Aborting operation.');
+          return null;
+        }
+
+        // Tambahkan hasil dari halaman saat ini ke daftar utama
+        allUserCourses.addAll(result.userCourses);
+
+        // Perbarui total halaman dari informasi paging
+        // Ini hanya perlu dilakukan sekali, tetapi aman untuk dilakukan di setiap iterasi
+        totalPages = result.paging.totalPage;
+
+        // Pindah ke halaman berikutnya untuk iterasi selanjutnya
+        currentPage++;
+      }
+
+      debugPrint(
+          'Successfully fetched all ${allUserCourses.length} user course permissions across $totalPages pages.');
+      return allUserCourses;
+    } catch (e) {
+      debugPrint('adminGetAllUserCoursesByCourseId DataSource error: $e');
+      return null;
+    }
+  }
+
+  Future<bool> adminDeleteUserCourse(String userCourseId) async {
+    try {
+      final url = Endpoints.deleteUserCourseForAdmin
+          .replaceFirst('{userCourseId}', userCourseId);
+
+      final response = await _httpManager.restRequest(
+        url: url,
+        method: HttpMethods.delete,
+      );
+
+      if (response['statusCode'] == 200) {
+        debugPrint('adminDeleteUserCourse DataSource success');
+        return true;
+      } else {
+        debugPrint(
+            'adminDeleteUserCourse DataSource failed: ${response['statusMessage']}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('adminDeleteUserCourse DataSource error: $e');
       return false;
     }
   }
