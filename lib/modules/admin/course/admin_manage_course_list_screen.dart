@@ -95,10 +95,9 @@ class AdminManageCourseListScreen extends StatelessWidget {
                     previewImages: item['previewImages'],
                     actionButtonText: "Lihat Materi",
                     onTapAction: () {
-                      // Ganti dengan navigasi ke detail materi dengan membawa ID materi
                       print("Navigasi ke detail materi: ${item['title']}");
-                      Get.toNamed(AppRoutes.courseDetail,
-                          arguments: {'materialId': item['id']});
+                      Get.toNamed(AppRoutes.adminCourseDetail,
+                          arguments: {'courseId': item['id']});
                     },
                   );
                 } else {
@@ -111,7 +110,6 @@ class AdminManageCourseListScreen extends StatelessWidget {
                     timeLimit: item['timeLimit'],
                     actionButtonText: "Lihat Kuis",
                     onTapAction: () {
-                      // Ganti dengan navigasi ke detail kuis dengan membawa ID kuis
                       print("Navigasi ke detail kuis: ${item['title']}");
                       Get.toNamed(AppRoutes.adminCreateQuiz,
                           arguments: {'quizId': item['id']});
@@ -146,6 +144,8 @@ class AdminManageCourseListScreen extends StatelessWidget {
           label: 'Unggah Materi',
           onTap: () {
             // Kirim subjectId dan kelas saat navigasi
+            debugPrint(
+                'Navigasi ke adminUploadCourse dengan subjectId: ${controller.subjectId} dan kelas: ${controller.kelas}');
             Get.toNamed(AppRoutes.adminCreateCourse, arguments: {
               'subjectId': controller.subjectId,
               'kelas': controller.kelas,

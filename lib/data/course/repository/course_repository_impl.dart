@@ -28,4 +28,62 @@ class CourseRepository {
       return null;
     }
   }
+
+  Future<CourseResponse?> adminGetCourseById(String courseId) async {
+    try {
+      return await _dataSource.adminGetCourseById(courseId);
+    } catch (e) {
+      debugPrint('Error in CourseRepository (adminGetCourseById): $e');
+      return null;
+    }
+  }
+
+  Future<bool> adminUpdateCourse({
+    required String courseId,
+    required String courseName,
+    required List<Map<String, dynamic>> content,
+    required int gradeLevel,
+  }) async {
+    try {
+      return await _dataSource.adminUpdateCourse(
+        courseId: courseId,
+        courseName: courseName,
+        content: content,
+        gradeLevel: gradeLevel,
+      );
+    } catch (e) {
+      debugPrint('Error in CourseRepository (adminUpdateCourse): $e');
+      return false;
+    }
+  }
+
+  Future<bool> adminPostCourse({
+    required String courseName,
+    required List<Map<String, dynamic>> content,
+    required int gradeLevel,
+    required String subjectId,
+  }) async {
+    try {
+      return await _dataSource.adminPostCourse(
+        courseName: courseName,
+        content: content,
+        gradeLevel: gradeLevel,
+        subjectId: subjectId
+      );
+    } catch (e) {
+      debugPrint('Error in CourseRepository (adminPostCourse): $e');
+      return false;
+    }
+  }
+
+  Future<bool> adminDeleteCourse(String courseId) async {
+    try {
+      return await _dataSource.adminDeleteCourse(courseId);
+    } catch (e) {
+      debugPrint('Error in CourseRepository (adminDeleteCourse): $e');
+      return false;
+    }
+  }
+
+
 }

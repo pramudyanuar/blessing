@@ -1,6 +1,11 @@
 import 'package:blessing/core/middlewares/role_middleware.dart';
 import 'package:blessing/core/utils/app_routes.dart';
+import 'package:blessing/modules/admin/course/admin_course_detail_screen.dart';
+import 'package:blessing/modules/admin/course/admin_manage_access_course_screen.dart';
+import 'package:blessing/modules/admin/course/bindings/admin_course_detail_bindings.dart';
+import 'package:blessing/modules/admin/course/bindings/admin_manage_access_course_bindings.dart' show AdminManageAccessCourseBindings;
 import 'package:blessing/modules/admin/course/bindings/admin_manage_course_list_binding.dart';
+import 'package:blessing/modules/admin/course/bindings/admin_upload_course_bindings.dart';
 import 'package:blessing/modules/admin/course/bindings/create_quiz_bindings.dart';
 import 'package:blessing/modules/admin/course/create_quiz_screen.dart';
 import 'package:blessing/modules/admin/course/quiz_result_screen.dart';
@@ -119,7 +124,7 @@ class AppPages {
     GetPage(
       name: AppRoutes.adminCreateCourse,
       page: () => const UploadCourseScreen(),
-      // binding: AdminManageCourseListBinding(),
+      binding: AdminUploadCourseBindings(),
       middlewares: [RoleMiddleware(requiredRole: 'admin')],
     ),
     GetPage(
@@ -137,6 +142,18 @@ class AppPages {
     GetPage(
       name: AppRoutes.adminQuizResult,
       page: () => AdminQuizResultScreen(),
+      middlewares: [RoleMiddleware(requiredRole: 'admin')],
+    ),
+    GetPage(
+      name: AppRoutes.adminCourseDetail,
+      page: () => AdminCourseDetailScreen(),
+      binding: AdminCourseDetailBindings(),
+      middlewares: [RoleMiddleware(requiredRole: 'admin')],
+    ),
+    GetPage(
+      name: AppRoutes.adminManageCourseAccess,
+      page: () => AdminManageAccessCourseScreen(),
+      binding: AdminManageAccessCourseBindings(),
       middlewares: [RoleMiddleware(requiredRole: 'admin')],
     ),
 

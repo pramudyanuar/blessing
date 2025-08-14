@@ -1,7 +1,9 @@
-import 'dart:convert';
+// lib/core/services/http_manager.dart
+
 import 'dart:io';
-import 'package:blessing/core/services/auth_interceptor.dart';
+import 'package:blessing/core/services/auth_interceptor.dart'; // Pastikan path ini benar
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http_parser/http_parser.dart';
 
 abstract class HttpMethods {
@@ -13,13 +15,10 @@ abstract class HttpMethods {
 }
 
 class HttpManager {
-  // --- SINGLETON SETUP ---
-  // This ensures there is only one instance of Dio and HttpManager in your app
   HttpManager._privateConstructor() {
-    // Add the interceptor to the Dio instance when it's created
     _dio.interceptors.add(AuthInterceptor());
-    _dio.options.baseUrl =
-        "https://your.api.baseurl.com/api"; // IMPORTANT: Set your base URL here
+    // PENTING: Ganti dengan base URL API Anda yang sebenarnya
+    // _dio.options.baseUrl = "https://api.blessing.com";
   }
   static final HttpManager _instance = HttpManager._privateConstructor();
   factory HttpManager() => _instance;
@@ -38,17 +37,14 @@ class HttpManager {
         return 'image/gif';
       case 'webp':
         return 'image/webp';
-      case 'pdf':
-        return 'application/pdf';
-      case 'txt':
-        return 'text/plain';
       default:
         return 'application/octet-stream';
     }
   }
 
-  // --- REVISED restRequest METHOD ---
-  // The 'useAuth' parameter is no longer needed. The interceptor handles it.
+  /// Metode ini telah diperbaiki untuk menangani header dengan lebih baik.
+  /// Secara otomatis menambahkan 'Content-Type: application/json' untuk request
+  /// dengan body (POST, PUT, PATCH).
   Future<Map<String, dynamic>> restRequest({
     required String url,
     String method = HttpMethods.get,
@@ -56,43 +52,31 @@ class HttpManager {
     Map<String, dynamic>? body,
     Map<String, dynamic>? queryParameters,
   }) async {
-    final headersDefault = headers ?? {'accept': 'application/json'};
+    // --- PERUBAHAN UTAMA DI SINI ---
+    // 1. Membuat map header dasar.
+    final Map<String, dynamic> baseHeaders = {
+      'Accept': 'application/json',
+    };
 
-    dynamic requestBody = body;
-
-    // FormData logic remains the same
-    if (body != null && body['file'] != null && body['file'] is File) {
-      FormData formData = FormData();
-
-      body.forEach((key, value) {
-        if (key == 'hashtags' && value is List<String>) {
-          String hashtagsJson = jsonEncode(value);
-          formData.fields.add(MapEntry('hashtags', hashtagsJson));
-        } else if (key == 'file' && value is File) {
-          File file = value;
-          String mimeType = getMimeType(file.path);
-          List<String> mimeTypeParts = mimeType.split('/');
-
-          formData.files.add(MapEntry(
-            'file',
-            MultipartFile.fromFileSync(
-              file.path,
-              filename: file.path.split(Platform.pathSeparator).last,
-              contentType: MediaType(mimeTypeParts[0], mimeTypeParts[1]),
-            ),
-          ));
-        } else {
-          formData.fields.add(MapEntry(key, value.toString()));
-        }
-      });
-      requestBody = formData;
+    // 2. Jika ada body yang dikirim, otomatis tambahkan Content-Type JSON.
+    // Ini adalah kunci untuk menyelesaikan masalah Anda.
+    if (body != null) {
+      baseHeaders['Content-Type'] = 'application/json';
     }
+
+    // 3. Gabungkan header dasar dengan header kustom dari pemanggil (jika ada).
+    // Header dari parameter `headers` akan menimpa header dasar jika ada key yang sama.
+    baseHeaders.addAll(headers ?? {});
+    // AuthInterceptor akan menambahkan header 'Authorization' secara otomatis.
 
     try {
       Response response = await _dio.request(
         url,
-        options: Options(method: method, headers: headersDefault),
-        data: requestBody,
+        options: Options(
+          method: method,
+          headers: baseHeaders, // Menggunakan header yang sudah digabungkan
+        ),
+        data: body,
         queryParameters: queryParameters,
       );
 
@@ -102,7 +86,8 @@ class HttpManager {
         'data': response.data,
       };
     } on DioException catch (e) {
-      // The interceptor's onError will run before this catch block for Dio-specific errors
+      debugPrint(
+          'HttpManager DioException [${e.requestOptions.path}]: ${e.response?.data}');
       return {
         'statusCode': e.response?.statusCode,
         'statusMessage': e.response?.statusMessage ?? e.message,
@@ -110,6 +95,57 @@ class HttpManager {
         'data': e.response?.data,
       };
     } catch (e) {
+      debugPrint('HttpManager Exception: $e');
+      return {
+        'error': e.toString(),
+      };
+    }
+  }
+
+  /// Metode ini secara khusus menangani pengiriman data multipart/form-data.
+  /// Sangat ideal untuk mengunggah file. (Tidak ada perubahan di sini)
+  Future<Map<String, dynamic>> uploadFileRequest({
+    required String url,
+    required File file,
+    String fileFieldKey = 'file',
+  }) async {
+    final headersDefault = {'accept': 'application/json'};
+
+    String fileName = file.path.split('/').last;
+    String mimeType = getMimeType(file.path);
+    List<String> mimeTypeParts = mimeType.split('/');
+
+    FormData formData = FormData.fromMap({
+      fileFieldKey: await MultipartFile.fromFile(
+        file.path,
+        filename: fileName,
+        contentType: MediaType(mimeTypeParts[0], mimeTypeParts[1]),
+      ),
+    });
+
+    try {
+      Response response = await _dio.post(
+        url,
+        data: formData,
+        options: Options(headers: headersDefault),
+      );
+
+      return {
+        'statusCode': response.statusCode,
+        'statusMessage': response.statusMessage,
+        'data': response.data,
+      };
+    } on DioException catch (e) {
+      debugPrint(
+          'HttpManager (uploadFileRequest) DioException [${e.requestOptions.path}]: ${e.response?.data}');
+      return {
+        'statusCode': e.response?.statusCode,
+        'statusMessage': e.response?.statusMessage ?? e.message,
+        'error': e.message,
+        'data': e.response?.data,
+      };
+    } catch (e) {
+      debugPrint('HttpManager (uploadFileRequest) Exception: $e');
       return {
         'error': e.toString(),
       };

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:blessing/core/helpers/course_content_type_adapter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -17,6 +18,11 @@ class CacheUtil {
   Future<void> init() async {
     final Directory appSupportDir = await getApplicationSupportDirectory();
     await Hive.initFlutter(appSupportDir.path);
+
+     if (!Hive.isAdapterRegistered(1)) {
+      Hive.registerAdapter(CourseContentTypeAdapter());
+    }
+    
     await Hive.openBox(_boxName);
   }
 
