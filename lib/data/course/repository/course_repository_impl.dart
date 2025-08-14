@@ -1,6 +1,7 @@
 import 'package:blessing/data/core/models/paging_response.dart';
 import 'package:blessing/data/course/datasource/course_remote_datasource.dart';
 import 'package:blessing/data/course/models/response/course_response.dart';
+import 'package:blessing/data/course/models/response/course_with_quizzes_response.dart';
 import 'package:blessing/data/course/models/response/user_course_response.dart';
 import 'package:flutter/foundation.dart';
 
@@ -125,5 +126,52 @@ class CourseRepository {
     }
   }
 
+  Future<({List<CourseResponse> courses, PagingResponse paging})?>
+      getAccessibleCourses({
+    int page = 1,
+    int size = 10,
+  }) async {
+    try {
+      final result = await _dataSource.getAccessibleCourses(
+        page: page,
+        size: size,
+      );
+      return result;
+    } catch (e) {
+      // Log error dari repository layer
+      debugPrint('Error in CourseRepository (getAccessibleCourses): $e');
+      return null;
+    }
+  }
+
+  Future<List<CourseWithQuizzesResponse>?>
+      getAllAccessibleCoursesWithQuizzes() async {
+    try {
+      return await _dataSource.getAllAccessibleCoursesWithQuizzes();
+    } catch (e) {
+      debugPrint(
+          'Error in CourseRepository (getAllAccessibleCoursesWithQuizzes): $e');
+      return null;
+    }
+  }
+
+  Future<List<CourseResponse>?> getAllAccessibleCourses() async {
+    try {
+      return await _dataSource.getAllAccessibleCourses();
+    } catch (e) {
+      debugPrint('Error in CourseRepository (getAllAccessibleCourses): $e');
+      return null;
+    }
+  }
+
+  Future<CourseWithQuizzesResponse?> getAccessibleCourseById(
+      String courseId) async {
+    try {
+      return await _dataSource.getAccessibleCourseById(courseId);
+    } catch (e) {
+      debugPrint('Error in CourseRepository (getAccessibleCourseById): $e');
+      return null;
+    }
+  }
 
 }

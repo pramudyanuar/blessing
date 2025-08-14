@@ -4,6 +4,7 @@ import 'package:blessing/core/services/endpoints.dart';
 import 'package:blessing/core/services/http_manager.dart';
 import 'package:blessing/data/core/models/paging_response.dart';
 import 'package:blessing/data/course/models/response/course_response.dart';
+import 'package:blessing/data/course/models/response/course_with_quizzes_response.dart';
 import 'package:blessing/data/course/models/response/user_course_response.dart';
 import 'package:flutter/foundation.dart';
 
@@ -202,6 +203,48 @@ class CourseDataSource {
     }
   }
 
+  Future<({List<CourseResponse> courses, PagingResponse paging})?>
+      getAccessibleCourses({
+    int page = 1,
+    int size = 10,
+  }) async {
+    try {
+      final url =
+          '${Endpoints.getAllAccessibleCourses}?page=$page&size=$size';
+
+      final response = await _httpManager.restRequest(
+        url: url,
+        method: HttpMethods.get,
+      );
+
+      if (response['statusCode'] == 200) {
+        debugPrint(
+            'getAccessibleCourses DataSource response: ${response['data']}');
+
+        // Respons berisi daftar objek UserCourseResponse.
+        // Kita perlu mem-parsingnya terlebih dahulu.
+        final userCourses = (response['data']['data'] as List)
+            .map((e) => UserCourseResponse.fromJson(e))
+            .toList();
+
+        // Ekstrak objek CourseResponse dari setiap UserCourseResponse.
+        final courses = userCourses.map((uc) => uc.course).toList();
+
+        // Parsing data paging.
+        final paging = PagingResponse.fromJson(response['data']['paging']);
+
+        return (courses: courses, paging: paging);
+      } else {
+        debugPrint(
+            'getAccessibleCourses DataSource failed: ${response['statusMessage']}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('getAccessibleCourses DataSource error: $e');
+      return null;
+    }
+  }
+
   Future<bool> adminAssignCoursesToUsers({
     required List<String> userIds,
     required List<String> courseIds,
@@ -275,6 +318,42 @@ class CourseDataSource {
     }
   }
 
+  Future<CourseWithQuizzesResponse?> getAccessibleCourseById(
+      String courseId) async {
+    try {
+      // Mengganti placeholder {courseId} dengan ID yang sebenarnya.
+      // Pastikan Endpoints.getAccessibleCourseById sudah didefinisikan dengan benar.
+      final url = Endpoints.getAccessibleCourseById
+          .replaceFirst('{courseId}', courseId);
+
+      final response = await _httpManager.restRequest(
+        url: url,
+        method: HttpMethods.get,
+      );
+
+      if (response['statusCode'] == 200) {
+        debugPrint(
+            'getAccessibleCourseById DataSource response: ${response['data']}');
+
+        // Berdasarkan struktur JSON, data utama ada di response['data']['data']
+        final data = response['data']['data'];
+
+        // Dari data tersebut, kita ambil object 'course' untuk diparsing.
+        final courseJson = data['course'];
+
+        // Parsing menggunakan CourseWithQuizzesResponse untuk mendapatkan detail kuis juga.
+        return CourseWithQuizzesResponse.fromJson(courseJson);
+      } else {
+        debugPrint(
+            'getAccessibleCourseById DataSource failed: ${response['statusMessage']}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('getAccessibleCourseById DataSource error: $e');
+      return null;
+    }
+  }
+
   Future<List<UserCourseResponse>?> adminGetAllUserCoursesByCourseId({
     required String courseId,
   }) async {
@@ -342,6 +421,118 @@ class CourseDataSource {
     } catch (e) {
       debugPrint('adminDeleteUserCourse DataSource error: $e');
       return false;
+    }
+  }
+
+    Future<List<CourseResponse>?> getAllAccessibleCourses() async {
+    try {
+      final List<CourseResponse> allCourses = [];
+      int currentPage = 1;
+      int totalPages = 1; // Nilai awal agar loop berjalan setidaknya sekali
+      const int pageSize =
+          50; // Ambil data dalam jumlah besar agar lebih efisien
+
+      // Lakukan perulangan selama halaman saat ini belum melewati total halaman
+      while (currentPage <= totalPages) {
+        // Panggil metode paginasi yang sudah ada
+        final result = await getAccessibleCourses(
+          page: currentPage,
+          size: pageSize,
+        );
+
+        // Jika salah satu halaman gagal diambil, gagalkan seluruh proses
+        if (result == null) {
+          debugPrint(
+              'Gagal mengambil data halaman $currentPage. Proses dibatalkan.');
+          return null;
+        }
+
+        // Tambahkan hasil dari halaman saat ini ke daftar utama
+        allCourses.addAll(result.courses);
+
+        // Perbarui total halaman dari informasi paging di respons
+        totalPages = result.paging.totalPage;
+
+        // Pindah ke halaman berikutnya untuk iterasi selanjutnya
+        currentPage++;
+      }
+
+      debugPrint(
+          'Sukses mengambil semua ${allCourses.length} course dari $totalPages halaman.');
+      return allCourses;
+    } catch (e) {
+      debugPrint('getAllAccessibleCourses DataSource error: $e');
+      return null;
+    }
+  }
+
+    Future<List<CourseWithQuizzesResponse>?>
+      getAllAccessibleCoursesWithQuizzes() async {
+    try {
+      final List<CourseWithQuizzesResponse> allCourses = [];
+      int currentPage = 1;
+      int totalPages = 1;
+      const int pageSize = 50;
+
+      while (currentPage <= totalPages) {
+        final result = await _getPaginatedAccessibleCoursesWithQuizzes(
+          page: currentPage,
+          size: pageSize,
+        );
+
+        if (result == null) {
+          debugPrint(
+              'Gagal mengambil data course (halaman $currentPage). Proses dibatalkan.');
+          return null;
+        }
+
+        allCourses.addAll(result.courses);
+        totalPages = result.paging.totalPage;
+        currentPage++;
+      }
+
+      debugPrint(
+          'Sukses mengambil semua ${allCourses.length} course dengan detail kuis.');
+      return allCourses;
+    } catch (e) {
+      debugPrint('getAllAccessibleCoursesWithQuizzes DataSource error: $e');
+      return null;
+    }
+  }
+
+  /// Fungsi helper paginasi yang mengembalikan model CourseWithQuizzesResponse.
+  Future<({List<CourseWithQuizzesResponse> courses, PagingResponse paging})?>
+      _getPaginatedAccessibleCoursesWithQuizzes({
+    int page = 1,
+    int size = 10,
+  }) async {
+    try {
+      final url =
+          '${Endpoints.getAllAccessibleCourses}?page=$page&size=$size';
+
+      final response = await _httpManager.restRequest(
+        url: url,
+        method: HttpMethods.get,
+      );
+
+      if (response['statusCode'] == 200) {
+        // Dari JSON response, kita ambil object 'course' di dalamnya
+        // dan langsung parsing menggunakan model baru kita.
+        final courses = (response['data']['data'] as List)
+            .map((userCourseJson) =>
+                CourseWithQuizzesResponse.fromJson(userCourseJson['course']))
+            .toList();
+
+        final paging = PagingResponse.fromJson(response['data']['paging']);
+
+        return (courses: courses, paging: paging);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      debugPrint(
+          '_getPaginatedAccessibleCoursesWithQuizzes DataSource error: $e');
+      return null;
     }
   }
 

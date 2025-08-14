@@ -15,6 +15,8 @@ class CourseListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Gunakan Get.put jika controller belum di-binding di tempat lain
+    // Jika sudah, Get.find() tidak masalah.
     final controller = Get.find<CourseListController>();
 
     return BaseWidgetContainer(
@@ -27,56 +29,69 @@ class CourseListScreen extends StatelessWidget {
               imagePath: controller.imagePath.value,
             )),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.only(bottom: 10.h, top: 10.h),
-        child: Obx(
-          () => ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: controller.courses.length,
-            itemBuilder: (context, index) {
-              final item = controller.courses[index] as Map<String, dynamic>;
-              final type = item['type'] as CourseContentType;
+      body: Obx(
+        () {
+          // Tampilkan loading indicator saat data sedang dimuat
+          if (controller.isLoading.value && controller.displayItems.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-              // Logika untuk membangun CourseCard berdasarkan tipe
-              if (type == CourseContentType.material) {
-                // Membuat kartu untuk Materi
-                return CourseCard(
-                  type: CourseContentType.material,
-                  title: item['title'],
-                  dateText: item['dateText'],
-                  description: item['description'],
-                  fileName: item['fileName'],
-                  previewImages: item['previewImages'],
-                  onTapAction: () {
-                    print("Melihat detail materi: ${item['title']}");
-                    Get.toNamed(AppRoutes.courseDetail, arguments: {'materialId': item['id']});
-                  },
-                );
-              } else { 
-                // Membuat kartu untuk Kuis
-                return CourseCard(
-                  type: CourseContentType.quiz,
-                  title: item['title'],
-                  dateText: item['dateText'],
-                  description: item['description'],
-                  timeLimit: item['timeLimit'],
-                  questionCount: item['questionCount'],
-                  isCompleted: item['isCompleted'],
-                  score: item['score'],
-                  onTapAction: () {
-                    // Aksi hanya berjalan jika kuis belum selesai
-                    if (!(item['isCompleted'] as bool)) {
-                      print("Memulai kuis: ${item['title']}");
-                      // Navigasi ke halaman pengerjaan kuis
-                      Get.toNamed(AppRoutes.quizAttempt, arguments: {'quizId': item['id']});
-                    }
-                  },
-                );
-              }
-            },
-          ),
-        ),
+          // Tampilkan pesan jika data kosong setelah selesai loading
+          if (!controller.isLoading.value && controller.displayItems.isEmpty) {
+            return const Center(
+              child: Text(
+                'Belum ada materi atau kuis untuk mata pelajaran ini.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+            );
+          }
+
+          // Tampilkan daftar course jika data tersedia
+          return RefreshIndicator(
+            onRefresh: () => controller.loadCourseData(),
+            child: ListView.builder(
+              padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
+              itemCount: controller.displayItems.length,
+              itemBuilder: (context, index) {
+                final item = controller.displayItems[index] as Map<String, dynamic>;
+                final type = item['type'] as CourseContentType;
+
+                if (type == CourseContentType.material) {
+                  return CourseCard(
+                    type: CourseContentType.material,
+                    title: item['title'],
+                    dateText: item['dateText'],
+                    description: item['description'],
+                    fileName: item['fileName'],
+                    previewImages: item['previewImages'],
+                    onTapAction: () {
+                      print("Melihat detail materi: ${item['title']}");
+                      Get.toNamed(AppRoutes.courseDetail, arguments: {'courseId': item['id']});
+                    },
+                  );
+                } else {
+                  return CourseCard(
+                    type: CourseContentType.quiz,
+                    title: item['title'],
+                    dateText: item['dateText'],
+                    description: item['description'],
+                    timeLimit: item['timeLimit'],
+                    questionCount: item['questionCount'],
+                    isCompleted: item['isCompleted'],
+                    score: item['score'],
+                    onTapAction: () {
+                      if (!(item['isCompleted'] as bool)) {
+                        print("Memulai kuis: ${item['title']}");
+                        Get.toNamed(AppRoutes.quizAttempt, arguments: {'quizId': item['id']});
+                      }
+                    },
+                  );
+                }
+              },
+            ),
+          );
+        },
       ),
     );
   }

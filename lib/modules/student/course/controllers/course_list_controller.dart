@@ -1,64 +1,131 @@
 // lib/modules/student/course/controllers/course_list_controller.dart
 
+import 'package:blessing/data/course/models/response/course_with_quizzes_response.dart';
+import 'package:blessing/data/course/repository/course_repository_impl.dart';
 import 'package:blessing/modules/student/course/widgets/course_card.dart';
 import 'package:get/get.dart';
+import 'package:blessing/core/utils/cache_util.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class CourseListController extends GetxController {
+  // State untuk UI
   final RxString title = 'Mata Pelajaran'.obs;
   final RxString classLevel = ''.obs;
   final RxString imagePath = ''.obs;
+  final isLoading = true.obs;
 
-  // Menggunakan RxList<dynamic> untuk menampung data Map dari materi dan kuis.
-  // Nantinya, list ini akan diisi dari hasil panggilan API.
-  final RxList<dynamic> courses = <dynamic>[
-    // Contoh data Kuis Belum Dikerjakan
-    {
-      'id': 'quiz-001', // Contoh ID untuk navigasi
-      'type': CourseContentType.quiz,
-      'title': 'Quiz 7: Vektor',
-      'dateText': '3 hari yang lalu',
-      'description': 'Kuis pemahaman tentang konsep dasar vektor.',
-      'timeLimit': 10,
-      'questionCount': 20,
-      'isCompleted': false, // Kuis ini belum dikerjakan
-    },
-    // Contoh data Kuis Sudah Dikerjakan
-    {
-      'id': 'quiz-002',
-      'type': CourseContentType.quiz,
-      'title': 'Quiz 6: Turunan Fungsi',
-      'dateText': '5 hari yang lalu',
-      'description': 'Kuis tentang aturan rantai dan turunan parsial.',
-      'timeLimit': 15,
-      'questionCount': 15,
-      'isCompleted': true, // Kuis ini sudah selesai
-      'score': 98,
-    },
-    // Contoh data Materi
-    {
-      'id': 'material-001',
-      'type': CourseContentType.material,
-      'title': 'Bab 5 : Geometri Ruang',
-      'description':
-          'Materi lengkap tentang bangun ruang sisi datar dan lengkung.',
-      'fileName': 'geometri_ruang.pdf',
-      'dateText': '1 minggu yang lalu',
-      'previewImages': null, // Bisa diisi dengan List<Widget> jika ada gambar
-    },
-  ].obs;
+  // State untuk data
+  final RxList<dynamic> displayItems = <dynamic>[].obs;
+
+  // Dependensi dan Cache
+  final _courseRepo = CourseRepository();
+  String? _subjectId;
+  String get _cacheKey => 'course_list_detailed_$_subjectId';
 
   @override
   void onInit() {
     super.onInit();
+    _handleArguments();
+    loadCourseData();
+  }
+
+  void _handleArguments() {
     final arguments = Get.arguments as Map<String, dynamic>?;
     if (arguments != null) {
       title.value = arguments['title'] ?? 'Mata Pelajaran';
       classLevel.value = arguments['classLevel'] ?? '';
-      imagePath.value = arguments['imagePath'] ?? 'assets/images/bg-admin-subject.png';
-      // Logika path gambar Anda yang kompleks bisa tetap di sini
+      imagePath.value =
+          arguments['imagePath'] ?? 'assets/images/bg-admin-subject.png';
+      _subjectId = arguments['subjectId'];
+    }
+  }
+
+  Future<void> loadCourseData() async {
+    if (_subjectId == null) {
+      isLoading.value = false;
+      return;
     }
 
-    // Panggil fungsi untuk mengambil data dari API di sini.
-    // fetchStudentCourseData(subjectId: arguments['subjectId']);
+    timeago.setLocaleMessages('id', timeago.IdMessages());
+
+    isLoading.value = true;
+    try {
+      await _loadFromCache();
+      await _fetchFromNetwork();
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal memuat data: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> _loadFromCache() async {
+    final cachedData = CacheUtil().getData(_cacheKey);
+    if (cachedData != null && cachedData is List) {
+      displayItems.assignAll(cachedData.cast<dynamic>());
+    }
+  }
+
+  Future<void> _fetchFromNetwork() async {
+    try {
+      // PANGGIL FUNGSI REPOSITORY YANG BARU
+      final allCoursesFromApi =
+          await _courseRepo.getAllAccessibleCoursesWithQuizzes();
+
+      if (allCoursesFromApi != null) {
+        final filteredCourses = allCoursesFromApi
+            .where((course) => course.subject.id == _subjectId)
+            .toList();
+
+        // GUNAKAN FUNGSI TRANSFORMASI YANG SEKARANG BISA MEMPROSES KUIS
+        final processedItems = _transformDataForUI(filteredCourses);
+
+        displayItems.assignAll(processedItems);
+        CacheUtil().setData(_cacheKey, processedItems);
+      }
+    } catch (e) {
+      print('Error fetching from network: $e');
+    }
+  }
+
+  /// SEKARANG FUNGSI INI BISA MEMPROSES KUIS KEMBALI!
+  List<dynamic> _transformDataForUI(List<CourseWithQuizzesResponse> courses) {
+    final List<dynamic> items = [];
+
+    for (final course in courses) {
+      // Tambahkan item untuk materi (course itu sendiri)
+      items.add({
+        'id': course.id,
+        'type': CourseContentType.material,
+        'title': course.courseName,
+        'description': 'Materi pembelajaran untuk ${course.courseName}.',
+        'fileName': 'Materi Digital',
+        'dateText': timeago.format(course.createdAt, locale: 'id'),
+        'date': course.createdAt,
+        'previewImages': null,
+      });
+
+      // Tambahkan item untuk setiap kuis di dalam course
+      for (final quiz in course.quizzes) {
+        items.add({
+          'id': quiz.id,
+          'type': CourseContentType.quiz,
+          'title': quiz.quizName,
+          'dateText': timeago.format(quiz.createdAt, locale: 'id'),
+          'date': quiz.createdAt,
+          'description': 'Kuis untuk menguji pemahaman materi.',
+          'timeLimit': quiz.timeLimit,
+          'questionCount': quiz.questionCount ?? 0,
+          'isCompleted': false,
+          'score': null,
+        });
+      }
+    }
+
+    // Urutkan semua item (materi & kuis) berdasarkan tanggal terbaru
+    items.sort(
+        (a, b) => (b['date'] as DateTime).compareTo(a['date'] as DateTime));
+
+    return items;
   }
 }
