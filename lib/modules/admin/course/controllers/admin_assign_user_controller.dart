@@ -1,4 +1,4 @@
-
+import 'package:blessing/data/course/models/response/user_course_response.dart'; // Pastikan import ini ada
 import 'package:blessing/data/course/repository/course_repository_impl.dart';
 import 'package:blessing/data/user/models/response/user_response.dart';
 import 'package:blessing/data/user/repository/user_repository_impl.dart';
@@ -14,7 +14,7 @@ class AdminAssignUserController extends GetxController {
   // Loading & Error
   final RxBool isLoading = true.obs;
   final RxString errorMessage = ''.obs;
-  final RxBool isAssigning = false.obs; // Loading state untuk proses assignment
+  final RxBool isAssigning = false.obs;
 
   // User Data & Filtering
   final RxList<UserResponse> allUsers = <UserResponse>[].obs;
@@ -25,6 +25,8 @@ class AdminAssignUserController extends GetxController {
 
   // Selection Management
   final RxSet<String> selectedUserIds = <String>{}.obs;
+  // BARU: Menyimpan ID user yang sudah punya akses dari awal
+  final RxSet<String> existingUserIds = <String>{}.obs;
 
   // Data from previous screen
   late final String courseId;
@@ -32,7 +34,6 @@ class AdminAssignUserController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Ambil courseId dari arguments
     courseId = Get.arguments as String? ?? '';
     if (courseId.isEmpty) {
       errorMessage.value = "ID Materi tidak valid.";
@@ -40,22 +41,53 @@ class AdminAssignUserController extends GetxController {
       return;
     }
 
-    fetchAllUsers();
+    // Panggil fungsi inisialisasi data
+    _initializeData();
 
     // Listener untuk filter otomatis
     ever(selectedKelas, (_) => _filterUsers());
     ever(searchQuery, (_) => _filterUsers());
   }
 
-  Future<void> fetchAllUsers() async {
+  /// Mengambil semua data yang dibutuhkan secara bersamaan
+  Future<void> _initializeData() async {
     isLoading.value = true;
+    errorMessage.value = '';
     try {
-      final users = await _userRepository.getAllUsersComplete();
-      allUsers.assignAll(users);
-      _filterUsers(); // Terapkan filter awal
+      // Jalankan kedua future secara paralel untuk efisiensi
+      final results = await Future.wait([
+        _userRepository.getAllUsersComplete(),
+        _courseRepository.adminGetAllUserCoursesByCourseId(courseId: courseId),
+      ]);
+
+      // --- Proses hasil dari `getAllUsersComplete` ---
+      final allUsersResult = results[0] as List<UserResponse>?;
+      if (allUsersResult != null) {
+        allUsers.assignAll(allUsersResult);
+      } else {
+        throw 'Gagal mendapatkan daftar siswa.';
+      }
+
+      // --- Proses hasil dari `adminGetAllUserCoursesByCourseId` ---
+      // =========================================================
+      // PERBAIKAN DI SINI: Tambahkan cast `as List<UserCourseResponse>?`
+      // =========================================================
+      final existingPermissionsResult = results[1] as List<UserCourseResponse>?;
+      if (existingPermissionsResult != null) {
+        // Ambil semua ID user yang sudah punya akses
+        final ids = existingPermissionsResult
+            .map((permission) => permission.user.id)
+            .toSet();
+        existingUserIds.assignAll(ids);
+        // Langsung centang user yang sudah punya akses
+        selectedUserIds.assignAll(ids);
+      }
+      // Jika null, tidak apa-apa, artinya belum ada yang punya akses
+
+      _filterUsers(); // Terapkan filter awal setelah semua data siap
     } catch (e) {
-      errorMessage.value = "Gagal memuat daftar siswa: $e";
-      debugPrint("Error fetching users: $e");
+      errorMessage.value = "Gagal memuat data: $e";
+      debugPrint("Error initializing data: $e");
     } finally {
       isLoading.value = false;
     }
@@ -109,12 +141,11 @@ class AdminAssignUserController extends GetxController {
     isAssigning.value = false;
 
     if (success) {
-      Get.snackbar('Berhasil', 'Siswa telah berhasil ditambahkan ke materi.',
+      Get.snackbar('Berhasil', 'Akses siswa telah diperbarui.',
           backgroundColor: Colors.green, colorText: Colors.white);
-      // Kembali ke halaman sebelumnya dengan hasil 'true' untuk trigger refresh
       Get.back(result: true);
     } else {
-      Get.snackbar('Gagal', 'Terjadi kesalahan saat menambahkan siswa.',
+      Get.snackbar('Gagal', 'Terjadi kesalahan saat memperbarui akses.',
           backgroundColor: Colors.red, colorText: Colors.white);
     }
   }

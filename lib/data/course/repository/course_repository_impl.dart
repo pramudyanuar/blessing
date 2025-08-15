@@ -27,7 +27,7 @@ class CourseRepository {
     }
   }
 
-    Future<List<CourseResponse>?> adminGetAllCoursesWithoutPaging() async {
+  Future<List<CourseResponse>?> adminGetAllCoursesWithoutPaging() async {
     try {
       final List<CourseResponse> allCourses = [];
       int currentPage = 1;
@@ -105,17 +105,44 @@ class CourseRepository {
   }) async {
     try {
       return await _dataSource.adminPostCourse(
-        courseName: courseName,
-        content: content,
-        gradeLevel: gradeLevel,
-        subjectId: subjectId
-      );
+          courseName: courseName,
+          content: content,
+          gradeLevel: gradeLevel,
+          subjectId: subjectId);
     } catch (e) {
       debugPrint('Error in CourseRepository (adminPostCourse): $e');
       return false;
     }
   }
 
+  // =========================================================================
+  // FUNGSI BARU DITAMBAHKAN DI SINI
+  // Fungsi ini untuk mengambil data user course permission DENGAN PAGINASI.
+  // =========================================================================
+  Future<({List<UserCourseResponse> userCourses, PagingResponse paging})?>
+      adminGetUserCoursesByCourseId({
+    required String courseId,
+    int page = 1,
+    int size = 10,
+  }) async {
+    try {
+      return await _dataSource.adminGetUserCoursesByCourseId(
+        courseId: courseId,
+        page: page,
+        size: size,
+      );
+    } catch (e) {
+      debugPrint(
+          'Error in CourseRepository (adminGetUserCoursesByCourseId): $e');
+      return null;
+    }
+  }
+
+  // =========================================================================
+  // FUNGSI INI SUDAH ADA SEBELUMNYA
+  // Fungsi ini untuk mengambil SEMUA data user course permission TANPA PAGINASI
+  // dengan cara looping semua halaman dari datasource.
+  // =========================================================================
   Future<List<UserCourseResponse>?> adminGetAllUserCoursesByCourseId({
     required String courseId,
   }) async {
@@ -211,5 +238,4 @@ class CourseRepository {
       return null;
     }
   }
-
 }

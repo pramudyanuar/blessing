@@ -16,19 +16,17 @@ class AdminCourseDetailScreen extends StatelessWidget {
     final controller = Get.find<AdminCourseDetailController>();
 
     return BaseWidgetContainer(
-      // --- AppBar yang Lebih Stylish ---
       appBar: AppBar(
         title: GlobalText.semiBold("Detail Materi",
             fontSize: 18.sp, color: AppColors.c2),
         backgroundColor: AppColors.c1,
-        // elevation: 2,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new),
           onPressed: () {
             if (controller.isEditing.value) {
-              controller.isEditing.value = false; // batal edit
+              controller.isEditing.value = false;
             } else {
-              Get.back(); // keluar halaman
+              Get.back();
             }
           },
         ),
@@ -106,40 +104,56 @@ class AdminCourseDetailScreen extends StatelessWidget {
             }
           }),
         ],
-
       ),
-      // --- Body dengan Background dan Penanganan State ---
       backgroundColor: AppColors.c1,
       body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(
-              child: CircularProgressIndicator(color: AppColors.c2));
+        final index = controller.selectedIndex.value;
+        if (index == 0) {
+          if (controller.isLoading.value && controller.course.value == null) {
+            return const Center(
+                child: CircularProgressIndicator(color: AppColors.c2));
+          }
+          if (controller.course.value == null) {
+            return Center(
+                child: GlobalText.regular('Data tidak ditemukan',
+                    color: AppColors.c2));
+          }
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: controller.isEditing.value
+                ? _buildEditMode(controller)
+                : _buildViewMode(controller),
+          );
+        } else {
+          if (controller.isQuizLoading.value) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.c2),
+            );
+          }
+          return _buildQuizSection(controller);
         }
-        if (controller.course.value == null) {
-          return Center(
-              child: GlobalText.regular('Data tidak ditemukan',
-                  color: AppColors.c2));
-        }
-
-        // --- Transisi Halus antara Mode View dan Edit ---
-        return AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          transitionBuilder: (child, animation) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          child: controller.isEditing.value
-              ? _buildEditMode(controller) // Widget untuk Mode Edit
-              : _buildViewMode(controller), // Widget untuk Mode View
-        );
       }),
+      bottomNavigationBar: Obx(() => BottomNavigationBar(
+            currentIndex: controller.selectedIndex.value,
+            onTap: (i) => controller.selectedIndex.value = i,
+            selectedItemColor: AppColors.c2,
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.menu_book_outlined),
+                label: 'Materi',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.quiz_outlined),
+                label: 'Kuis',
+              ),
+            ],
+          )),
     );
   }
 
-  // --- WIDGET UNTUK MODE VIEW (LEBIH RAPI) ---
   Widget _buildViewMode(AdminCourseDetailController controller) {
     final course = controller.course.value!;
     return SingleChildScrollView(
-      key: const ValueKey('viewMode'),
       padding: EdgeInsets.all(16.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,29 +161,24 @@ class AdminCourseDetailScreen extends StatelessWidget {
           Card(
             elevation: 4,
             shadowColor: Colors.black.withOpacity(0.1),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.r)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: Padding(
               padding: EdgeInsets.all(16.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GlobalText.bold(
-                    course.courseName ?? 'Tanpa Judul',
-                    fontSize: 22.sp,
-                    color: AppColors.c2,
-                  ),
+                  GlobalText.bold(course.courseName ?? 'Tanpa Judul',
+                      fontSize: 22.sp, color: AppColors.c2),
                   SizedBox(height: 12.h),
                   _buildInfoRow(
-                    icon: Icons.class_outlined,
-                    text: 'Kelas: ${course.gradeLevel}',
-                  ),
+                      icon: Icons.class_outlined,
+                      text: 'Kelas: ${course.gradeLevel}'),
                   SizedBox(height: 8.h),
                   _buildInfoRow(
-                    icon: Icons.book_outlined,
-                    text:
-                        'Mata Pelajaran: ${course.subject?.subjectName ?? 'N/A'}',
-                  ),
+                      icon: Icons.book_outlined,
+                      text:
+                          'Mata Pelajaran: ${course.subject?.subjectName ?? 'N/A'}'),
                 ],
               ),
             ),
@@ -198,22 +207,6 @@ class AdminCourseDetailScreen extends StatelessWidget {
                   child: Image.network(
                     content.data,
                     fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                          color: AppColors.c2,
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) => const Icon(
-                        Icons.broken_image,
-                        size: 50,
-                        color: Colors.grey),
                   ),
                 ),
               );
@@ -225,83 +218,105 @@ class AdminCourseDetailScreen extends StatelessWidget {
     );
   }
 
-  // --- WIDGET UNTUK MODE EDIT (LEBIH MODERN) ---
-  Widget _buildEditMode(AdminCourseDetailController controller) {
+  Widget _buildQuizSection(AdminCourseDetailController controller) {
     return SingleChildScrollView(
-      key: const ValueKey('editMode'),
       padding: EdgeInsets.all(16.w),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildStyledTextField(
-            controller:
-                TextEditingController(text: controller.editedCourseName.value)
-                  ..selection = TextSelection.fromPosition(TextPosition(
-                      offset: controller.editedCourseName.value.length)),
-            onChanged: (v) => controller.editedCourseName.value = v,
-            labelText: 'Judul Materi',
-            icon: Icons.title,
+          InkWell(
+            onTap: () {
+              Get.toNamed(AppRoutes.adminCreateQuiz,
+                  arguments: {'courseId': controller.courseId});
+            },
+            borderRadius: BorderRadius.circular(20),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Icon(Icons.add, size: 20.sp, color: AppColors.c2),
+                  SizedBox(width: 4.w),
+                  GlobalText.medium("Tambah Kuis", color: AppColors.c2),
+                ],
+              ),
+            ),
           ),
           SizedBox(height: 16.h),
-          ...List.generate(controller.editedContents.length, (index) {
-            return Padding(
-              padding: EdgeInsets.only(bottom: 16.h),
-              child: _buildStyledTextField(
-                controller: TextEditingController(
-                    text: controller.editedContents[index])
-                  ..selection = TextSelection.fromPosition(TextPosition(
-                      offset: controller.editedContents[index].length)),
-                onChanged: (v) => controller.editedContents[index] = v,
-                labelText: 'Konten Teks ${index + 1}',
-                icon: Icons.article_outlined,
-                maxLines: 5,
+          if (controller.quizzes.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 16.w),
+              decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12.r)),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.quiz_outlined, size: 40.sp, color: Colors.grey),
+                    SizedBox(height: 8.h),
+                    GlobalText.regular("Belum ada kuis untuk materi ini.",
+                        color: Colors.grey),
+                  ],
+                ),
               ),
-            );
-          }),
+            )
+          else
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: controller.quizzes.length,
+              itemBuilder: (context, index) {
+                final quiz = controller.quizzes[index];
+                return Card(
+                  elevation: 2,
+                  margin: EdgeInsets.only(bottom: 12.h),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r)),
+                  child: ListTile(
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+                    leading: const Icon(Icons.quiz, color: AppColors.c2),
+                    title: GlobalText.medium(
+                      quiz.quizName ?? 'Kuis Tanpa Judul',
+                    ),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () {
+                      // Get.toNamed(AppRoutes.adminQuizDetail, arguments: {'quizId': quiz.id});
+                    },
+                  ),
+                );
+              },
+            ),
         ],
       ),
     );
   }
 
-  // Helper untuk baris info (Kelas, Mapel)
-  Widget _buildInfoRow({required IconData icon, required String text}) {
-    return Row(
-      children: [
-        Icon(icon, color: AppColors.c2, size: 20.sp),
-        SizedBox(width: 8.w),
-        GlobalText.regular(text,
-            color: AppColors.c2, fontSize: 14.sp),
-      ],
+  Widget _buildEditMode(AdminCourseDetailController controller) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(16.w),
+      child: Column(
+        children: [
+          TextField(
+            controller:
+                TextEditingController(text: controller.editedCourseName.value),
+            onChanged: (v) => controller.editedCourseName.value = v,
+            decoration: const InputDecoration(labelText: 'Judul Materi'),
+          ),
+        ],
+      ),
     );
   }
 
-  // Helper untuk TextField yang stylish
-  Widget _buildStyledTextField({
-    required TextEditingController controller,
-    required ValueChanged<String> onChanged,
-    required String labelText,
-    required IconData icon,
-    int maxLines = 1,
-  }) {
-    return TextField(
-      controller: controller,
-      onChanged: onChanged,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        labelText: labelText,
-        prefixIcon: Icon(icon, color: AppColors.c2),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
+  Widget _buildInfoRow({required IconData icon, required String text}) {
+    return Row(
+      children: [
+        Icon(icon, color: AppColors.c2),
+        SizedBox(width: 8.w),
+        Flexible(
+          child: GlobalText.regular(text, color: AppColors.c2),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: AppColors.c2, width: 2.0),
-        ),
-        floatingLabelStyle: const TextStyle(color: AppColors.c2),
-      ),
+      ],
     );
   }
 }

@@ -1,13 +1,18 @@
 import 'package:blessing/data/course/models/response/course_response.dart';
 import 'package:blessing/data/course/repository/course_repository_impl.dart';
+import 'package:blessing/data/quiz/models/response/quiz_response.dart'; // --- TAMBAHAN ---
+import 'package:blessing/data/quiz/repository/quiz_repository_impl.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 class AdminCourseDetailController extends GetxController {
-  final _repository = Get.find<CourseRepository>();
+  // --- MODIFIKASI: Tambahkan QuizRepository ---
+  final _courseRepository = Get.find<CourseRepository>();
+  final _quizRepository = Get.find<QuizRepository>();
 
   final course = Rxn<CourseResponse>();
   final isLoading = false.obs;
+  final selectedIndex = 0.obs;
 
   late final String courseId;
 
@@ -15,6 +20,10 @@ class AdminCourseDetailController extends GetxController {
   final isEditing = false.obs;
   final editedCourseName = ''.obs;
   final editedContents = <String>[].obs;
+
+  // --- TAMBAHAN: State untuk Kuis ---
+  final quizzes = <QuizResponse>[].obs;
+  final isQuizLoading = false.obs;
 
   @override
   void onInit() {
@@ -28,9 +37,11 @@ class AdminCourseDetailController extends GetxController {
   Future<void> fetchCourseDetail() async {
     try {
       isLoading.value = true;
-      final result = await _repository.adminGetCourseById(courseId);
+      final result = await _courseRepository.adminGetCourseById(courseId);
       if (result != null) {
         course.value = result;
+        // --- TAMBAHAN: Panggil fetch kuis setelah materi didapat ---
+        await fetchQuizzesForCourse();
       }
     } catch (e) {
       debugPrint('Error fetchCourseDetail: $e');
@@ -39,10 +50,30 @@ class AdminCourseDetailController extends GetxController {
     }
   }
 
+  // --- TAMBAHAN: Fungsi untuk mengambil data kuis ---
+  Future<void> fetchQuizzesForCourse() async {
+    try {
+      isQuizLoading.value = true;
+      quizzes.clear(); // Kosongkan list sebelum fetch baru
+      final result = await _quizRepository.searchQuizzesByCourseId(
+        courseId: courseId,
+        page: 1,
+        size: 5, // Ambil 5 kuis teratas, sesuaikan jika perlu
+      );
+      if (result != null && result.quizzes.isNotEmpty) {
+        quizzes.value = result.quizzes;
+      }
+    } catch (e) {
+      debugPrint('Error fetchQuizzesForCourse: $e');
+      Get.snackbar('Error', 'Gagal memuat data kuis');
+    } finally {
+      isQuizLoading.value = false;
+    }
+  }
+
   void startEditing() {
     if (course.value != null) {
       editedCourseName.value = course.value!.courseName ?? '';
-      // hanya ambil konten type text
       editedContents.value = course.value!.content!
           .where((c) => c.type == 'text')
           .map((c) => c.data)
@@ -54,7 +85,7 @@ class AdminCourseDetailController extends GetxController {
   Future<void> deleteCourse() async {
     try {
       isLoading.value = true;
-      final success = await _repository.adminDeleteCourse(courseId);
+      final success = await _courseRepository.adminDeleteCourse(courseId);
       if (success) {
         Get.back(); // keluar dialog konfirmasi
         Get.back(); // keluar dari detail page
@@ -70,7 +101,6 @@ class AdminCourseDetailController extends GetxController {
     }
   }
 
-
   Future<void> saveEdits() async {
     if (course.value == null) return;
 
@@ -85,7 +115,6 @@ class AdminCourseDetailController extends GetxController {
           "data": editedContents[index],
         };
       } else {
-        // konten non-text tidak diubah
         return {
           "type": c.type,
           "data": c.data,
@@ -94,7 +123,7 @@ class AdminCourseDetailController extends GetxController {
     }).toList();
 
     try {
-      final success = await _repository.adminUpdateCourse(
+      final success = await _courseRepository.adminUpdateCourse(
         courseId: courseId,
         courseName: editedCourseName.value,
         content: updatedContent,
@@ -102,7 +131,7 @@ class AdminCourseDetailController extends GetxController {
       );
 
       if (success) {
-        await fetchCourseDetail();
+        await fetchCourseDetail(); // fetch ulang semua data termasuk kuis
         isEditing.value = false;
       } else {
         debugPrint("Update course gagal di backend");

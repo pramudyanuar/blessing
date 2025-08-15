@@ -8,7 +8,6 @@ import 'package:blessing/modules/admin/course/controllers/course_list_controller
 import 'package:blessing/modules/admin/course/widgets/course_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 
 class AdminManageCourseListScreen extends StatelessWidget {
@@ -121,51 +120,19 @@ class AdminManageCourseListScreen extends StatelessWidget {
           },
         ),
       ),
-      floatingActionButton: buildSpeedDial(context, controller),
-    );
-  }
-
-  // Helper untuk membuat SpeedDial FAB
-  SpeedDial buildSpeedDial(
-      BuildContext context, AdminManageCourseListController controller) {
-    return SpeedDial(
-      backgroundColor: AppColors.c2,
-      foregroundColor: AppColors.c1,
-      icon: Icons.add,
-      activeIcon: Icons.close,
-      spacing: 10,
-      spaceBetweenChildren: 10,
-      elevation: 4,
-      children: [
-        SpeedDialChild(
-          child: const Icon(Icons.upload_file),
-          backgroundColor: AppColors.c8,
-          foregroundColor: AppColors.c1,
-          label: 'Unggah Materi',
-          onTap: () {
-            // Kirim subjectId dan kelas saat navigasi
-            debugPrint(
-                'Navigasi ke adminUploadCourse dengan subjectId: ${controller.subjectId} dan kelas: ${controller.kelas}');
-            Get.toNamed(AppRoutes.adminCreateCourse, arguments: {
-              'subjectId': controller.subjectId,
-              'kelas': controller.kelas,
-            });
-          },
-        ),
-        SpeedDialChild(
-          child: const Icon(Icons.quiz),
-          backgroundColor: AppColors.c9,
-          foregroundColor: AppColors.c1,
-          label: 'Buat Kuis',
-          onTap: () {
-            // Kirim subjectId dan kelas saat navigasi
-            Get.toNamed(AppRoutes.adminCreateQuiz, arguments: {
-              'subjectId': controller.subjectId,
-              'kelas': controller.kelas,
-            });
-          },
-        ),
-      ],
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.c2,
+        foregroundColor: AppColors.c1,
+        child: const Icon(Icons.upload_file),
+        onPressed: () {
+          debugPrint(
+              'Navigasi ke adminUploadCourse dengan subjectId: ${controller.subjectId} dan kelas: ${controller.kelas}');
+          Get.toNamed(AppRoutes.adminCreateCourse, arguments: {
+            'subjectId': controller.subjectId,
+            'kelas': controller.kelas,
+          });
+        },
+      ),
     );
   }
 }

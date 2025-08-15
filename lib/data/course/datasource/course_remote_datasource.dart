@@ -48,7 +48,6 @@ class CourseDataSource {
       return null;
     }
   }
-  
 
   Future<CourseResponse?> adminGetCourseById(String courseId) async {
     try {
@@ -187,8 +186,7 @@ class CourseDataSource {
         body: body,
       );
 
-      debugPrint(
-          'adminPostCourse DataSource response: ${response['data']}');
+      debugPrint('adminPostCourse DataSource response: ${response['data']}');
 
       if (response['statusCode'] == 200 || response['statusCode'] == 201) {
         debugPrint('Course created successfully: ${response['data']}');
@@ -210,8 +208,7 @@ class CourseDataSource {
     int size = 10,
   }) async {
     try {
-      final url =
-          '${Endpoints.getAllAccessibleCourses}?page=$page&size=$size';
+      final url = '${Endpoints.getAllAccessibleCourses}?page=$page&size=$size';
 
       final response = await _httpManager.restRequest(
         url: url,
@@ -425,7 +422,7 @@ class CourseDataSource {
     }
   }
 
-    Future<List<CourseResponse>?> getAllAccessibleCourses() async {
+  Future<List<CourseResponse>?> getAllAccessibleCourses() async {
     try {
       final List<CourseResponse> allCourses = [];
       int currentPage = 1;
@@ -467,7 +464,7 @@ class CourseDataSource {
     }
   }
 
-    Future<List<CourseWithQuizzesResponse>?>
+  Future<List<CourseWithQuizzesResponse>?>
       getAllAccessibleCoursesWithQuizzes() async {
     try {
       final List<CourseWithQuizzesResponse> allCourses = [];
@@ -508,8 +505,7 @@ class CourseDataSource {
     int size = 10,
   }) async {
     try {
-      final url =
-          '${Endpoints.getAllAccessibleCourses}?page=$page&size=$size';
+      final url = '${Endpoints.getAllAccessibleCourses}?page=$page&size=$size';
 
       final response = await _httpManager.restRequest(
         url: url,
@@ -560,6 +556,4 @@ class CourseDataSource {
       return false;
     }
   }
-
-
 }
