@@ -9,10 +9,6 @@ class CourseRepository {
   // Instansiasi datasource secara langsung sesuai dengan pola yang ada
   final CourseDataSource _dataSource = CourseDataSource();
 
-  /// Memanggil datasource untuk mengambil semua course admin dengan paginasi.
-  ///
-  /// Meneruskan hasil atau null dari datasource.
-  /// Penanganan error lebih lanjut bisa ditambahkan di sini jika diperlukan.
   Future<({List<CourseResponse> courses, PagingResponse paging})?>
       adminGetAllCourses({
     int page = 1,
@@ -27,6 +23,48 @@ class CourseRepository {
     } catch (e) {
       // Log error dari repository layer
       debugPrint('Error in CourseRepository: $e');
+      return null;
+    }
+  }
+
+    Future<List<CourseResponse>?> adminGetAllCoursesWithoutPaging() async {
+    try {
+      final List<CourseResponse> allCourses = [];
+      int currentPage = 1;
+      int totalPages = 1; // Nilai awal agar loop berjalan setidaknya sekali
+      const int pageSize = 50; // Ambil 50 data per request agar lebih efisien
+
+      while (currentPage <= totalPages) {
+        // Panggil metode paginasi yang sudah ada
+        final result = await _dataSource.adminGetAllCourses(
+          page: currentPage,
+          size: pageSize,
+        );
+
+        // Jika salah satu halaman gagal diambil, gagalkan seluruh proses
+        if (result == null) {
+          debugPrint(
+              'Gagal mengambil data halaman $currentPage. Proses dibatalkan.');
+          return null; // Mengembalikan null untuk menandakan kegagalan
+        }
+
+        // Tambahkan hasil dari halaman saat ini ke daftar utama
+        allCourses.addAll(result.courses);
+
+        // Perbarui total halaman dari informasi paging di respons
+        // Ini hanya perlu dilakukan sekali, tapi aman dilakukan di setiap iterasi
+        totalPages = result.paging.totalPage;
+
+        // Pindah ke halaman berikutnya untuk iterasi selanjutnya
+        currentPage++;
+      }
+
+      debugPrint(
+          'Sukses mengambil semua ${allCourses.length} course dari $totalPages halaman.');
+      return allCourses;
+    } catch (e) {
+      debugPrint(
+          'Error in CourseRepository (adminGetAllCoursesWithoutPaging): $e');
       return null;
     }
   }

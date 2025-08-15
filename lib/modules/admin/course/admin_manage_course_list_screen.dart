@@ -58,33 +58,34 @@ class AdminManageCourseListScreen extends StatelessWidget {
               ],
             )),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.only(
-            bottom: 80.h, top: 10.h), // Tambah padding bawah untuk FAB
+      body: RefreshIndicator(
+        onRefresh: controller.refreshCourses,
         child: Obx(
           () {
             if (controller.courses.isEmpty) {
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(32.0),
-                  child: Text(
-                    'Belum ada materi atau kuis.\nTekan tombol + untuk menambahkan.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey),
+              return ListView(
+                padding: EdgeInsets.only(bottom: 80.h, top: 10.h),
+                children: const [
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(32.0),
+                      child: Text(
+                        'Belum ada materi atau kuis.\nTekan tombol + untuk menambahkan.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
                   ),
-                ),
+                ],
               );
             }
-            // --- PERUBAHAN UTAMA DI SINI ---
             return ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.only(bottom: 80.h, top: 10.h),
               itemCount: controller.courses.length,
               itemBuilder: (context, index) {
                 final item = controller.courses[index] as Map<String, dynamic>;
                 final type = item['type'] as CourseContentType;
 
-                // Membangun CourseCard berdasarkan tipenya
                 if (type == CourseContentType.material) {
                   return CourseCard(
                     type: CourseContentType.material,
@@ -101,7 +102,6 @@ class AdminManageCourseListScreen extends StatelessWidget {
                     },
                   );
                 } else {
-                  // type == CourseContentType.quiz
                   return CourseCard(
                     type: CourseContentType.quiz,
                     title: item['title'],

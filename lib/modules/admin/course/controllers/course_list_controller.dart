@@ -2,6 +2,7 @@ import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/core/global_components/global_confirmation_dialog.dart';
 import 'package:blessing/core/utils/cache_util.dart';
 import 'package:blessing/data/core/models/content_block.dart';
+import 'package:blessing/data/course/models/response/course_response.dart'; // Pastikan import ini ada
 import 'package:blessing/data/course/repository/course_repository_impl.dart';
 import 'package:blessing/data/subject/models/request/update_subject_request.dart';
 import 'package:blessing/data/subject/repository/subject_repository_impl.dart';
@@ -75,16 +76,21 @@ class AdminManageCourseListController extends GetxController {
     }
   }
 
+  // --- PERUBAHAN UTAMA DI FUNGSI INI ---
   Future<void> fetchCourses() async {
     if (courses.isEmpty) {
       isLoading.value = true;
     }
 
     try {
-      final result = await _courseRepository.adminGetAllCourses();
+      // 1. Panggil metode baru untuk mengambil SEMUA course
+      final List<CourseResponse>? allCourses =
+          await _courseRepository.adminGetAllCoursesWithoutPaging();
 
-      if (result != null) {
-        final mappedCourses = result.courses
+      // 2. Lanjutkan proses hanya jika hasilnya tidak null
+      if (allCourses != null) {
+        // 3. Lakukan filter, map, dan sort pada SEMUA data yang sudah didapat
+        final mappedCourses = allCourses
             .where((c) => c.subject?.id == subjectId && c.gradeLevel == kelas)
             .map((course) {
           final date = course.updatedAt ?? course.createdAt ?? DateTime.now();
@@ -101,6 +107,7 @@ class AdminManageCourseListController extends GetxController {
           ..sort((a, b) => (b['dateObject'] as DateTime)
               .compareTo(a['dateObject'] as DateTime));
 
+        // Simpan hasil yang sudah difilter ke cache
         CacheUtil().setData(
           _cacheKey,
           mappedCourses.map((item) {
@@ -111,6 +118,7 @@ class AdminManageCourseListController extends GetxController {
           }).toList(),
         );
 
+        // Tampilkan hasilnya di UI
         courses.assignAll(mappedCourses);
       }
     } catch (e) {
@@ -123,6 +131,7 @@ class AdminManageCourseListController extends GetxController {
       isLoading.value = false;
     }
   }
+  // --- AKHIR DARI PERUBAHAN ---
 
   String _formatDate(DateTime date) {
     return DateFormat('d MMMM yyyy', 'id_ID').format(date);
@@ -250,6 +259,12 @@ class AdminManageCourseListController extends GetxController {
         showDeleteConfirmation();
         break;
     }
+  }
+
+  Future<void> refreshCourses() async {
+    CacheUtil().removeData(_cacheKey);
+    // Tidak perlu assignAll([]) karena fetchCourses akan menggantinya
+    await fetchCourses();
   }
 
   @override
