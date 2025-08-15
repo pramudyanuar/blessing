@@ -51,7 +51,7 @@ class CourseListScreen extends StatelessWidget {
           return RefreshIndicator(
             onRefresh: () => controller.loadCourseData(),
             child: ListView.builder(
-              padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
+              padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 8.w),
               itemCount: controller.displayItems.length,
               itemBuilder: (context, index) {
                 final item = controller.displayItems[index] as Map<String, dynamic>;

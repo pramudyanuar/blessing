@@ -11,6 +11,7 @@ class CourseDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Dapatkan instance controller yang sudah di-initialize
     final controller = Get.find<CourseDetailController>();
 
     return BaseWidgetContainer(
@@ -22,6 +23,10 @@ class CourseDetailScreen extends StatelessWidget {
               controller.course.value?.courseName ?? 'Detail Materi',
               color: Colors.white,
             )),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          onPressed: () => Get.back(),
+        ),
       ),
       // Body akan reaktif terhadap state dari controller
       body: Obx(() {
@@ -70,7 +75,7 @@ class CourseDetailScreen extends StatelessWidget {
           case 'text':
             return Padding(
               padding: EdgeInsets.only(bottom: 12.h),
-              child: GlobalText.regular(data.toString()),
+              child: GlobalText.regular(data.toString(), textAlign: TextAlign.start,),
             );
           case 'image':
             return Padding(
@@ -94,7 +99,7 @@ class CourseDetailScreen extends StatelessWidget {
                 ),
               ),
             );
-          // Anda bisa menambahkan case lain di sini, misalnya untuk PDF
+          // Anda bisa menambahkan case lain di sini, misalnya untuk PDF, video, dll.
           // case 'pdf':
           //   return SfPdfViewer.network(data.toString());
           default:

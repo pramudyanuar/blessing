@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 
 class CourseDetailController extends GetxController {
   // --- Dependensi ---
-  // Instansiasi repository untuk mengambil data course
+  // Instansiasi repository untuk mengambil data course. Pastikan sudah di-bind sebelumnya.
   final _courseRepository = Get.find<CourseRepository>();
 
   // --- State Observables ---
