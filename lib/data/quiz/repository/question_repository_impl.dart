@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:blessing/data/core/models/paging_response.dart';
 import 'package:blessing/data/quiz/datasource/question_remote_datasource.dart';
 import 'package:blessing/data/quiz/models/request/create_question_request.dart';
@@ -45,7 +46,9 @@ class QuestionRepository {
   }
 
   Future<bool> updateQuestion(
-      String questionId, CreateQuestionRequest request) async {
+    String questionId,
+    CreateQuestionRequest request,
+  ) async {
     try {
       return await _dataSource.updateQuestion(questionId, request);
     } catch (e) {
@@ -60,6 +63,17 @@ class QuestionRepository {
     } catch (e) {
       debugPrint('Error in QuestionRepository (deleteQuestion): $e');
       return false;
+    }
+  }
+
+  /// Upload image khusus untuk pertanyaan
+  Future<String?> uploadQuestionImage(File imageFile) async {
+    try {
+      final imageUrl = await _dataSource.uploadImage(imageFile);
+      return imageUrl;
+    } catch (e) {
+      debugPrint('Error in QuestionRepository (uploadQuestionImage): $e');
+      return null;
     }
   }
 }

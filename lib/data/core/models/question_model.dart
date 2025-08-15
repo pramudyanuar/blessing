@@ -1,17 +1,18 @@
+// lib/data/core/models/question_model.dart
+
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class QuestionModel {
-  // Controller untuk teks deskripsi/pertanyaan
-  final TextEditingController descriptionController;
+  final TextEditingController descriptionController = TextEditingController();
+  final RxList<TextEditingController> optionControllers =
+      <TextEditingController>[].obs;
+  final Rx<File?> imageFile = Rx<File?>(null);
+  final RxInt correctAnswerIndex = 0.obs; // <-- Tambahkan ini
 
-  // Daftar reaktif yang berisi controller untuk setiap opsi jawaban
-  final RxList<TextEditingController> optionControllers;
-
-  QuestionModel()
-      : descriptionController = TextEditingController(),
-        optionControllers = <TextEditingController>[].obs {
-    // Setiap pertanyaan baru otomatis dibuat dengan 2 opsi awal
+  QuestionModel() {
+    // Memulai dengan 2 opsi jawaban default
     optionControllers.add(TextEditingController());
     optionControllers.add(TextEditingController());
   }

@@ -1,29 +1,54 @@
+// lib/modules/admin/course/controllers/create_quiz_controller.dart
+
+import 'dart:io'; // <-- Tambahkan import
+import 'package:blessing/data/core/models/content_block.dart';
 import 'package:blessing/data/core/models/question_model.dart';
+import 'package:blessing/data/quiz/models/request/create_question_option_request.dart';
+import 'package:blessing/data/quiz/models/request/create_question_request.dart';
+import 'package:blessing/data/quiz/models/request/create_quiz_answer_request.dart';
+import 'package:blessing/data/quiz/models/request/create_quiz_request.dart';
+import 'package:blessing/data/quiz/repository/question_option_repository.dart';
+import 'package:blessing/data/quiz/repository/question_repository_impl.dart';
+import 'package:blessing/data/quiz/repository/quiz_answer_repository_impl.dart';
+import 'package:blessing/data/quiz/repository/quiz_repository_impl.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart'; // <-- Tambahkan import
 
 class CreateQuizController extends GetxController {
   final TextEditingController quizTitleController = TextEditingController();
-
-  // State utama sekarang adalah daftar (list) dari QuestionModel
+  final TextEditingController timeLimitController = TextEditingController();
   final RxList<QuestionModel> questions = <QuestionModel>[].obs;
+
+  // --- REPOSITORIES ---
+  final QuizRepository _quizRepository = Get.find();
+  final QuestionRepository _questionRepository = Get.find();
+  final QuestionOptionRepository _questionOptionRepository = Get.find();
+  final QuizAnswerRepository _quizAnswerRepository = Get.find();
+
+  // --- END REPOSITORIES ---
+
+  // --- BARU ---
+  final ImagePicker _picker = ImagePicker();
+  // --- SELESAI BARU ---
+
+  final RxBool isLoading = false.obs;
+  late final String courseId;
 
   @override
   void onInit() {
     super.onInit();
-    // Mulai dengan satu pertanyaan saat layar dibuka
     addQuestion();
+    courseId = (Get.arguments as Map<String, dynamic>)['courseId'];
   }
 
-  // Fungsi untuk menambah pertanyaan baru ke dalam list
   void addQuestion() {
     questions.add(QuestionModel());
   }
 
-  // Fungsi untuk menghapus pertanyaan
   void removeQuestion(int index) {
     if (questions.length > 1) {
-      questions[index].dispose(); // Hapus controllernya dari memori
+      questions[index].dispose();
       questions.removeAt(index);
     } else {
       Get.snackbar("Gagal", "Kuis harus memiliki setidaknya satu pertanyaan.",
@@ -31,7 +56,6 @@ class CreateQuizController extends GetxController {
     }
   }
 
-  // Fungsi untuk menambah opsi PADA pertanyaan tertentu
   void addOption(int questionIndex) {
     final question = questions[questionIndex];
     if (question.optionControllers.length < 5) {
@@ -43,10 +67,10 @@ class CreateQuizController extends GetxController {
     }
   }
 
-  // Fungsi untuk menghapus opsi PADA pertanyaan tertentu
   void removeOption(int questionIndex, int optionIndex) {
     final question = questions[questionIndex];
-    if (question.optionControllers.length > 1) {
+    if (question.optionControllers.length > 2) {
+      // Minimal 2 opsi
       question.optionControllers[optionIndex].dispose();
       question.optionControllers.removeAt(optionIndex);
     } else {
@@ -56,10 +80,200 @@ class CreateQuizController extends GetxController {
     }
   }
 
+  // --- FUNGSI BARU UNTUK GAMBAR ---
+  Future<void> pickImageForQuestion(int questionIndex) async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery, // Bisa juga diganti ImageSource.camera
+        imageQuality: 80, // Kompresi gambar agar tidak terlalu besar
+      );
+
+      if (pickedFile != null) {
+        questions[questionIndex].imageFile.value = File(pickedFile.path);
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Gagal memilih gambar: $e",
+          snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+
+  void removeImageForQuestion(int questionIndex) {
+    questions[questionIndex].imageFile.value = null;
+  }
+  // --- SELESAI FUNGSI BARU ---
+
+  // --- FUNGSI UNTUK UPLOAD KUIS ---
+  Future<void> uploadQuiz() async {
+    isLoading.value = true;
+    try {
+      // 1. Buat Kuis
+      final createQuizRequest = CreateQuizRequest(
+        quizName: quizTitleController.text,
+        courseId: courseId,
+        timeLimit: int.tryParse(timeLimitController.text),
+      );
+      final quizCreated = await _quizRepository.createQuiz(createQuizRequest);
+
+      if (quizCreated) {
+        // Ambil quizId dari kuis yang baru dibuat
+        final quizList =
+            await _quizRepository.searchQuizzesByCourseId(courseId: courseId);
+        if (quizList != null && quizList.quizzes.isNotEmpty) {
+          final newQuizId = quizList.quizzes.first.id;
+
+          // 2. Iterasi setiap pertanyaan
+          // for (final questionModel in questions) {
+          //   String? imageUrl;
+
+          //   // Upload image kalau ada
+          //   if (questionModel.imageFile.value != null) {
+          //     imageUrl = await _questionRepository.uploadQuestionImage(
+          //       questionModel.imageFile.value!,
+          //     );
+          //   }
+
+          //   // Buat Question
+          //   final createQuestionRequest = CreateQuestionRequest(
+          //     content: [
+          //       ContentBlock(
+          //         type: 'text',
+          //         data: questionModel.descriptionController.text,
+          //       ),
+          //       ContentBlock(
+          //         type: 'image',
+          //         data: imageUrl ?? ''
+          //       )
+          //     ],
+          //     quizId: newQuizId,
+          //   );
+          //   final questionCreated = await _questionRepository.createQuestion(
+          //     createQuestionRequest,
+          //   );
+
+          //   if (questionCreated) {
+          //     // Ambil questionId
+          //     final questionList =
+          //         await _questionRepository.getAllQuestions(quizId: newQuizId);
+          //     if (questionList != null && questionList.questions.isNotEmpty) {
+          //       final newQuestionId = questionList.questions.first.id;
+
+          //       // Buat Opsi Jawaban
+          //       for (final optionController
+          //           in questionModel.optionControllers) {
+          //         final createOptionRequest = CreateQuestionOptionRequest(
+          //           option: optionController.text,
+          //         );
+          //         await _questionOptionRepository.createOption(
+          //           newQuestionId,
+          //           createOptionRequest,
+          //         );
+          //       }
+
+          //       // Buat Jawaban Benar
+          //       final options = await _questionOptionRepository
+          //           .getAllOptionsByQuestionId(newQuestionId);
+          //       if (options != null && options.options.isNotEmpty) {
+          //         final correctOptionId = options
+          //             .options[questionModel.correctAnswerIndex.value].id;
+          //         print("Correct Option ID: $correctOptionId");
+          //         print("New Question ID: ${options.options[questionModel.correctAnswerIndex.value].id}");
+          //         final createAnswerRequest = CreateQuizAnswerRequest(
+          //           optionId: correctOptionId,
+          //           // questionId: options.options[questionModel.correctAnswerIndex.value].id,
+          //         );
+          //         await _quizAnswerRepository
+          //             .createQuizAnswer(createAnswerRequest);
+          //       }
+          //     }
+          //   }
+          // }
+
+          for (final questionModel in questions) {
+            String? imageUrl;
+
+            if (questionModel.imageFile.value != null) {
+              imageUrl = await _questionRepository.uploadQuestionImage(
+                questionModel.imageFile.value!,
+              );
+            }
+
+            final createQuestionRequest = CreateQuestionRequest(
+              content: [
+                ContentBlock(
+                  type: 'text',
+                  data: questionModel.descriptionController.text,
+                ),
+                if (imageUrl != null && imageUrl.isNotEmpty)
+                  ContentBlock(
+                    type: 'image',
+                    data: imageUrl,
+                  ),
+              ],
+              quizId: newQuizId,
+            );
+
+            final questionCreated = await _questionRepository.createQuestion(
+              createQuestionRequest,
+            );
+
+            if (questionCreated) {
+              final questionList =
+                  await _questionRepository.getAllQuestions(quizId: newQuizId);
+
+              if (questionList != null && questionList.questions.isNotEmpty) {
+
+                final newQuestionId = questionList.questions.last.id;
+
+                for (final optionController
+                    in questionModel.optionControllers) {
+                  final createOptionRequest = CreateQuestionOptionRequest(
+                    option: optionController.text,
+                  );
+                  await _questionOptionRepository.createOption(
+                    newQuestionId,
+                    createOptionRequest,
+                  );
+                }
+
+                final options =
+                    await _questionOptionRepository.getAllOptionsByQuestionId(
+                  newQuestionId,
+                );
+
+                if (options != null && options.options.isNotEmpty) {
+                  final correctOptionId = options
+                      .options[questionModel.correctAnswerIndex.value].id;
+
+                  final createAnswerRequest = CreateQuizAnswerRequest(
+                    optionId: correctOptionId,
+                  );
+                  await _quizAnswerRepository
+                      .createQuizAnswer(createAnswerRequest);
+                }
+              }
+            }
+          }
+
+          Get.snackbar("Sukses", "Kuis berhasil diunggah.",
+              snackPosition: SnackPosition.BOTTOM);
+        }
+      } else {
+        Get.snackbar("Gagal", "Gagal membuat kuis.",
+            snackPosition: SnackPosition.BOTTOM);
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Terjadi kesalahan: $e",
+          snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+  // --- SELESAI FUNGSI UPLOAD KUIS ---
+
   @override
   void onClose() {
     quizTitleController.dispose();
-    // Pastikan semua controller di setiap pertanyaan juga dibersihkan
+    timeLimitController.dispose();
     for (var question in questions) {
       question.dispose();
     }

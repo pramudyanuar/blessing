@@ -2,6 +2,7 @@ import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/modules/admin/course/controllers/create_quiz_controller.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -28,20 +29,33 @@ class CreateQuizScreen extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(right: 16.w),
             child: Center(
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.c2,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.r)),
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                ),
-                child: Text('Unggah',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600)),
-              ),
+              child: Obx(() => ElevatedButton(
+                    onPressed: controller.isLoading.value
+                        ? null
+                        : () {
+                            controller.uploadQuiz();
+                          },
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.c2,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r)),
+                        padding: EdgeInsets.symmetric(horizontal: 24.w),
+                        disabledBackgroundColor: Colors.grey.shade300),
+                    child: controller.isLoading.value
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text('Unggah',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600)),
+                  )),
             ),
           ),
         ],
@@ -73,7 +87,7 @@ class CreateQuizScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQuizNameCard(CreateQuizController controller) {
+Widget _buildQuizNameCard(CreateQuizController controller) {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
@@ -85,8 +99,19 @@ class CreateQuizScreen extends StatelessWidget {
               style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600)),
           SizedBox(height: 8.h),
           _buildTextFormField(
-              hint: 'Masukkan Nama Kuis',
-              controller: controller.quizTitleController),
+            hint: 'Masukkan Nama Kuis',
+            controller: controller.quizTitleController,
+          ),
+          SizedBox(height: 16.h),
+
+          // Input Time Limit
+          Text("Batas Waktu (menit)",
+              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600)),
+          SizedBox(height: 8.h),
+          _buildTextFormField(
+            hint: 'Contoh: 30',
+            controller: controller.timeLimitController,
+          ),
         ],
       ),
     );
@@ -118,13 +143,21 @@ class CreateQuizScreen extends StatelessWidget {
                 ),
             ],
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 16.h),
+
+          // --- WIDGET UNTUK GAMBAR ---
+          _buildImagePicker(controller, questionIndex),
+          // --- SELESAI WIDGET GAMBAR ---
+
+          SizedBox(height: 16.h),
           _buildTextFormField(
             hint: 'Tambah deskripsi atau instruksi',
             maxLines: 4,
             controller: question.descriptionController,
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 24.h),
+          GlobalText.semiBold("Opsi Jawaban", fontSize: 14.sp),
+          SizedBox(height: 12.h),
 
           // Obx ini untuk membuat daftar OPSI yang dinamis untuk pertanyaan ini
           Obx(
@@ -134,14 +167,10 @@ class CreateQuizScreen extends StatelessWidget {
               itemCount: question.optionControllers.length,
               separatorBuilder: (context, index) => SizedBox(height: 12.h),
               itemBuilder: (context, optionIndex) {
-                final optionLetter = String.fromCharCode(65 + optionIndex);
                 return _buildOptionField(
-                  optionLetter,
-                  question.optionControllers[optionIndex],
-                  onRemove: question.optionControllers.length > 2
-                      ? () =>
-                          controller.removeOption(questionIndex, optionIndex)
-                      : null,
+                  controller,
+                  questionIndex,
+                  optionIndex,
                 );
               },
             ),
@@ -168,6 +197,69 @@ class CreateQuizScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildImagePicker(CreateQuizController controller, int questionIndex) {
+    final question = controller.questions[questionIndex];
+
+    return Obx(() {
+      if (question.imageFile.value == null) {
+        // Tampilan jika tidak ada gambar
+        return GestureDetector(
+          onTap: () => controller.pickImageForQuestion(questionIndex),
+          child: DottedBorder(
+            child: Container(
+              height: 150.h,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.image_outlined,
+                      color: Colors.grey.shade500, size: 40.sp),
+                  SizedBox(height: 8.h),
+                  Text("Tambah Gambar (Opsional)",
+                      style: TextStyle(
+                          color: Colors.grey.shade600, fontSize: 14.sp)),
+                ],
+              ),
+            ),
+          ),
+        );
+      } else {
+        // Tampilan jika ada gambar yang dipilih
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(8.r),
+          child: Stack(
+            alignment: Alignment.topRight,
+            children: [
+              Image.file(
+                question.imageFile.value!,
+                width: double.infinity,
+                height: 180.h,
+                fit: BoxFit.cover,
+              ),
+              Container(
+                margin: EdgeInsets.all(8.w),
+                decoration: const BoxDecoration(
+                  color: Colors.black54,
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.close, color: Colors.white, size: 20.sp),
+                  onPressed: () =>
+                      controller.removeImageForQuestion(questionIndex),
+                  tooltip: 'Hapus Gambar',
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    });
   }
 
   Widget _buildBottomButton(CreateQuizController controller) {
@@ -197,30 +289,39 @@ class CreateQuizScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOptionField(String option, TextEditingController textController,
-      {VoidCallback? onRemove}) {
-    return Row(
-      children: [
-        SizedBox(
-            width: 20.w,
-            child: Text('$option.',
-                style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black54))),
-        SizedBox(width: 8.w),
-        Expanded(
-            child: _buildTextFormField(
-                hint: 'Tulis Jawaban', controller: textController)),
-        if (onRemove != null)
-          IconButton(
-            icon: Icon(Icons.remove_circle_outline, color: Colors.red.shade400),
-            onPressed: onRemove,
-            tooltip: 'Hapus Opsi',
-          )
-        else
-          SizedBox(width: 48.w)
-      ],
+  Widget _buildOptionField(
+      CreateQuizController controller, int questionIndex, int optionIndex) {
+    final question = controller.questions[questionIndex];
+    final textController = question.optionControllers[optionIndex];
+
+    return Obx(
+      () => Row(
+        children: [
+          Radio<int>(
+            value: optionIndex,
+            groupValue: question.correctAnswerIndex.value,
+            onChanged: (value) {
+              if (value != null) {
+                question.correctAnswerIndex.value = value;
+              }
+            },
+            activeColor: AppColors.c2,
+          ),
+          Expanded(
+              child: _buildTextFormField(
+                  hint: 'Tulis Jawaban', controller: textController)),
+          if (question.optionControllers.length > 2)
+            IconButton(
+              icon:
+                  Icon(Icons.remove_circle_outline, color: Colors.red.shade400),
+              onPressed: () =>
+                  controller.removeOption(questionIndex, optionIndex),
+              tooltip: 'Hapus Opsi',
+            )
+          else
+            SizedBox(width: 48.w) // Placeholder to keep alignment
+        ],
+      ),
     );
   }
 
