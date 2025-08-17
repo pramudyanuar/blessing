@@ -1,5 +1,8 @@
+// lib/modules/student/quiz_attempt/widgets/question_navigation_drawer.dart
+
 import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/global_button.dart';
+// Pastikan import ini ada
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/modules/student/quiz_attempt/controller/quiz_attempt_controller.dart';
 import 'package:flutter/material.dart';
@@ -33,8 +36,11 @@ class QuestionNavigationDrawer extends StatelessWidget {
                   itemCount: controller.questions.length,
                   itemBuilder: (context, index) {
                     return Obx(() {
+                      // ---- PERBAIKAN LOGIKA isAnswered ----
+                      // Cek jawaban berdasarkan ID pertanyaan, bukan index
+                      final questionId = controller.questions[index].id;
                       final isAnswered =
-                          controller.userAnswers.containsKey(index);
+                          controller.userAnswers.containsKey(questionId);
                       final isActive =
                           controller.currentQuestionIndex.value == index;
 
@@ -66,7 +72,11 @@ class QuestionNavigationDrawer extends StatelessWidget {
               GlobalButton(
                 text: "Kirim Jawaban",
                 onPressed: () {
-                  // TODO: Logika untuk submit kuis
+                  // ---- IMPLEMENTASI SUBMIT ----
+                  // 1. Tutup drawer terlebih dahulu
+                  Navigator.of(context).pop();
+                  // 2. Panggil method konfirmasi dari controller
+                  controller.confirmAndSubmitQuiz();
                 },
                 width: double.infinity,
                 height: 48,

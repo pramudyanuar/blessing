@@ -83,7 +83,8 @@ class CourseListScreen extends StatelessWidget {
                     onTapAction: () {
                       if (!(item['isCompleted'] as bool)) {
                         print("Memulai kuis: ${item['title']}");
-                        Get.toNamed(AppRoutes.quizAttempt, arguments: {'quizId': item['id']});
+                        Get.toNamed(AppRoutes.quizIntro,
+                            arguments: item['id']); 
                       }
                     },
                   );

@@ -42,7 +42,9 @@ import 'package:blessing/modules/student/course_detail/course_detail_screen.dart
 import 'package:blessing/modules/student/main/bindings/main_student_bindings.dart';
 import 'package:blessing/modules/student/profile/bindings/profile_binding.dart';
 import 'package:blessing/modules/student/quiz_attempt/bindings/quiz_attempt_binding.dart';
+import 'package:blessing/modules/student/quiz_attempt/bindings/quiz_intro_binding.dart';
 import 'package:blessing/modules/student/quiz_attempt/quiz_attempt_screen.dart';
+import 'package:blessing/modules/student/quiz_attempt/quiz_intro_screen.dart';
 import 'package:blessing/modules/student/quiz_attempt/quiz_result_screen.dart';
 import 'package:blessing/modules/student/subject/bindings/subject_bindings.dart';
 import 'package:blessing/modules/student/subject/subject_main_screen.dart';
@@ -212,6 +214,12 @@ class AppPages {
     GetPage(
       name: AppRoutes.quizResult,
       page: () => const QuizResultScreen(),
+      middlewares: [RoleMiddleware(requiredRole: 'student')],
+    ),
+    GetPage(
+      name: AppRoutes.quizIntro,
+      page: () => const QuizIntroScreen(),
+      binding: QuizIntroBinding(),
       middlewares: [RoleMiddleware(requiredRole: 'student')],
     ),
   ];

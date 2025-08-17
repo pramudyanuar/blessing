@@ -35,4 +35,5 @@ abstract class AppRoutes {
   static const quizList = '/quiz-list';
   static const quizAttempt = '/quiz-attempt';
   static const quizResult = '/quiz-result';
+  static const quizIntro = '/quiz-intro';
 }

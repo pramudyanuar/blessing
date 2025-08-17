@@ -15,4 +15,15 @@ class AnswerRepository {
       return null;
     }
   }
+
+  Future<UserAnswerResponse?> updateUserAnswer(
+    CreateUserAnswerRequest request) async {
+  try {
+    // Asumsi dataSource punya metode updateUserAnswer
+    return await _dataSource.updateUserAnswer(request);
+  } catch (e) {
+    debugPrint('Error in AnswerRepository (updateUserAnswer): $e');
+    return null;
+  }
+}
 }

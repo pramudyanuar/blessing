@@ -4,14 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_text.dart';
+import 'package:get/get.dart';
 
 class QuizResultScreen extends StatelessWidget {
   const QuizResultScreen({super.key});
 
-  static const String videoId = 'dQw4w9WgXcQ'; // Ganti videoId di sini
+  static const String videoId = 'dQw4w9WgXcQ';
 
   @override
   Widget build(BuildContext context) {
+    final args = Get.arguments ?? {};
+    final String quizName = args['quizname'] ?? 'Kuis';
+    final int score = args['result'] ?? 0;
+
     return BaseWidgetContainer(
       backgroundColor: AppColors.c5,
       appBar: AppBar(
@@ -45,8 +50,11 @@ class QuizResultScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  GlobalText.bold("Kuis 8",
-                      fontSize: 24.sp, color: const Color(0xFF1976D2)),
+                  GlobalText.bold(
+                    quizName,
+                    fontSize: 24.sp,
+                    color: const Color(0xFF1976D2),
+                  ),
                   SizedBox(height: 20.h),
                   Container(
                     width: 60.w,
@@ -65,8 +73,11 @@ class QuizResultScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
                     children: [
-                      GlobalText.bold("88",
-                          fontSize: 36.sp, color: const Color(0xFF1976D2)),
+                      GlobalText.bold(
+                        "$score",
+                        fontSize: 36.sp,
+                        color: const Color(0xFF1976D2),
+                      ),
                       GlobalText.medium("/100",
                           fontSize: 18.sp, color: Colors.grey),
                     ],
@@ -167,4 +178,3 @@ class QuizResultScreen extends StatelessWidget {
     );
   }
 }
-

@@ -31,4 +31,29 @@ class AnswerDataSource {
       return null;
     }
   }
+
+  Future<UserAnswerResponse?> updateUserAnswer(
+      CreateUserAnswerRequest request) async {
+    try {
+      final url = Endpoints.createUserAnswer;
+      final response = await _httpManager.restRequest(
+        url: url,
+        method: HttpMethods.post,
+        body: request.toJson(),
+      );
+
+      if (response['statusCode'] == 200 || response['statusCode'] == 201) {
+        debugPrint('updateUserAnswer DataSource success: ${response['data']}');
+        final data = response['data']['data'];
+        return UserAnswerResponse.fromJson(data);
+      } else {
+        debugPrint(
+            'updateUserAnswer DataSource failed: ${response['statusMessage']}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('updateUserAnswer DataSource error: $e');
+      return null;
+    }
+  }
 }
