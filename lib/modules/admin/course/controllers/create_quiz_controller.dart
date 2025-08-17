@@ -1,6 +1,7 @@
 // lib/modules/admin/course/controllers/create_quiz_controller.dart
 
 import 'dart:io'; // <-- Tambahkan import
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/data/core/models/content_block.dart';
 import 'package:blessing/data/core/models/question_model.dart';
 import 'package:blessing/data/quiz/models/request/create_question_option_request.dart';
@@ -103,6 +104,9 @@ class CreateQuizController extends GetxController {
   // --- SELESAI FUNGSI BARU ---
 
   // --- FUNGSI UNTUK UPLOAD KUIS ---
+  // lib/modules/admin/course/controllers/create_quiz_controller.dart
+
+// --- FUNGSI UNTUK UPLOAD KUIS ---
   Future<void> uploadQuiz() async {
     isLoading.value = true;
     try {
@@ -112,163 +116,88 @@ class CreateQuizController extends GetxController {
         courseId: courseId,
         timeLimit: int.tryParse(timeLimitController.text),
       );
-      final quizCreated = await _quizRepository.createQuiz(createQuizRequest);
 
-      if (quizCreated) {
-        // Ambil quizId dari kuis yang baru dibuat
-        final quizList =
-            await _quizRepository.searchQuizzesByCourseId(courseId: courseId);
-        if (quizList != null && quizList.quizzes.isNotEmpty) {
-          final newQuizId = quizList.quizzes.first.id;
+      // Panggil repository dan simpan hasilnya (objek QuizResponse)
+      final newQuiz = await _quizRepository.createQuiz(createQuizRequest);
 
-          // 2. Iterasi setiap pertanyaan
-          // for (final questionModel in questions) {
-          //   String? imageUrl;
+      // Periksa apakah pembuatan kuis berhasil (objek tidak null)
+      if (newQuiz != null) {
+        // DAPATKAN ID LANGSUNG DARI OBJEK YANG DIKEMBALIKAN. TIDAK PERLU SEARCH LAGI.
+        final newQuizId = newQuiz.id;
 
-          //   // Upload image kalau ada
-          //   if (questionModel.imageFile.value != null) {
-          //     imageUrl = await _questionRepository.uploadQuestionImage(
-          //       questionModel.imageFile.value!,
-          //     );
-          //   }
+        for (final questionModel in questions) {
+          String? imageUrl;
 
-          //   // Buat Question
-          //   final createQuestionRequest = CreateQuestionRequest(
-          //     content: [
-          //       ContentBlock(
-          //         type: 'text',
-          //         data: questionModel.descriptionController.text,
-          //       ),
-          //       ContentBlock(
-          //         type: 'image',
-          //         data: imageUrl ?? ''
-          //       )
-          //     ],
-          //     quizId: newQuizId,
-          //   );
-          //   final questionCreated = await _questionRepository.createQuestion(
-          //     createQuestionRequest,
-          //   );
+          if (questionModel.imageFile.value != null) {
+            imageUrl = await _questionRepository.uploadQuestionImage(
+              questionModel.imageFile.value!,
+            );
+          }
 
-          //   if (questionCreated) {
-          //     // Ambil questionId
-          //     final questionList =
-          //         await _questionRepository.getAllQuestions(quizId: newQuizId);
-          //     if (questionList != null && questionList.questions.isNotEmpty) {
-          //       final newQuestionId = questionList.questions.first.id;
+          final createQuestionRequest = CreateQuestionRequest(
+            content: [
+              ContentBlock(
+                type: 'text',
+                data: questionModel.descriptionController.text,
+              ),
+              if (imageUrl != null && imageUrl.isNotEmpty)
+                ContentBlock(
+                  type: 'image',
+                  data: imageUrl,
+                ),
+            ],
+            quizId: newQuizId, // <-- Sekarang menggunakan ID yang 100% benar
+          );
 
-          //       // Buat Opsi Jawaban
-          //       for (final optionController
-          //           in questionModel.optionControllers) {
-          //         final createOptionRequest = CreateQuestionOptionRequest(
-          //           option: optionController.text,
-          //         );
-          //         await _questionOptionRepository.createOption(
-          //           newQuestionId,
-          //           createOptionRequest,
-          //         );
-          //       }
+          // (ASUMSI) Terapkan pola yang sama untuk `createQuestion`.
+          // Pastikan `createQuestion` juga mengembalikan objek QuestionResponse.
+          final newQuestion = await _questionRepository.createQuestion(
+            createQuestionRequest,
+          );
 
-          //       // Buat Jawaban Benar
-          //       final options = await _questionOptionRepository
-          //           .getAllOptionsByQuestionId(newQuestionId);
-          //       if (options != null && options.options.isNotEmpty) {
-          //         final correctOptionId = options
-          //             .options[questionModel.correctAnswerIndex.value].id;
-          //         print("Correct Option ID: $correctOptionId");
-          //         print("New Question ID: ${options.options[questionModel.correctAnswerIndex.value].id}");
-          //         final createAnswerRequest = CreateQuizAnswerRequest(
-          //           optionId: correctOptionId,
-          //           // questionId: options.options[questionModel.correctAnswerIndex.value].id,
-          //         );
-          //         await _quizAnswerRepository
-          //             .createQuizAnswer(createAnswerRequest);
-          //       }
-          //     }
-          //   }
-          // }
+          if (newQuestion != null) {
+            // Dapatkan ID pertanyaan yang baru secara langsung
+            final newQuestionId = newQuestion.id;
 
-          for (final questionModel in questions) {
-            String? imageUrl;
-
-            if (questionModel.imageFile.value != null) {
-              imageUrl = await _questionRepository.uploadQuestionImage(
-                questionModel.imageFile.value!,
+            for (final optionController in questionModel.optionControllers) {
+              final createOptionRequest = CreateQuestionOptionRequest(
+                option: optionController.text,
+              );
+              await _questionOptionRepository.createOption(
+                newQuestionId, // <-- Gunakan ID pertanyaan yang benar
+                createOptionRequest,
               );
             }
 
-            final createQuestionRequest = CreateQuestionRequest(
-              content: [
-                ContentBlock(
-                  type: 'text',
-                  data: questionModel.descriptionController.text,
-                ),
-                if (imageUrl != null && imageUrl.isNotEmpty)
-                  ContentBlock(
-                    type: 'image',
-                    data: imageUrl,
-                  ),
-              ],
-              quizId: newQuizId,
+            final options =
+                await _questionOptionRepository.getAllOptionsByQuestionId(
+              newQuestionId,
             );
 
-            final questionCreated = await _questionRepository.createQuestion(
-              createQuestionRequest,
-            );
+            if (options != null && options.options.isNotEmpty) {
+              final correctOptionId =
+                  options.options[questionModel.correctAnswerIndex.value].id;
 
-            if (questionCreated) {
-              final questionList =
-                  await _questionRepository.getAllQuestions(quizId: newQuizId);
-
-              if (questionList != null && questionList.questions.isNotEmpty) {
-
-                final newQuestionId = questionList.questions.last.id;
-
-                for (final optionController
-                    in questionModel.optionControllers) {
-                  final createOptionRequest = CreateQuestionOptionRequest(
-                    option: optionController.text,
-                  );
-                  await _questionOptionRepository.createOption(
-                    newQuestionId,
-                    createOptionRequest,
-                  );
-                }
-
-                final options =
-                    await _questionOptionRepository.getAllOptionsByQuestionId(
-                  newQuestionId,
-                );
-
-                if (options != null && options.options.isNotEmpty) {
-                  final correctOptionId = options
-                      .options[questionModel.correctAnswerIndex.value].id;
-
-                  final createAnswerRequest = CreateQuizAnswerRequest(
-                    optionId: correctOptionId,
-                  );
-                  await _quizAnswerRepository
-                      .createQuizAnswer(createAnswerRequest);
-                }
-              }
+              final createAnswerRequest = CreateQuizAnswerRequest(
+                optionId: correctOptionId,
+              );
+              await _quizAnswerRepository.createQuizAnswer(createAnswerRequest);
             }
           }
-
-          Get.snackbar("Sukses", "Kuis berhasil diunggah.",
-              snackPosition: SnackPosition.BOTTOM);
         }
+
+        CustomSnackbar.show(
+            title: "Sukses", message: "Kuis berhasil diunggah.");
+        Get.back();
       } else {
-        Get.snackbar("Gagal", "Gagal membuat kuis.",
-            snackPosition: SnackPosition.BOTTOM);
+        CustomSnackbar.show(title: "Gagal", message: "Gagal membuat kuis.");
       }
     } catch (e) {
-      Get.snackbar("Error", "Terjadi kesalahan: $e",
-          snackPosition: SnackPosition.BOTTOM);
+      CustomSnackbar.show(title: "Error", message: "Terjadi kesalahan: $e");
     } finally {
       isLoading.value = false;
     }
   }
-  // --- SELESAI FUNGSI UPLOAD KUIS ---
 
   @override
   void onClose() {

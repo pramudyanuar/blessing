@@ -36,16 +36,17 @@ class QuestionRepository {
     }
   }
 
-  Future<bool> createQuestion(CreateQuestionRequest request) async {
+  Future<QuestionResponse?> createQuestion(
+      CreateQuestionRequest request) async {
     try {
       return await _dataSource.createQuestion(request);
     } catch (e) {
       debugPrint('Error in QuestionRepository (createQuestion): $e');
-      return false;
+      return null;
     }
   }
 
-  Future<bool> updateQuestion(
+  Future<QuestionResponse?> updateQuestion(
     String questionId,
     CreateQuestionRequest request,
   ) async {
@@ -53,7 +54,7 @@ class QuestionRepository {
       return await _dataSource.updateQuestion(questionId, request);
     } catch (e) {
       debugPrint('Error in QuestionRepository (updateQuestion): $e');
-      return false;
+      return null;
     }
   }
 
@@ -66,7 +67,6 @@ class QuestionRepository {
     }
   }
 
-  /// Upload image khusus untuk pertanyaan
   Future<String?> uploadQuestionImage(File imageFile) async {
     try {
       final imageUrl = await _dataSource.uploadImage(imageFile);

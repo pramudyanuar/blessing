@@ -51,14 +51,15 @@ class QuizRepository {
     }
   }
 
-  Future<bool> createQuiz(CreateQuizRequest request) async {
+  Future<QuizResponse?> createQuiz(CreateQuizRequest request) async {
     try {
       return await _dataSource.createQuiz(request);
     } catch (e) {
       debugPrint('Error in QuizRepository (createQuiz): $e');
-      return false;
+      return null;
     }
   }
+
 
   Future<bool> updateQuiz(String quizId, CreateQuizRequest request) async {
     try {

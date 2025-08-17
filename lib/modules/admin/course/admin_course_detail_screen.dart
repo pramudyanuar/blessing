@@ -271,17 +271,32 @@ class AdminCourseDetailScreen extends StatelessWidget {
                   elevation: 2,
                   margin: EdgeInsets.only(bottom: 12.h),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r)),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
                   child: ListTile(
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
                     leading: const Icon(Icons.quiz, color: AppColors.c2),
                     title: GlobalText.medium(
                       quiz.quizName ?? 'Kuis Tanpa Judul',
+                      textAlign: TextAlign.start,
                     ),
+                    subtitle: quiz.timeLimit != null
+                        ? GlobalText.regular(
+                            'Durasi: ${quiz.timeLimit} menit',
+                            color: Colors.grey,
+                            fontSize: 12.sp,
+                            textAlign: TextAlign.start,
+                          )
+                        : null,
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                     onTap: () {
-                      // Get.toNamed(AppRoutes.adminQuizDetail, arguments: {'quizId': quiz.id});
+                      // Arahkan ke detail kuis
+                      Get.toNamed(
+                        AppRoutes.adminDetailQuiz,
+                        arguments: {
+                          'quizId': quiz.id,
+                          'titleQuiz': quiz.quizName
+                        },
+                      );
                     },
                   ),
                 );

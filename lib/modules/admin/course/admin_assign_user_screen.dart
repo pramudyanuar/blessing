@@ -1,5 +1,9 @@
+import 'package:blessing/core/constants/color.dart';
+import 'package:blessing/core/global_components/base_widget_container.dart';
+import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/modules/admin/course/controllers/admin_assign_user_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class AdminAssignUserScreen extends StatelessWidget {
@@ -9,9 +13,14 @@ class AdminAssignUserScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<AdminAssignUserController>();
 
-    return Scaffold(
+    return BaseWidgetContainer(
       appBar: AppBar(
-        title: const Text('Kelola Akses Pengguna'),
+        title: GlobalText.semiBold("Tambah Akses",
+            fontSize: 18.sp, color: AppColors.c2),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
           Obx(() {
             return TextButton(
@@ -27,7 +36,7 @@ class AdminAssignUserScreen extends StatelessWidget {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('SIMPAN', style: TextStyle(color: Colors.white)),
+                  : const Text('SIMPAN', style: TextStyle(color: AppColors.c2)),
             );
           }),
         ],

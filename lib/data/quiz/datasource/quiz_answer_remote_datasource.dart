@@ -54,6 +54,31 @@ class QuizAnswerDataSource {
     }
   }
 
+  Future<QuizAnswerResponse?> getQuizAnswerById(String quizAnswerId) async {
+    try {
+      final url = Endpoints.getUserAnswerById
+          .replaceFirst('{quizAnswerId}', quizAnswerId);
+
+      final response = await _httpManager.restRequest(
+        url: url,
+        method: HttpMethods.get,
+      );
+
+      if (response['statusCode'] == 200) {
+        debugPrint('getQuizAnswerById DataSource success: ${response['data']}');
+        return QuizAnswerResponse.fromJson(response['data']['data']);
+      } else {
+        debugPrint(
+            'getQuizAnswerById DataSource failed: ${response['statusMessage']}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('getQuizAnswerById DataSource error: $e');
+      return null;
+    }
+  }
+
+
   Future<bool> createQuizAnswer(CreateQuizAnswerRequest request) async {
     try {
       final url = Endpoints.createQuizAnswerForAdmin;

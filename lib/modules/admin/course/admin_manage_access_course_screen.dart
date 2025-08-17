@@ -1,4 +1,6 @@
+import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
+import 'package:blessing/core/global_components/global_confirmation_dialog.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/modules/admin/course/controllers/admin_manage_access_course_controller.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +17,11 @@ class AdminManageAccessCourseScreen extends StatelessWidget {
     return BaseWidgetContainer(
       appBar: AppBar(
         centerTitle: false,
-        title: GlobalText.semiBold("Akses Materi", fontSize: 16.sp),
+        title: GlobalText.semiBold("Akses Materi", fontSize: 16.sp, color: AppColors.c2,),
         backgroundColor: Colors.white,
         elevation: 0.5,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.c2),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -75,17 +77,15 @@ class AdminManageAccessCourseScreen extends StatelessWidget {
                   trailing: IconButton(
                     icon: const Icon(Icons.delete_outline, color: Colors.red),
                     onPressed: () {
-                      Get.defaultDialog(
-                        title: 'Hapus Akses?',
-                        middleText:
-                            'Anda yakin ingin menghapus akses untuk ${userAccess.user.username}?',
-                        textConfirm: 'Ya, Hapus',
-                        textCancel: 'Batal',
-                        confirmTextColor: Colors.white,
-                        onConfirm: () {
-                          Get.back();
-                          controller.removeUserAccess(userAccess.id);
-                        },
+                      Get.dialog(
+                        GlobalConfirmationDialog(
+                          message: "Apakah kamu yakin ingin menghapus akses untuk ${userAccess.user.username}?",
+                          onYes: () {
+                            Get.back();
+                            controller.removeUserAccess(userAccess.id);
+                          },
+                          onNo: () => Get.back(),
+                        ),
                       );
                     },
                   ),

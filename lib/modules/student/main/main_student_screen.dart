@@ -2,7 +2,7 @@ import 'package:blessing/core/constants/images.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/modules/student/main/controllers/main_student_controllers.dart';
 import 'package:blessing/modules/student/main/widgets/class_list.dart';
-import 'package:blessing/modules/student/main/widgets/new_activity.dart';
+// import 'package:blessing/modules/student/main/widgets/new_activity.dart';
 import 'package:blessing/core/global_components/search_bar.dart';
 import 'package:blessing/modules/student/main/widgets/student_appbar.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +59,7 @@ class MainStudent extends StatelessWidget {
                   hintText: 'Cari mata pelajaran...',
                 ),
                 SizedBox(height: 16.h),
-                NewActivity(),
+                // NewActivity(),
                 ClassList(),
               ],
             ),

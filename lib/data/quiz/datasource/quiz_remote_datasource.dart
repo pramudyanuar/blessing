@@ -104,7 +104,7 @@ class QuizDataSource {
   }
 
 
-  Future<bool> createQuiz(CreateQuizRequest request) async {
+  Future<QuizResponse?> createQuiz(CreateQuizRequest request) async {
     try {
       final url = Endpoints.createQuiz;
 
@@ -116,17 +116,20 @@ class QuizDataSource {
 
       if (response['statusCode'] == 200 || response['statusCode'] == 201) {
         debugPrint('createQuiz DataSource success: ${response['data']}');
-        return true;
+
+        final data = response['data']['data'];
+        return QuizResponse.fromJson(data);
       } else {
         debugPrint(
             'createQuiz DataSource failed: ${response['statusMessage']}');
-        return false;
+        return null;
       }
     } catch (e) {
       debugPrint('createQuiz DataSource error: $e');
-      return false;
+      return null;
     }
   }
+
 
   Future<bool> updateQuiz(String quizId, CreateQuizRequest request) async {
     try {

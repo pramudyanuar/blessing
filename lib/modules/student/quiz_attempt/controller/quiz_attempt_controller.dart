@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:blessing/core/global_components/global_confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -42,9 +43,15 @@ class QuizAttemptController extends GetxController {
         remainingSeconds.value--;
       } else {
         timer.cancel();
-        Get.defaultDialog(
-            title: "Waktu Habis",
-            middleText: "Waktu pengerjaan kuis telah berakhir.");
+        Get.dialog(
+          GlobalConfirmationDialog(
+            message: "Waktu pengerjaan kuis telah berakhir.",
+            onYes: () {
+              Get.back();
+            },
+            onNo: () => Get.back(),
+          ),
+        );
       }
     });
   }

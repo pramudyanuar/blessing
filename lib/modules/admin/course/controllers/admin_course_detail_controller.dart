@@ -58,7 +58,7 @@ class AdminCourseDetailController extends GetxController {
       final result = await _quizRepository.searchQuizzesByCourseId(
         courseId: courseId,
         page: 1,
-        size: 5, // Ambil 5 kuis teratas, sesuaikan jika perlu
+        size: 20, // Ambil 5 kuis teratas, sesuaikan jika perlu
       );
       if (result != null && result.quizzes.isNotEmpty) {
         quizzes.value = result.quizzes;

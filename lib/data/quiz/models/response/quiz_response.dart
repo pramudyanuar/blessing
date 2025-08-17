@@ -4,6 +4,7 @@ class QuizResponse {
   final String id;
   final String? quizName;
   final String? courseId;
+  final int? timeLimit;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -11,6 +12,7 @@ class QuizResponse {
     required this.id,
     this.quizName,
     this.courseId,
+    this.timeLimit,
     this.createdAt,
     this.updatedAt,
   });
@@ -19,6 +21,7 @@ class QuizResponse {
         id: json["id"],
         quizName: json["quiz_name"],
         courseId: json["course_id"],
+        timeLimit: json["time_limit"],
         createdAt: json["created_at"] == null
             ? null
             : DateTime.parse(json["created_at"]),

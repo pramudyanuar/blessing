@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:blessing/core/services/endpoints.dart';
 import 'package:blessing/core/services/http_manager.dart';
 import 'package:blessing/data/core/models/paging_response.dart';
@@ -18,7 +17,7 @@ class QuestionDataSource {
   }) async {
     try {
       String url = '${Endpoints.getAllQuestions}?page=$page&size=$size';
-      if (quizId != null) {
+      if (quizId != null && quizId.isNotEmpty) {
         url += '&quiz_id=$quizId';
       }
 
@@ -38,12 +37,11 @@ class QuestionDataSource {
 
         return (questions: questions, paging: paging);
       } else {
-        debugPrint(
-            'getAllQuestions DataSource failed: ${response['statusMessage']}');
+        debugPrint('getAllQuestions failed: ${response['statusMessage']}');
         return null;
       }
     } catch (e) {
-      debugPrint('getAllQuestions DataSource error: $e');
+      debugPrint('getAllQuestions error: $e');
       return null;
     }
   }
@@ -54,12 +52,10 @@ class QuestionDataSource {
       final response = await _httpManager.uploadFileRequest(
         url: url,
         file: imageFile,
-        // Sesuaikan 'fileFieldKey' jika backend mengharapkan nama field yang berbeda, misal 'image'
         fileFieldKey: 'file',
       );
 
       if (response['statusCode'] == 200 && response['data'] != null) {
-        // Berdasarkan JSON response Anda: { "data": { "url": "..." } }
         final imageUrl = response['data']['data']['url'];
         debugPrint('Image uploaded successfully: $imageUrl');
         return imageUrl;
@@ -85,8 +81,7 @@ class QuestionDataSource {
       );
 
       if (response['statusCode'] == 200) {
-        debugPrint(
-            'getQuestionById DataSource response: ${response['data']}');
+        debugPrint('getQuestionById DataSource response: ${response['data']}');
 
         final data = response['data']['data'];
         return QuestionResponse.fromJson(data);
@@ -101,7 +96,8 @@ class QuestionDataSource {
     }
   }
 
-  Future<bool> createQuestion(CreateQuestionRequest request) async {
+  Future<QuestionResponse?> createQuestion(
+      CreateQuestionRequest request) async {
     try {
       final url = Endpoints.createQuestion;
 
@@ -113,19 +109,20 @@ class QuestionDataSource {
 
       if (response['statusCode'] == 200 || response['statusCode'] == 201) {
         debugPrint('createQuestion DataSource success: ${response['data']}');
-        return true;
+        final data = response['data']['data'];
+        return QuestionResponse.fromJson(data);
       } else {
         debugPrint(
             'createQuestion DataSource failed: ${response['statusMessage']}');
-        return false;
+        return null;
       }
     } catch (e) {
       debugPrint('createQuestion DataSource error: $e');
-      return false;
+      return null;
     }
   }
 
-  Future<bool> updateQuestion(
+  Future<QuestionResponse?> updateQuestion(
       String questionId, CreateQuestionRequest request) async {
     try {
       final url =
@@ -139,15 +136,16 @@ class QuestionDataSource {
 
       if (response['statusCode'] == 200) {
         debugPrint('updateQuestion DataSource success: ${response['data']}');
-        return true;
+        final data = response['data']['data'];
+        return QuestionResponse.fromJson(data);
       } else {
         debugPrint(
             'updateQuestion DataSource failed: ${response['statusMessage']}');
-        return false;
+        return null;
       }
     } catch (e) {
       debugPrint('updateQuestion DataSource error: $e');
-      return false;
+      return null;
     }
   }
 

@@ -2,9 +2,11 @@ import 'package:blessing/core/middlewares/role_middleware.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/modules/admin/course/admin_assign_user_screen.dart';
 import 'package:blessing/modules/admin/course/admin_course_detail_screen.dart';
+import 'package:blessing/modules/admin/course/admin_detail_quiz_screen.dart';
 import 'package:blessing/modules/admin/course/admin_manage_access_course_screen.dart';
 import 'package:blessing/modules/admin/course/bindings/admin_assign_user_bindings.dart';
 import 'package:blessing/modules/admin/course/bindings/admin_course_detail_bindings.dart';
+import 'package:blessing/modules/admin/course/bindings/admin_detail_quiz_bindings.dart';
 import 'package:blessing/modules/admin/course/bindings/admin_manage_access_course_bindings.dart' show AdminManageAccessCourseBindings;
 import 'package:blessing/modules/admin/course/bindings/admin_manage_course_list_binding.dart';
 import 'package:blessing/modules/admin/course/bindings/admin_upload_course_bindings.dart';
@@ -162,6 +164,12 @@ class AppPages {
       name: AppRoutes.adminAssignUser,
       page: () => const AdminAssignUserScreen(),
       binding: AdminAssignUserBindings(),
+      middlewares: [RoleMiddleware(requiredRole: 'admin')],
+    ),
+    GetPage(
+      name: AppRoutes.adminDetailQuiz,
+      page: () => const AdminDetailQuizScreen(),
+      binding: AdminDetailQuizBindings(),
       middlewares: [RoleMiddleware(requiredRole: 'admin')],
     ),
 
