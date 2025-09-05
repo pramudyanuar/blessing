@@ -97,22 +97,28 @@ class QuizAttemptController extends GetxController {
   }
 
   /// Memulai sesi kuis, mengambil data soal, dan memulai timer.
+  // --- Lifecycle & Initialization ---
   Future<void> initiateQuiz() async {
     try {
       isLoading.value = true;
       errorMessage.value = '';
-      isQuizAlreadyAttempted.value = false; // Reset state setiap kali inisiasi
+      isQuizAlreadyAttempted.value = false; // Reset state
 
       // 1. Buat sesi kuis baru
       final request = CreateUserQuizSessionRequest(quizId: quizId);
       final sessionResponse = await _sessionRepository.createSession(request);
 
-      // Pengecekan null ini akan dilewati jika ada exception, jadi aman
       if (sessionResponse == null) {
+        Get.back();
+        Get.snackbar(
+          "Info",
+          "Anda sudah pernah mengerjakan kuis ini.",
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+        );
         throw Exception("Gagal memulai sesi kuis. Respons dari server kosong.");
       }
       sessionId = sessionResponse.id;
-      debugPrint("Quiz session started with ID: $sessionId");
 
       // 2. Ambil sisa waktu sesi
       final remainingTime =
@@ -121,23 +127,25 @@ class QuizAttemptController extends GetxController {
         throw Exception("Gagal mendapatkan durasi kuis.");
       }
       totalDuration.value = remainingTime;
-      debugPrint("Quiz duration fetched: $remainingTime seconds");
 
-      // 3. Ambil data pertanyaan dan opsi dari API
+      // 3. Ambil soal dan opsi
       await _fetchQuestionsAndOptions();
 
       // 4. Mulai timer
       startTimer();
     } catch (e) {
-      // ---- BAGIAN YANG DIUBAH ADA DI SINI ----
       final errorString = e.toString().toLowerCase();
 
-      // Cek apakah error mengandung kata 'conflict' atau kode status '409'
       if (errorString.contains('conflict') || errorString.contains('409')) {
-        errorMessage.value = "Anda sudah pernah mengerjakan kuis ini.";
-        isQuizAlreadyAttempted.value = true; // Set state khusus ini
+        // <<< BAGIAN INI DIUBAH >>>
+        Get.back(); // langsung kembali ke halaman sebelumnya
+        Get.snackbar(
+          "Info",
+          "Anda sudah pernah mengerjakan kuis ini.",
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+        );
       } else {
-        // Tangani error umum lainnya
         errorMessage.value = "Terjadi kesalahan: ${e.toString()}";
       }
       debugPrint("Error during quiz initiation: $e");

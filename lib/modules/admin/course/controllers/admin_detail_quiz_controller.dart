@@ -3,17 +3,22 @@ import 'package:blessing/data/quiz/models/response/question_option_response.dart
 import 'package:blessing/data/quiz/repository/question_option_repository.dart';
 import 'package:blessing/data/quiz/repository/question_repository_impl.dart';
 import 'package:blessing/data/quiz/repository/quiz_repository_impl.dart';
+import 'package:blessing/data/report/model/response/all_report_cards_response.dart';
+// import 'package:blessing/data/report/repository/report_card_repository.dart';
 import 'package:get/get.dart';
 
 class AdminDetailQuizController extends GetxController {
   final QuestionRepository _questionRepository = QuestionRepository();
   final QuestionOptionRepository _optionRepository = QuestionOptionRepository();
   final QuizRepository _quizRepository = QuizRepository();
+  // final ReportCardRepository _reportCardRepository = ReportCardRepository();
 
   var questions = <QuestionResponse>[].obs;
   var optionsByQuestion = <String, List<QuestionOptionResponse>>{}.obs;
+  var reportData = <AllReportCardsResponse>[].obs;
   var isLoadingQuestions = false.obs;
   var isLoadingOptions = false.obs;
+  var isLoadingReport = false.obs;
   var isDeleting = false.obs;
 
   late final String titleQuiz;
@@ -25,6 +30,7 @@ class AdminDetailQuizController extends GetxController {
     quizId = Get.arguments['quizId'];
     titleQuiz = Get.arguments['titleQuiz'];
     fetchQuestionsByQuizId();
+    // fetchReport(quizId);
   }
 
   Future<void> fetchQuestionsByQuizId() async {
@@ -43,6 +49,19 @@ class AdminDetailQuizController extends GetxController {
       isLoadingQuestions.value = false;
     }
   }
+
+  // Future<void> fetchReport(String qId) async {
+  //   try {
+  //     isLoadingReport.value = true;
+
+  //     final result = await _reportCardRepository.getAllReportCards(quizId: qId, size: 100);
+  //     if (result != null) {
+  //       reportData.value = result.data.data;
+  //     }
+  //   } finally {
+  //     isLoadingReport.value = false;
+  //   }
+  // }
 
   Future<void> fetchOptionsForQuestions() async {
     try {

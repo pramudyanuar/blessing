@@ -29,6 +29,7 @@ class QuizIntroController extends GetxController {
     }
   }
 
+
   Future<void> fetchQuizDetails() async {
     try {
       isLoading.value = true;
@@ -43,7 +44,6 @@ class QuizIntroController extends GetxController {
       } else {
         throw Exception("Gagal memuat detail kuis.");
       }
-
     } catch (e) {
       errorMessage.value = e.toString();
       debugPrint("Error fetching quiz details: $e");
@@ -51,4 +51,6 @@ class QuizIntroController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  //dapatkan score dari myreport card, kalau sudah ada score maka langsung tampilkan saja, kalau belum ada bisa mulai kuisnya
 }

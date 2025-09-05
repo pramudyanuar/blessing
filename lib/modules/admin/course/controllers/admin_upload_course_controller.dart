@@ -15,6 +15,7 @@ class AdminUploadCourseController extends GetxController {
   // State untuk UI
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
+  final linkController = TextEditingController(); // Controller untuk link
   final gradeLevel = 1.obs; // Default ke 1, bisa diubah dari UI
   final isLoading = false.obs;
   late String subjectId;
@@ -36,6 +37,7 @@ class AdminUploadCourseController extends GetxController {
   void onClose() {
     titleController.dispose();
     descriptionController.dispose();
+    linkController.dispose();
     super.onClose();
   }
 
@@ -49,6 +51,34 @@ class AdminUploadCourseController extends GetxController {
           'type': 'image',
           'data': File(xFile.path),
         });
+      }
+    }
+  }
+
+  /// [BARU] Fungsi untuk menambahkan link ke content
+  void addLink() {
+    if (linkController.text.isNotEmpty) {
+      // Validasi basic untuk URL
+      final link = linkController.text.trim();
+      if (Uri.tryParse(link) != null && link.startsWith('http')) {
+        contentItems.add({
+          'type': 'link',
+          'data': link,
+        });
+        linkController.clear();
+        Get.snackbar(
+          'Berhasil',
+          'Link berhasil ditambahkan',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else {
+        Get.snackbar(
+          'Error',
+          'Format link tidak valid. Pastikan dimulai dengan http:// atau https://',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
       }
     }
   }
@@ -91,11 +121,10 @@ class AdminUploadCourseController extends GetxController {
 
     // Memanggil repository dengan signature yang sudah diperbarui
     final success = await _courseRepository.adminPostCourse(
-      courseName: titleController.text,
-      gradeLevel: kelas,
-      content: finalPayloadContent,
-      subjectId: subjectId
-    );
+        courseName: titleController.text,
+        gradeLevel: kelas,
+        content: finalPayloadContent,
+        subjectId: subjectId);
 
     isLoading.value = false;
 

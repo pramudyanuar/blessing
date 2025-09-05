@@ -1,4 +1,5 @@
 import 'package:blessing/core/constants/color.dart';
+import 'package:blessing/core/global_components/image_viewer_screen.dart';
 import 'package:blessing/data/quiz/models/response/question_response.dart'; // 1. Tambahkan import ini
 import 'package:blessing/modules/student/quiz_attempt/controller/quiz_attempt_controller.dart';
 import 'package:flutter/material.dart';
@@ -37,23 +38,78 @@ class QuestionCard extends StatelessWidget {
                 ),
               );
             } else if (content.type == "image" && content.data.isNotEmpty) {
-              return Container(
-                margin: EdgeInsets.only(bottom: 8.h),
-                padding: EdgeInsets.all(4.w),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(4.r),
-                  // Gunakan Image.network untuk memuat dari URL
-                  child: Image.network(
-                    content.data,
-                    fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => Container(
-                      height: 150,
-                      alignment: Alignment.center,
-                      child: const Text("Gagal memuat gambar"),
+              return GestureDetector(
+                onTap: () {
+                  // Buka image viewer saat gambar diklik
+                  Get.to(
+                    () => ImageViewerScreen(
+                      imageUrl: content.data,
+                      heroTag:
+                          'quiz_question_image_${questionData.id}_${questionIndex}',
+                    ),
+                    transition: Transition.fadeIn,
+                    duration: const Duration(milliseconds: 300),
+                  );
+                },
+                child: Hero(
+                  tag:
+                      'quiz_question_image_${questionData.id}_${questionIndex}',
+                  child: Container(
+                    margin: EdgeInsets.only(bottom: 8.h),
+                    padding: EdgeInsets.all(4.w),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4.r),
+                          // Gunakan Image.network untuk memuat dari URL
+                          child: Image.network(
+                            content.data,
+                            fit: BoxFit.contain,
+                            width: double.infinity,
+                            errorBuilder: (_, __, ___) => Container(
+                              height: 150,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(4.r),
+                              ),
+                              child: const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.broken_image,
+                                      size: 40, color: Colors.grey),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    "Gagal memuat gambar",
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Icon zoom di pojok kanan atas
+                        Positioned(
+                          top: 8.h,
+                          right: 8.w,
+                          child: Container(
+                            padding: EdgeInsets.all(6.w),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.6),
+                              borderRadius: BorderRadius.circular(16.r),
+                            ),
+                            child: Icon(
+                              Icons.zoom_in,
+                              color: Colors.white,
+                              size: 16.sp,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

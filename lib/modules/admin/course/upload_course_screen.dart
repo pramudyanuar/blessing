@@ -34,13 +34,15 @@ class UploadCourseScreen extends StatelessWidget {
             padding: EdgeInsets.only(right: 12.w),
             child: Obx(() {
               return TextButton(
-                onPressed: controller.isLoading.value ? null : controller.uploadCourse,
+                onPressed:
+                    controller.isLoading.value ? null : controller.uploadCourse,
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
                   backgroundColor: Colors.transparent,
                 ),
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                   decoration: BoxDecoration(
                     color: AppColors.c2,
                     borderRadius: BorderRadius.circular(8.r),
@@ -94,6 +96,34 @@ class UploadCourseScreen extends StatelessWidget {
                 fillColor: Colors.white,
               ),
               SizedBox(height: 16.h),
+              // [BARU] Input dan tombol untuk menambah link
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomTextField(
+                      controller: controller.linkController,
+                      hintText:
+                          'Masukkan link video/URL (contoh: https://youtube.com/watch?v=...)',
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  ElevatedButton(
+                    onPressed: controller.addLink,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.c2,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 12.w, vertical: 14.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                    ),
+                    child: const Icon(Icons.add_link),
+                  ),
+                ],
+              ),
+              SizedBox(height: 12.h),
               // [DIUBAH] Tombol untuk memilih gambar
               ElevatedButton.icon(
                 onPressed: controller.pickImages,
@@ -109,11 +139,11 @@ class UploadCourseScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 12.h),
-              // [DIUBAH] Tampilkan daftar gambar yang dipilih dari `contentItems`
+              // [DIUBAH] Tampilkan semua content items (gambar dan link)
               Obx(() {
                 return Column(
                   children: controller.contentItems.map((item) {
-                    // Pastikan hanya menampilkan item gambar
+                    // Tampilkan item gambar
                     if (item['type'] == 'image' && item['data'] is File) {
                       final file = item['data'] as File;
                       return _buildFileItem(
@@ -126,7 +156,15 @@ class UploadCourseScreen extends StatelessWidget {
                         file: file,
                       );
                     }
-                    return const SizedBox.shrink(); // Jangan tampilkan item teks di sini
+                    // Tampilkan item link
+                    else if (item['type'] == 'link') {
+                      final link = item['data'] as String;
+                      return _buildLinkItem(
+                        link: link,
+                        onRemove: () => controller.removeContentItem(item),
+                      );
+                    }
+                    return const SizedBox.shrink();
                   }).toList(),
                 );
               }),
@@ -180,6 +218,77 @@ class UploadCourseScreen extends StatelessWidget {
                     color: Colors.grey.shade600,
                     fontSize: 12.sp,
                   ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: onRemove,
+            icon: const Icon(Icons.close, color: Colors.grey),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLinkItem({
+    required String link,
+    required VoidCallback onRemove,
+  }) {
+    // Determine icon and color based on URL
+    IconData linkIcon = FontAwesomeIcons.link;
+    Color color = Colors.blue.shade300;
+    String displayText = 'Link';
+
+    if (link.contains('youtube.com') || link.contains('youtu.be')) {
+      linkIcon = FontAwesomeIcons.youtube;
+      color = Colors.red.shade300;
+      displayText = 'Video YouTube';
+    } else if (link.contains('vimeo.com')) {
+      linkIcon = FontAwesomeIcons.vimeo;
+      color = Colors.blue.shade400;
+      displayText = 'Video Vimeo';
+    }
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40.w,
+            height: 40.w,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            child: Icon(
+              linkIcon,
+              color: color,
+              size: 20.sp,
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  displayText,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  link.length > 50 ? '${link.substring(0, 50)}...' : link,
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 12.sp,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

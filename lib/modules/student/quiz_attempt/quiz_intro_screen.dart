@@ -24,6 +24,8 @@ class QuizIntroScreen extends StatelessWidget {
           color: AppColors.c2,
         ),
         backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.grey.withOpacity(0.2),
         elevation: 0.5,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.c2),
@@ -54,9 +56,11 @@ class QuizIntroScreen extends StatelessWidget {
           child: Column(
             children: [
               Card(
+                color: Colors.white,
                 elevation: 3,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(16.r),
+                  side: BorderSide(color: AppColors.c2, width: 0.5.w),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
