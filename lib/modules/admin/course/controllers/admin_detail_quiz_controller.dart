@@ -3,8 +3,6 @@ import 'package:blessing/data/quiz/models/response/question_option_response.dart
 import 'package:blessing/data/quiz/repository/question_option_repository.dart';
 import 'package:blessing/data/quiz/repository/question_repository_impl.dart';
 import 'package:blessing/data/quiz/repository/quiz_repository_impl.dart';
-import 'package:blessing/data/report/model/response/all_report_cards_response.dart';
-// import 'package:blessing/data/report/repository/report_card_repository.dart';
 import 'package:get/get.dart';
 
 class AdminDetailQuizController extends GetxController {
@@ -15,7 +13,7 @@ class AdminDetailQuizController extends GetxController {
 
   var questions = <QuestionResponse>[].obs;
   var optionsByQuestion = <String, List<QuestionOptionResponse>>{}.obs;
-  var reportData = <AllReportCardsResponse>[].obs;
+  // var reportData = <AllReportCardsResponse>[].obs;
   var isLoadingQuestions = false.obs;
   var isLoadingOptions = false.obs;
   var isLoadingReport = false.obs;

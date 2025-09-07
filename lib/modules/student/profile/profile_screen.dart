@@ -2,6 +2,7 @@ import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_button.dart';
 import 'package:blessing/core/global_components/global_confirmation_dialog.dart';
 import 'package:blessing/core/global_components/global_text.dart';
+import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/modules/student/profile/controllers/profile_controller.dart';
 import 'package:blessing/core/global_components/custom_text_field.dart';
 import 'package:flutter/material.dart';
@@ -133,6 +134,21 @@ class ProfileScreen extends StatelessWidget {
                         )),
                   ),
                   SizedBox(height: 24.h),
+
+                  // Tombol Report Card (hanya untuk mode edit, bukan initial setup)
+                  if (controller.mode == ProfileMode.edit)
+                    GlobalButton(
+                      text: 'Lihat Report Card',
+                      onPressed: () {
+                        Get.toNamed(AppRoutes.reportCard);
+                      },
+                      color: const Color(0xFF0D47A1),
+                      width: double.infinity,
+                      height: 40.h,
+                    ),
+
+                  if (controller.mode == ProfileMode.edit)
+                    SizedBox(height: 12.h),
 
                   // Tombol Simpan atau Logout
                   if (controller.mode == ProfileMode.initialSetup)

@@ -25,11 +25,13 @@ abstract class AppRoutes {
   static const adminManageCourseAccess = '/admin-manage-course-access';
   static const adminAssignUser = '/admin-assign-user';
   static const adminDetailQuiz = '/admin-detail-quiz';
+  static const adminStudentReport = '/admin-student-report';
 
   // Student Routes
   static const studentMenu = '/student-menu';
   static const profile = '/profile';
   static const editProfile = '/edit-profile';
+  static const reportCard = '/report-card';
   static const courseMain = '/course-main';
   static const courseDetail = '/course-detail';
   static const quizList = '/quiz-list';

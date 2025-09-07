@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:blessing/core/utils/system_ui_util.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final String videoUrl;
@@ -56,6 +57,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         setState(() {
           _isFullScreen = _controller.value.isFullScreen;
         });
+
+        // Set system UI berdasarkan status fullscreen
+        if (_isFullScreen) {
+          SystemUIUtil.setVideoFullscreenUI();
+        } else {
+          SystemUIUtil.setVideoNormalUI();
+        }
       }
     });
   }
@@ -63,10 +71,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   @override
   void dispose() {
     _controller.dispose();
-    // Kembali ke portrait only saat keluar dari video player
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
+    // Reset system UI menggunakan utility
+    SystemUIUtil.resetSystemUI();
     super.dispose();
   }
 
@@ -74,10 +80,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        // Force back to portrait when leaving
-        SystemChrome.setPreferredOrientations([
-          DeviceOrientation.portraitUp,
-        ]);
+        // Reset system UI menggunakan utility
+        SystemUIUtil.resetSystemUI();
         return true;
       },
       child: YoutubePlayerBuilder(
@@ -116,10 +120,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     leading: IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
                       onPressed: () {
-                        // Force back to portrait before going back
-                        SystemChrome.setPreferredOrientations([
-                          DeviceOrientation.portraitUp,
-                        ]);
+                        // Reset system UI menggunakan utility
+                        SystemUIUtil.resetSystemUI();
                         Get.back();
                       },
                     ),

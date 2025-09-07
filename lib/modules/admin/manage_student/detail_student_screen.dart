@@ -7,7 +7,6 @@ import 'package:blessing/core/global_components/global_text.dart'; // Pastikan p
 import 'package:blessing/core/global_components/global_confirmation_dialog.dart'; // Pastikan path ini benar
 import 'package:blessing/modules/admin/manage_student/controller/detail_student_controller.dart';
 import 'package:blessing/modules/admin/manage_student/widgets/detail_field.dart';
-import 'package:blessing/modules/admin/manage_student/widgets/quiz_score_card.dart'; // Pastikan path ini benar
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -126,40 +125,19 @@ class DetailStudentScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 24.h),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 16.w),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12.r),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 5)
-                    ]),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GlobalText.semiBold("Nilai Kuis", fontSize: 16.sp),
-                        TextButton(
-                          onPressed: () {
-                            /* TODO: Navigasi ke halaman semua nilai */
-                          },
-                          child: GlobalText.medium("Lihat Semua",
-                              color: AppColors.c2, fontSize: 14.sp),
-                        )
-                      ],
-                    ),
-                    ...controller.quizScores.entries
-                        .map((e) => QuizScoreCard(title: e.key, score: e.value))
-                        .toList(),
-                    SizedBox(height: 8.h),
-                  ],
-                ),
+              GlobalButton(
+                text: "Lihat Report Card",
+                onPressed: () {
+                  // Navigasi ke halaman report card siswa
+                  Get.toNamed('/admin-student-report', arguments: {
+                    'userId': controller.studentId.value,
+                    'userName': controller.name.value,
+                  });
+                },
+                width: double.infinity,
+                color: AppColors.c2,
               ),
-              SizedBox(height: 32.h),
+              SizedBox(height: 24.h),
               GlobalButton(
                 text: "Hapus Siswa",
                 onPressed: () {

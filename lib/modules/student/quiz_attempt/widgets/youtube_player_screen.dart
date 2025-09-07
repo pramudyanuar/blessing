@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_text.dart';
+import 'package:blessing/core/utils/system_ui_util.dart';
 
 class YoutubePlayerScreen extends StatelessWidget {
   const YoutubePlayerScreen({super.key});
@@ -33,6 +34,8 @@ class YoutubePlayerScreen extends StatelessWidget {
           SystemChrome.setPreferredOrientations([
             DeviceOrientation.portraitUp,
           ]);
+          // Reset system UI menggunakan utility
+          SystemUIUtil.resetSystemUI();
         }
       });
 
@@ -44,7 +47,11 @@ class YoutubePlayerScreen extends StatelessWidget {
         elevation: 0.5,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            // Reset system UI menggunakan utility
+            SystemUIUtil.resetSystemUI();
+            Navigator.pop(context);
+          },
         ),
       ),
       body: YoutubePlayerScaffold(
