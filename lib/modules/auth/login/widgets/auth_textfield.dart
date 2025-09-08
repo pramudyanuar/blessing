@@ -2,7 +2,7 @@ import 'package:blessing/core/global_components/global_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class AuthTextField extends StatelessWidget {
+class AuthTextField extends StatefulWidget {
   final String label;
   final String hintText;
   final bool isPassword;
@@ -17,12 +17,31 @@ class AuthTextField extends StatelessWidget {
   });
 
   @override
+  State<AuthTextField> createState() => _AuthTextFieldState();
+}
+
+class _AuthTextFieldState extends State<AuthTextField> {
+  bool _obscureText = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscureText = widget.isPassword;
+  }
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GlobalText.bold(
-          label,
+          widget.label,
           fontSize: 16.sp,
         ),
         SizedBox(height: 8.h),
@@ -39,10 +58,10 @@ class AuthTextField extends StatelessWidget {
             ],
           ),
           child: TextField(
-            controller: controller,
-            obscureText: isPassword,
+            controller: widget.controller,
+            obscureText: widget.isPassword ? _obscureText : false,
             decoration: InputDecoration(
-              hintText: hintText,
+              hintText: widget.hintText,
               hintStyle: TextStyle(
                 fontSize: 14.sp,
                 color: Colors.grey,
@@ -55,11 +74,13 @@ class AuthTextField extends StatelessWidget {
               ),
               contentPadding:
                   EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
-              suffixIcon: isPassword
+              suffixIcon: widget.isPassword
                   ? IconButton(
-                      icon:
-                          const Icon(Icons.visibility_off, color: Colors.grey),
-                      onPressed: () {},
+                      icon: Icon(
+                        _obscureText ? Icons.visibility_off : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: _togglePasswordVisibility,
                     )
                   : null,
             ),

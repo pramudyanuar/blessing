@@ -1,9 +1,24 @@
-allprojects {
+buildscript {
+    ext.kotlin_version = '1.9.22'
     repositories {
         google()
         mavenCentral()
     }
 
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.3.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    
+    // This block you provided is good. It ensures your app's source code
+    // is compiled to be compatible with Java 17, which is a stable target.
     tasks.withType(JavaCompile) {
         options.compilerArgs << "-Xlint:-options" 
         sourceCompatibility = JavaVersion.VERSION_17

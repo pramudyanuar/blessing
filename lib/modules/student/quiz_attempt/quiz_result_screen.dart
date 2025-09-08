@@ -1,5 +1,5 @@
 import 'package:blessing/core/constants/color.dart';
-import 'package:blessing/modules/student/quiz_attempt/widgets/youtube_player_screen.dart';
+import 'package:blessing/core/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
@@ -8,8 +8,6 @@ import 'package:get/get.dart';
 
 class QuizResultScreen extends StatelessWidget {
   const QuizResultScreen({super.key});
-
-  static const String videoId = 'dQw4w9WgXcQ';
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +24,7 @@ class QuizResultScreen extends StatelessWidget {
         elevation: 0.5,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Get.offAllNamed(AppRoutes.studentMenu),
         ),
       ),
       body: SingleChildScrollView(
@@ -82,92 +80,26 @@ class QuizResultScreen extends StatelessWidget {
                           fontSize: 18.sp, color: Colors.grey),
                     ],
                   ),
-                ],
-              ),
-            ),
-
-            SizedBox(height: 20.h),
-
-            // Container Pembahasan Kuis
-            Container(
-              padding: EdgeInsets.all(16.w),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GlobalText.semiBold("Pembahasan Kuis", fontSize: 16.sp),
-                  SizedBox(height: 12.h),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const YoutubePlayerScreen(),
+                  SizedBox(height: 30.h),
+                  // Tombol Kembali ke Menu Utama
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Get.offAllNamed(AppRoutes.studentMenu),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1976D2),
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
-                      );
-                    },
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12.r),
-                          child: Image.network(
-                            'https://img.youtube.com/vi/$videoId/hqdefault.jpg',
-                            width: double.infinity,
-                            height: 200.h,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Container(
-                                width: double.infinity,
-                                height: 200.h,
-                                color: Colors.grey.shade200,
-                                child: const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                width: double.infinity,
-                                height: 200.h,
-                                color: Colors.grey.shade200,
-                                child:
-                                    const Icon(Icons.error, color: Colors.red),
-                              );
-                            },
-                          ),
-                        ),
-                        Container(
-                          width: 60.w,
-                          height: 60.h,
-                          decoration: const BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(Icons.play_arrow,
-                              color: Colors.white, size: 30.sp),
-                        ),
-                      ],
+                      ),
+                      child: GlobalText.semiBold(
+                        "Kembali ke Menu Utama",
+                        fontSize: 16.sp,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 16.h),
-                  GlobalText.regular(
-                    "Tonton pembahasan lengkap untuk memahami jawaban yang benar dan meningkatkan pemahamanmu.",
-                    maxLines: 5,
-                    textAlign: TextAlign.justify,
-                    fontSize: 14.sp,
-                    color: Colors.grey.shade600,
                   ),
                 ],
               ),
