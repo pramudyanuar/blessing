@@ -297,8 +297,7 @@ class AdminCourseDetailScreen extends StatelessWidget {
       child: Column(
         children: [
           TextField(
-            controller:
-                TextEditingController(text: controller.editedCourseName.value),
+            controller: controller.courseNameController,
             onChanged: (v) => controller.editedCourseName.value = v,
             decoration: const InputDecoration(labelText: 'Judul Materi'),
           ),

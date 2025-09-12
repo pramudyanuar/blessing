@@ -3,9 +3,12 @@ import 'package:blessing/data/course/repository/course_repository_impl.dart';
 import 'package:blessing/data/quiz/models/response/quiz_response.dart'; // --- TAMBAHAN ---
 import 'package:blessing/data/quiz/repository/quiz_repository_impl.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AdminCourseDetailController extends GetxController {
+  // Controller for course name editing
+  final courseNameController = TextEditingController();
   // --- MODIFIKASI: Tambahkan QuizRepository ---
   final _courseRepository = Get.find<CourseRepository>();
   final _quizRepository = Get.find<QuizRepository>();
@@ -32,6 +35,15 @@ class AdminCourseDetailController extends GetxController {
     if (courseId.isNotEmpty) {
       fetchCourseDetail();
     }
+    // Sync controller with observable
+    ever(editedCourseName, (String name) {
+      if (courseNameController.text != name) {
+        courseNameController.text = name;
+        courseNameController.selection = TextSelection.fromPosition(
+          TextPosition(offset: courseNameController.text.length),
+        );
+      }
+    });
   }
 
   Future<void> fetchCourseDetail() async {
@@ -79,6 +91,11 @@ class AdminCourseDetailController extends GetxController {
           .map((c) => c.data)
           .toList();
       isEditing.value = true;
+      // Set controller text when editing starts
+      courseNameController.text = editedCourseName.value;
+      courseNameController.selection = TextSelection.fromPosition(
+        TextPosition(offset: courseNameController.text.length),
+      );
     }
   }
 
@@ -103,6 +120,9 @@ class AdminCourseDetailController extends GetxController {
 
   Future<void> saveEdits() async {
     if (course.value == null) return;
+
+  // Update editedCourseName from controller before saving
+  editedCourseName.value = courseNameController.text;
 
     final textContents =
         course.value!.content!.where((c) => c.type == 'text').toList();
