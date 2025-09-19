@@ -50,6 +50,11 @@ class MainStudentController extends GetxController {
     }
   }
 
+  /// Reload user data from cache (for updating after profile edit)
+  Future<void> reloadUserData() async {
+    await _loadUserData();
+  }
+
   /// Mengambil data semua mata pelajaran dari API.
   Future<void> fetchSubjects() async {
     try {

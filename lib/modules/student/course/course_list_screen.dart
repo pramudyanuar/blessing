@@ -50,46 +50,48 @@ class CourseListScreen extends StatelessWidget {
           // Tampilkan daftar course jika data tersedia
           return RefreshIndicator(
             onRefresh: () => controller.loadCourseData(),
-            child: ListView.builder(
-              padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 8.w),
-              itemCount: controller.displayItems.length,
-              itemBuilder: (context, index) {
-                final item = controller.displayItems[index] as Map<String, dynamic>;
-                final type = item['type'] as CourseContentType;
+            child: SafeArea(
+              child: ListView.builder(
+                padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 8.w),
+                itemCount: controller.displayItems.length,
+                itemBuilder: (context, index) {
+                  final item = controller.displayItems[index] as Map<String, dynamic>;
+                  final type = item['type'] as CourseContentType;
 
-                if (type == CourseContentType.material) {
-                  return CourseCard(
-                    type: CourseContentType.material,
-                    title: item['title'],
-                    dateText: item['dateText'],
-                    description: item['description'],
-                    fileName: item['fileName'],
-                    previewImages: item['previewImages'],
-                    onTapAction: () {
-                      print("Melihat detail materi: ${item['title']}");
-                      Get.toNamed(AppRoutes.courseDetail, arguments: {'courseId': item['id']});
-                    },
-                  );
-                } else {
-                  return CourseCard(
-                    type: CourseContentType.quiz,
-                    title: item['title'],
-                    dateText: item['dateText'],
-                    description: item['description'],
-                    timeLimit: item['timeLimit'],
-                    questionCount: item['questionCount'],
-                    isCompleted: item['isCompleted'],
-                    score: item['score'],
-                    onTapAction: () {
-                      if (!(item['isCompleted'] as bool)) {
-                        print("Memulai kuis: ${item['title']}");
-                        Get.toNamed(AppRoutes.quizIntro,
-                            arguments: item['id']); 
-                      }
-                    },
-                  );
-                }
-              },
+                  if (type == CourseContentType.material) {
+                    return CourseCard(
+                      type: CourseContentType.material,
+                      title: item['title'],
+                      dateText: item['dateText'],
+                      description: item['description'],
+                      fileName: item['fileName'],
+                      previewImages: item['previewImages'],
+                      onTapAction: () {
+                        print("Melihat detail materi: ${item['title']}");
+                        Get.toNamed(AppRoutes.courseDetail, arguments: {'courseId': item['id']});
+                      },
+                    );
+                  } else {
+                    return CourseCard(
+                      type: CourseContentType.quiz,
+                      title: item['title'],
+                      dateText: item['dateText'],
+                      description: item['description'],
+                      timeLimit: item['timeLimit'],
+                      questionCount: item['questionCount'],
+                      isCompleted: item['isCompleted'],
+                      score: item['score'],
+                      onTapAction: () {
+                        if (!(item['isCompleted'] as bool)) {
+                          print("Memulai kuis: ${item['title']}");
+                          Get.toNamed(AppRoutes.quizIntro,
+                              arguments: item['id']); 
+                        }
+                      },
+                    );
+                  }
+                },
+              ),
             ),
           );
         },

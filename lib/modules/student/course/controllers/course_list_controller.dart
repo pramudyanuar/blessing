@@ -100,7 +100,7 @@ class CourseListController extends GetxController {
         'title': course.courseName,
         'description': 'Materi pembelajaran untuk ${course.courseName}.',
         'fileName': 'Materi Digital',
-        'dateText': timeago.format(course.createdAt, locale: 'id'),
+        'dateText': _formatDateDisplay(course.createdAt),
         'date': course.createdAt,
         'previewImages': null,
       });
@@ -111,7 +111,7 @@ class CourseListController extends GetxController {
           'id': quiz.id,
           'type': CourseContentType.quiz,
           'title': quiz.quizName,
-          'dateText': timeago.format(quiz.createdAt, locale: 'id'),
+          'dateText': _formatDateDisplay(quiz.createdAt),
           'date': quiz.createdAt,
           'description': 'Kuis untuk menguji pemahaman materi.',
           'timeLimit': quiz.timeLimit,
@@ -127,5 +127,28 @@ class CourseListController extends GetxController {
         (a, b) => (b['date'] as DateTime).compareTo(a['date'] as DateTime));
 
     return items;
+  }
+
+  /// Format date display: show relative time for recent dates, actual date for older ones
+  String _formatDateDisplay(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    // Jika lebih dari 30 hari (sekitar 1 bulan), tampilkan tanggal aktual
+    if (difference.inDays > 30) {
+      return '${date.day} ${_getMonthName(date.month)} ${date.year}';
+    }
+
+    // Jika kurang dari 30 hari, gunakan timeago
+    return timeago.format(date, locale: 'id');
+  }
+
+  /// Helper method to get Indonesian month name (short form)
+  String _getMonthName(int month) {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+      'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'
+    ];
+    return months[month - 1];
   }
 }

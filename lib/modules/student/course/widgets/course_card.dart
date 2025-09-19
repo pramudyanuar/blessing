@@ -103,7 +103,15 @@ class CourseCard extends StatelessWidget {
             GlobalText.medium(text, fontSize: 12.sp),
           ],
         ),
-        GlobalText.light(dateText, fontSize: 11.sp, color: Colors.grey),
+        Flexible(
+          child: GlobalText.light(
+            dateText, 
+            fontSize: 11.sp, 
+            color: Colors.grey,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
       ],
     );
   }

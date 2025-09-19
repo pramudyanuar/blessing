@@ -66,45 +66,47 @@ class QuizAttemptScreen extends StatelessWidget {
 
           // State: Kuis Sudah Dikerjakan (Conflict Error)
           if (controller.isQuizAlreadyAttempted.value) {
-            return Center(
-              child: Padding(
-                padding: EdgeInsets.all(24.w),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.check_circle_outline,
-                      size: 80,
-                      color: Colors.green,
-                    ),
-                    SizedBox(height: 16.h),
-                    GlobalText.bold(
-                      "Kuis Telah Dikerjakan",
-                      fontSize: 20.sp,
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 8.h),
-                    GlobalText.regular(
-                      controller.errorMessage.value,
-                      textAlign: TextAlign.center,
-                      fontSize: 16.sp,
-                    ),
-                    SizedBox(height: 24.h),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.c2,
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 32.w, vertical: 12.h),
+            return SafeArea(
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.all(24.w),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.check_circle_outline,
+                        size: 80,
+                        color: Colors.green,
                       ),
-                      onPressed: () =>
-                          Get.back(), // Kembali ke halaman sebelumnya
-                      child: GlobalText.medium(
-                        "Kembali",
-                        color: Colors.white,
+                      SizedBox(height: 16.h),
+                      GlobalText.bold(
+                        "Kuis Telah Dikerjakan",
+                        fontSize: 20.sp,
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 8.h),
+                      GlobalText.regular(
+                        controller.errorMessage.value,
+                        textAlign: TextAlign.center,
                         fontSize: 16.sp,
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 24.h),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.c2,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 32.w, vertical: 12.h),
+                        ),
+                        onPressed: () =>
+                            Get.back(), // Kembali ke halaman sebelumnya
+                        child: GlobalText.medium(
+                          "Kembali",
+                          color: Colors.white,
+                          fontSize: 16.sp,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -112,36 +114,40 @@ class QuizAttemptScreen extends StatelessWidget {
 
           // State: Error Umum Lainnya
           if (controller.errorMessage.value.isNotEmpty) {
-            return Center(
-              child: Padding(
-                padding: EdgeInsets.all(16.w),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error_outline, color: Colors.red, size: 60.r),
-                    SizedBox(height: 16.h),
-                    GlobalText.regular(
-                      controller.errorMessage.value,
-                      textAlign: TextAlign.center,
-                      color: Colors.red,
-                      fontSize: 16.sp,
-                    ),
-                    SizedBox(height: 20.h),
-                    ElevatedButton(
-                      onPressed: () =>
-                          controller.initiateQuiz(), // Tombol coba lagi
-                      child: const Text('Coba Lagi'),
-                    )
-                  ],
+            return SafeArea(
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.w),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.error_outline, color: Colors.red, size: 60.r),
+                      SizedBox(height: 16.h),
+                      GlobalText.regular(
+                        controller.errorMessage.value,
+                        textAlign: TextAlign.center,
+                        color: Colors.red,
+                        fontSize: 16.sp,
+                      ),
+                      SizedBox(height: 20.h),
+                      ElevatedButton(
+                        onPressed: () =>
+                            controller.initiateQuiz(), // Tombol coba lagi
+                        child: const Text('Coba Lagi'),
+                      )
+                    ],
+                  ),
                 ),
               ),
             );
           }
 
           // State: Sukses (Kuis Berjalan)
-          return Container(
-            color: AppColors.c5,
-            child: const QuizAttemptBody(),
+          return SafeArea(
+            child: Container(
+              color: AppColors.c5,
+              child: const QuizAttemptBody(),
+            ),
           );
         }),
         endDrawer: const QuestionNavigationDrawer(),

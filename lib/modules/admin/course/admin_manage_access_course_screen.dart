@@ -17,7 +17,11 @@ class AdminManageAccessCourseScreen extends StatelessWidget {
     return BaseWidgetContainer(
       appBar: AppBar(
         centerTitle: false,
-        title: GlobalText.semiBold("Akses Materi", fontSize: 16.sp, color: AppColors.c2,),
+        title: GlobalText.semiBold(
+          "Akses Materi",
+          fontSize: 16.sp,
+          color: AppColors.c2,
+        ),
         backgroundColor: Colors.white,
         elevation: 0.5,
         leading: IconButton(
@@ -41,9 +45,10 @@ class AdminManageAccessCourseScreen extends StatelessWidget {
               children: [
                 Text(controller.errorMessage.value),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: controller.fetchUserAccess,
-                  child: const Text('Coba Lagi'),
+                ElevatedButton.icon(
+                  onPressed: controller.refreshUserAccess,
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Coba Lagi'),
                 )
               ],
             ),
@@ -51,10 +56,21 @@ class AdminManageAccessCourseScreen extends StatelessWidget {
         }
 
         if (controller.userAccessList.isEmpty) {
-          return const Center(
-            child: Text(
-              'Belum ada pengguna yang memiliki akses ke materi ini.',
-              textAlign: TextAlign.center,
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Belum ada pengguna yang memiliki akses ke materi ini.',
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: controller.refreshUserAccess,
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Refresh'),
+                ),
+              ],
             ),
           );
         }
@@ -69,8 +85,9 @@ class AdminManageAccessCourseScreen extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   leading: CircleAvatar(
-                    child: Text(
-                        userAccess.user.username!.substring(0, 1).toUpperCase()),
+                    child: Text(userAccess.user.username!
+                        .substring(0, 1)
+                        .toUpperCase()),
                   ),
                   title: Text(userAccess.user.username ?? ''),
                   subtitle: Text(userAccess.user.email ?? ''),
@@ -79,7 +96,8 @@ class AdminManageAccessCourseScreen extends StatelessWidget {
                     onPressed: () {
                       Get.dialog(
                         GlobalConfirmationDialog(
-                          message: "Apakah kamu yakin ingin menghapus akses untuk ${userAccess.user.username}?",
+                          message:
+                              "Apakah kamu yakin ingin menghapus akses untuk ${userAccess.user.username}?",
                           onYes: () {
                             Get.back();
                             controller.removeUserAccess(userAccess.id);

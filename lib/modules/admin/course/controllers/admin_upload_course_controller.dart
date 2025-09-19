@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/data/course/repository/course_repository_impl.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -99,61 +100,70 @@ class AdminUploadCourseController extends GetxController {
 
     isLoading.value = true;
 
-    // --- Membangun Payload 'content' ---
-    final List<Map<String, dynamic>> finalPayloadContent = [];
+    try {
+      // --- Membangun Payload 'content' ---
+      final List<Map<String, dynamic>> finalPayloadContent = [];
 
-    // 1. Tambahkan deskripsi sebagai item teks pertama (jika ada)
-    if (descriptionController.text.isNotEmpty) {
-      finalPayloadContent.add({
-        'type': 'text',
-        'data': descriptionController.text,
-      });
-    }
-
-    // 2. Tambahkan semua item gambar yang sudah dipilih pengguna
-    finalPayloadContent.addAll(contentItems);
-    // --- Selesai Membangun Payload ---
-
-    if (finalPayloadContent.isEmpty) {
-      Get.snackbar(
-          'Error', 'Konten (deskripsi atau gambar) tidak boleh kosong');
-      isLoading.value = false;
-      return;
-    }
-
-    // Memanggil repository dengan signature yang sudah diperbarui
-    final success = await _courseRepository.adminPostCourse(
-        courseName: titleController.text,
-        gradeLevel: kelas,
-        content: finalPayloadContent,
-        subjectId: subjectId);
-
-    isLoading.value = false;
-
-    if (success) {
-      Get.snackbar(
-        'Berhasil',
-        'Materi berhasil diunggah',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-
-      // Tunggu sebentar agar user bisa melihat notifikasi sukses
-      await Future.delayed(const Duration(seconds: 1));
-
-      Get.back(); // Kembali ke halaman sebelumnya
-
-      // Panggil callback untuk refresh course list
-      if (onCourseCreated != null) {
-        onCourseCreated!();
+      // 1. Tambahkan deskripsi sebagai item teks pertama (jika ada)
+      if (descriptionController.text.isNotEmpty) {
+        finalPayloadContent.add({
+          'type': 'text',
+          'data': descriptionController.text,
+        });
       }
-    } else {
+
+      // 2. Tambahkan semua item gambar yang sudah dipilih pengguna
+      finalPayloadContent.addAll(contentItems);
+      // --- Selesai Membangun Payload ---
+
+      if (finalPayloadContent.isEmpty) {
+        Get.snackbar(
+            'Error', 'Konten (deskripsi atau gambar) tidak boleh kosong');
+        return;
+      }
+
+      // Memanggil repository dengan signature yang sudah diperbarui
+      final success = await _courseRepository.adminPostCourse(
+          courseName: titleController.text,
+          gradeLevel: kelas,
+          content: finalPayloadContent,
+          subjectId: subjectId);
+
+      if (success) {
+        Get.snackbar(
+          'Berhasil',
+          'Materi berhasil diunggah',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+
+        // Tunggu sebentar agar user bisa melihat notifikasi sukses
+        await Future.delayed(const Duration(seconds: 1));
+
+        // Gunakan Get.offNamed() untuk memastikan kembali ke course list
+        Get.offNamed(AppRoutes.manageSubject);
+
+        // Panggil callback untuk refresh course list
+        if (onCourseCreated != null) {
+          onCourseCreated!();
+        }
+      } else {
+        Get.snackbar(
+          'Gagal',
+          'Terjadi kesalahan saat mengunggah materi',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
       Get.snackbar(
-        'Gagal',
+        'Error',
         'Terjadi kesalahan saat mengunggah materi',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+    } finally {
+      isLoading.value = false; // Pastikan loading state selalu di-reset
     }
   }
 }

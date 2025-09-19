@@ -42,6 +42,17 @@ class AdminManageAccessCourseController extends GetxController {
     }
   }
 
+  @override
+  void onReady() {
+    super.onReady();
+    // Auto refresh ketika halaman dibuka dengan sedikit delay
+    if (courseId.isNotEmpty) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        fetchUserAccess();
+      });
+    }
+  }
+
   /// Mengambil semua data akses pengguna untuk course ini.
   Future<void> fetchUserAccess() async {
     isLoading.value = true;
@@ -63,6 +74,11 @@ class AdminManageAccessCourseController extends GetxController {
     }
   }
 
+  /// Method untuk refresh manual data akses pengguna
+  Future<void> refreshUserAccess() async {
+    await fetchUserAccess();
+  }
+
   /// Menghapus akses seorang pengguna dari course ini.
   Future<void> removeUserAccess(String userCourseId) async {
     // Tampilkan loading indicator atau dialog
@@ -76,14 +92,20 @@ class AdminManageAccessCourseController extends GetxController {
     Get.back(); // Tutup dialog loading
 
     if (success) {
-      // Hapus item dari list secara lokal agar UI langsung update
-      userAccessList.removeWhere((item) => item.id == userCourseId);
+      // Selalu fetch ulang data dari server untuk memastikan konsistensi
+      // Terutama penting ketika user terakhir dihapus
+      await fetchUserAccess();
+
       Get.snackbar(
         'Berhasil',
         'Akses pengguna telah dihapus.',
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
+
+      // Tunggu sebentar agar user bisa melihat notifikasi
+      await Future.delayed(const Duration(seconds: 1));
+
       // Panggil callback untuk refresh course list
       if (onAccessChanged != null) {
         onAccessChanged!();
@@ -108,7 +130,7 @@ class AdminManageAccessCourseController extends GetxController {
     // Jika kita kembali dengan hasil 'true' (artinya assignment berhasil),
     // panggil ulang fetchUserAccess untuk me-refresh daftar.
     if (result == true) {
-      fetchUserAccess();
+      await fetchUserAccess();
       // Panggil callback untuk refresh course list
       if (onAccessChanged != null) {
         onAccessChanged!();

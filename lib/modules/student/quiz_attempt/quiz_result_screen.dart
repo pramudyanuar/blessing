@@ -22,10 +22,6 @@ class QuizResultScreen extends StatelessWidget {
         title: GlobalText.semiBold("Hasil Kuis", fontSize: 16.sp),
         backgroundColor: Colors.white,
         elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Get.offAllNamed(AppRoutes.studentMenu),
-        ),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.w),

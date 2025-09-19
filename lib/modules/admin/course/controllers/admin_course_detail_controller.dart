@@ -1,3 +1,4 @@
+import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/data/course/models/response/course_response.dart';
 import 'package:blessing/data/course/repository/course_repository_impl.dart';
 import 'package:blessing/data/quiz/models/response/quiz_response.dart'; // --- TAMBAHAN ---
@@ -113,8 +114,8 @@ class AdminCourseDetailController extends GetxController {
         // Tunggu sebentar agar user bisa melihat notifikasi sukses
         await Future.delayed(const Duration(seconds: 1));
 
-        Get.back(); // keluar dialog konfirmasi
-        Get.back(); // keluar dari detail page
+        // Gunakan Get.offNamed() untuk memastikan kembali ke course list
+        Get.offNamed(AppRoutes.manageSubject);
 
         // Panggil callback untuk refresh course list
         if (onCourseDeleted != null) {

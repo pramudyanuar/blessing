@@ -86,33 +86,116 @@ class ProfileScreen extends StatelessWidget {
                             SizedBox(height: 16.h),
                             GlobalText.medium('Kelas', fontSize: 14),
                             SizedBox(height: 8.h),
-                            DropdownButtonFormField<String>(
-                              dropdownColor: Colors.white,
-                              value: controller.selectedClass.value,
-                              decoration: InputDecoration(
-                                prefixIcon: const Icon(Icons.book_outlined),
-                                hintText: 'Pilih kelas anda',
-                                hintStyle:
-                                    TextStyle(color: Colors.grey.shade500),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  borderSide: BorderSide.none,
+                            // Logika untuk menampilkan field kelas:
+                            // - Initial setup: dropdown bisa diedit
+                            // - Edit mode: read-only dengan lock icon
+                            // - View mode: read-only tanpa lock icon
+                            if (controller.mode == ProfileMode.initialSetup)
+                              DropdownButtonFormField<String>(
+                                dropdownColor: Colors.white,
+                                value: controller.selectedClass.value,
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(Icons.book_outlined),
+                                  hintText: 'Pilih kelas anda',
+                                  hintStyle:
+                                      TextStyle(color: Colors.grey.shade500),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12.r),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  filled: true,
+                                  fillColor: const Color(0xFFF5F6FA),
                                 ),
-                                filled: true,
-                                fillColor: controller.isEditMode.value
-                                    ? const Color(0xFFF5F6FA)
-                                    : Colors.grey.shade200,
+                                items: controller.classOptions
+                                    .map((kelas) => DropdownMenuItem(
+                                        value: kelas, child: Text(kelas)))
+                                    .toList(),
+                                onChanged: (value) {
+                                  controller.selectedClass.value = value;
+                                },
+                              )
+                            else if (controller.isEditMode.value)
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 12.w, vertical: 16.h),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade100,
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  border: Border.all(
+                                    color: Colors.grey.shade300,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.book_outlined,
+                                      color: Colors.grey.shade500,
+                                    ),
+                                    SizedBox(width: 12.w),
+                                    Expanded(
+                                      child: Text(
+                                        controller.selectedClass.value ??
+                                            'Belum dipilih',
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          color: Colors.grey.shade500,
+                                        ),
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.lock,
+                                      color: Colors.grey.shade400,
+                                      size: 16.sp,
+                                    ),
+                                  ],
+                                ),
+                              )
+                            else
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 12.w, vertical: 16.h),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  border: Border.all(
+                                    color: Colors.grey.shade300,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.book_outlined,
+                                      color: Colors.grey.shade700,
+                                    ),
+                                    SizedBox(width: 12.w),
+                                    Expanded(
+                                      child: Text(
+                                        controller.selectedClass.value ??
+                                            'Belum dipilih',
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              items: controller.classOptions
-                                  .map((kelas) => DropdownMenuItem(
-                                      value: kelas, child: Text(kelas)))
-                                  .toList(),
-                              onChanged: controller.isEditMode.value
-                                  ? (value) {
-                                      controller.selectedClass.value = value;
-                                    }
-                                  : null,
-                            ),
+                            if (controller.mode == ProfileMode.edit &&
+                                controller.isEditMode.value)
+                              Padding(
+                                padding: EdgeInsets.only(top: 4.h),
+                                child: Text(
+                                  'Kelas tidak dapat diubah oleh siswa',
+                                  style: TextStyle(
+                                    fontSize: 10.sp,
+                                    color: Colors.grey.shade500,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ),
                             SizedBox(height: 16.h),
                             GlobalText.medium('Tanggal Lahir', fontSize: 14),
                             SizedBox(height: 8.h),

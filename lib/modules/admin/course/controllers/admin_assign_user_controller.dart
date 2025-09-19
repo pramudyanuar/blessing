@@ -150,7 +150,8 @@ class AdminAssignUserController extends GetxController {
       // Tunggu sebentar agar user bisa melihat notifikasi info
       await Future.delayed(const Duration(seconds: 1));
 
-      Get.back(result: true); // Tetap kembali dengan success
+      // Kembali ke manage access course dengan result success
+      Get.back(result: true);
       return;
     }
 
@@ -168,6 +169,7 @@ class AdminAssignUserController extends GetxController {
       // Tunggu sebentar agar user bisa melihat notifikasi sukses
       await Future.delayed(const Duration(seconds: 1));
 
+      // Kembali ke manage access course dengan result success
       Get.back(result: true);
     } else {
       Get.snackbar('Gagal', 'Terjadi kesalahan saat memperbarui akses.',

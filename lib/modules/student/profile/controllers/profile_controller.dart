@@ -3,6 +3,7 @@ import 'package:blessing/data/user/models/request/update_user_request.dart';
 import 'package:blessing/data/user/repository/user_repository_impl.dart';
 import 'package:blessing/main.dart';
 import 'package:blessing/core/utils/app_routes.dart';
+import 'package:blessing/modules/student/main/controllers/main_student_controllers.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -129,10 +130,20 @@ class ProfileController extends GetxController {
   }
 
   Future<void> saveProfile() async {
-    if (fullNameController.text.isEmpty || selectedClass.value == null) {
-      Get.snackbar('Error', 'Nama Lengkap dan Kelas wajib diisi.',
-          backgroundColor: Colors.red, colorText: Colors.white);
-      return;
+    // Validasi berbeda untuk initial setup vs edit mode
+    if (mode == ProfileMode.initialSetup) {
+      if (fullNameController.text.isEmpty || selectedClass.value == null) {
+        Get.snackbar('Error', 'Nama Lengkap dan Kelas wajib diisi.',
+            backgroundColor: Colors.red, colorText: Colors.white);
+        return;
+      }
+    } else {
+      // Mode edit: hanya validasi nama lengkap
+      if (fullNameController.text.isEmpty) {
+        Get.snackbar('Error', 'Nama Lengkap wajib diisi.',
+            backgroundColor: Colors.red, colorText: Colors.white);
+        return;
+      }
     }
 
     isLoading.value = true;
@@ -144,12 +155,16 @@ class ProfileController extends GetxController {
         birthDateForApi = parsedDate.toUtc().toIso8601String();
       }
 
-      final gradeLevel =
-          int.tryParse(selectedClass.value?.replaceAll('Kelas ', '') ?? '');
+      String? gradeLevelForApi;
+      if (mode == ProfileMode.initialSetup) {
+        // Hanya kirim gradeLevel saat initial setup
+        gradeLevelForApi = selectedClass.value?.replaceAll('Kelas ', '') ?? '';
+      }
+      // Untuk mode edit, gradeLevel tidak dikirim (siswa tidak bisa ubah kelas)
 
       final request = UpdateUserRequest(
         username: fullNameController.text,
-        gradeLevel: gradeLevel?.toString(),
+        gradeLevel: gradeLevelForApi,
         birthDate: birthDateForApi,
       );
 
@@ -158,11 +173,21 @@ class ProfileController extends GetxController {
       if (updatedUser != null) {
         final currentData = await CacheUtil().getData('user_data') ?? {};
         currentData['username'] = updatedUser.username;
-        currentData['grade_level'] = updatedUser.gradeLevel;
-        currentData['birth_date'] =
-            updatedUser.birthDate; // Dari API mestinya sudah String
+
+        // Update grade_level hanya saat initial setup
+        if (mode == ProfileMode.initialSetup) {
+          currentData['grade_level'] = updatedUser.gradeLevel;
+        }
+
+        currentData['birth_date'] = updatedUser.birthDate;
 
         await CacheUtil().setData('user_data', currentData);
+
+        // Reload user data in MainStudentController if it exists
+        if (Get.isRegistered<MainStudentController>()) {
+          final mainController = Get.find<MainStudentController>();
+          await mainController.reloadUserData();
+        }
 
         isEditMode.value = false;
         Get.snackbar('Sukses', 'Profil berhasil diperbarui!');
