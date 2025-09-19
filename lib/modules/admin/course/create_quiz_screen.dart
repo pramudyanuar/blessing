@@ -60,34 +60,36 @@ class CreateQuizScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Stack(
-        children: [
-          // Gunakan Obx untuk membuat daftar pertanyaan yang dinamis
-          Obx(
-            () => ListView.separated(
-              padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 100.h),
-              itemCount:
-                  controller.questions.length + 1, // +1 untuk kartu nama kuis
-              separatorBuilder: (context, index) => SizedBox(height: 24.h),
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  // Item pertama adalah input nama kuis
-                  return _buildQuizNameCard(controller);
-                }
-                // Item selanjutnya adalah kartu pertanyaan
-                final questionIndex = index - 1;
-                return _buildQuestionSection(controller, questionIndex);
-              },
+      body: SafeArea(
+        child: Stack(
+          children: [
+            // Gunakan Obx untuk membuat daftar pertanyaan yang dinamis
+            Obx(
+              () => ListView.separated(
+                padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 100.h),
+                itemCount:
+                    controller.questions.length + 1, // +1 untuk kartu nama kuis
+                separatorBuilder: (context, index) => SizedBox(height: 24.h),
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    // Item pertama adalah input nama kuis
+                    return _buildQuizNameCard(controller);
+                  }
+                  // Item selanjutnya adalah kartu pertanyaan
+                  final questionIndex = index - 1;
+                  return _buildQuestionSection(controller, questionIndex);
+                },
+              ),
             ),
-          ),
-          // Tombol permanen di bagian bawah
-          _buildBottomButton(controller),
-        ],
+            // Tombol permanen di bagian bawah
+            _buildBottomButton(controller),
+          ],
+        ),
       ),
     );
   }
 
-Widget _buildQuizNameCard(CreateQuizController controller) {
+  Widget _buildQuizNameCard(CreateQuizController controller) {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(

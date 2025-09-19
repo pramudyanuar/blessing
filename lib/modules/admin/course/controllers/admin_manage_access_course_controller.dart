@@ -17,15 +17,18 @@ class AdminManageAccessCourseController extends GetxController {
   late final String courseId;
   // Nama course untuk ditampilkan di AppBar. Juga dari Get.arguments.
   late final String courseName;
+  // Callback untuk refresh course list setelah perubahan akses
+  Function? onAccessChanged;
 
   @override
   void onInit() {
     super.onInit();
-    // Ambil arguments yang dikirim dari halaman sebelumnya
     final arguments = Get.arguments as Map<String, dynamic>?;
     if (arguments != null) {
       courseId = arguments['courseId'] ?? '';
       courseName = arguments['courseName'] ?? 'Kelola Akses';
+      onAccessChanged =
+          arguments['onAccessChanged']; // Ambil callback dari arguments
       if (courseId.isNotEmpty) {
         // Langsung panggil fungsi untuk mengambil data saat controller diinisialisasi
         fetchUserAccess();
@@ -81,6 +84,10 @@ class AdminManageAccessCourseController extends GetxController {
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
+      // Panggil callback untuk refresh course list
+      if (onAccessChanged != null) {
+        onAccessChanged!();
+      }
     } else {
       Get.snackbar(
         'Gagal',
@@ -102,6 +109,10 @@ class AdminManageAccessCourseController extends GetxController {
     // panggil ulang fetchUserAccess untuk me-refresh daftar.
     if (result == true) {
       fetchUserAccess();
+      // Panggil callback untuk refresh course list
+      if (onAccessChanged != null) {
+        onAccessChanged!();
+      }
     }
   }
 }

@@ -130,23 +130,51 @@ class AdminAssignUserController extends GetxController {
     if (selectedUserIds.isEmpty) {
       Get.snackbar('Perhatian', 'Pilih setidaknya satu siswa untuk ditugaskan.',
           backgroundColor: Colors.orange);
+
+      // Tunggu sebentar agar user bisa melihat notifikasi peringatan
+      await Future.delayed(const Duration(seconds: 2));
+
+      return;
+    }
+
+    // Filter hanya user yang belum memiliki akses (baru ditambahkan)
+    final newUserIds = selectedUserIds
+        .where((userId) => !existingUserIds.contains(userId))
+        .toList();
+
+    // Jika tidak ada user baru yang dipilih, tampilkan pesan
+    if (newUserIds.isEmpty) {
+      Get.snackbar('Info', 'Semua siswa yang dipilih sudah memiliki akses.',
+          backgroundColor: Colors.blue, colorText: Colors.white);
+
+      // Tunggu sebentar agar user bisa melihat notifikasi info
+      await Future.delayed(const Duration(seconds: 1));
+
+      Get.back(result: true); // Tetap kembali dengan success
       return;
     }
 
     isAssigning.value = true;
     final success = await _courseRepository.adminAssignCoursesToUsers(
-      userIds: selectedUserIds.toList(),
-      courseIds: [courseId], // courseId didapat dari onInit
+      userIds: newUserIds, // Hanya kirim user yang belum memiliki akses
+      courseIds: [courseId],
     );
     isAssigning.value = false;
 
     if (success) {
       Get.snackbar('Berhasil', 'Akses siswa telah diperbarui.',
           backgroundColor: Colors.green, colorText: Colors.white);
+
+      // Tunggu sebentar agar user bisa melihat notifikasi sukses
+      await Future.delayed(const Duration(seconds: 1));
+
       Get.back(result: true);
     } else {
       Get.snackbar('Gagal', 'Terjadi kesalahan saat memperbarui akses.',
           backgroundColor: Colors.red, colorText: Colors.white);
+
+      // Tunggu sebentar agar user bisa melihat notifikasi error
+      await Future.delayed(const Duration(seconds: 2));
     }
   }
 }

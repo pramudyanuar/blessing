@@ -4,6 +4,7 @@ import 'package:blessing/data/user/models/response/user_response.dart';
 import 'package:blessing/data/user/repository/user_repository_impl.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:async'; // Tambahkan import untuk Future.delayed
 
 class AddStudentController extends GetxController {
   final emailController = TextEditingController();
@@ -13,6 +14,14 @@ class AddStudentController extends GetxController {
 
   final _userRepository = Get.find<UserRepository>();
   var isLoading = false.obs;
+  Function? onStudentAdded; // Callback untuk refresh student list
+
+  @override
+  void onInit() {
+    super.onInit();
+    onStudentAdded =
+        Get.arguments?['onStudentAdded']; // Ambil callback dari arguments
+  }
 
   Future<void> addStudent() async {
     final request = RegisterUserRequest(
@@ -32,6 +41,15 @@ class AddStudentController extends GetxController {
           message: 'Siswa berhasil didaftarkan',
         );
         clearForm();
+        // Tunggu sebentar agar user bisa melihat notifikasi sukses
+        await Future.delayed(const Duration(seconds: 1));
+
+        // Tutup semua overlay (dialog, snackbar, dll) dan kembali ke halaman sebelumnya
+        Get.close(1); // Tutup 1 halaman dari stack
+        // Panggil callback untuk refresh student list
+        if (onStudentAdded != null) {
+          onStudentAdded!();
+        }
       } else {
         CustomSnackbar.show(
           title: 'Gagal',

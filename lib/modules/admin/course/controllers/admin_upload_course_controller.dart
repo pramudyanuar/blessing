@@ -20,6 +20,7 @@ class AdminUploadCourseController extends GetxController {
   final isLoading = false.obs;
   late String subjectId;
   late int kelas;
+  Function? onCourseCreated; // Callback untuk refresh course list
 
   /// [DIUBAH] Menggunakan satu list untuk semua konten (teks dan gambar).
   /// Ini adalah "source of truth" untuk konten course.
@@ -31,6 +32,7 @@ class AdminUploadCourseController extends GetxController {
     final args = Get.arguments;
     subjectId = args['subjectId'];
     kelas = args['kelas'];
+    onCourseCreated = args['onCourseCreated']; // Ambil callback dari arguments
   }
 
   @override
@@ -129,13 +131,22 @@ class AdminUploadCourseController extends GetxController {
     isLoading.value = false;
 
     if (success) {
-      Get.back(); // Kembali ke halaman sebelumnya
       Get.snackbar(
         'Berhasil',
         'Materi berhasil diunggah',
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
+
+      // Tunggu sebentar agar user bisa melihat notifikasi sukses
+      await Future.delayed(const Duration(seconds: 1));
+
+      Get.back(); // Kembali ke halaman sebelumnya
+
+      // Panggil callback untuk refresh course list
+      if (onCourseCreated != null) {
+        onCourseCreated!();
+      }
     } else {
       Get.snackbar(
         'Gagal',

@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 
 class DetailStudentController extends GetxController {
   var isEditMode = false.obs;
+  var isDeleting = false.obs; // Tambahkan loading state untuk delete
 
   var studentId = ''.obs;
   var name = ''.obs;
@@ -20,6 +21,9 @@ class DetailStudentController extends GetxController {
   late TextEditingController gradeController;
   late TextEditingController schoolController;
   late TextEditingController birthDateController;
+
+  Function?
+      onStudentDeleted; // Callback untuk refresh student list setelah delete
 
   final quizScores = {
     "Quiz 1": 85,
@@ -45,6 +49,8 @@ class DetailStudentController extends GetxController {
     final args = Get.arguments;
     if (args != null && args['id'] != null) {
       studentId.value = args['id'];
+      onStudentDeleted =
+          args['onStudentDeleted']; // Ambil callback dari arguments
       fetchStudentDetail();
     }
   }
@@ -177,9 +183,10 @@ class DetailStudentController extends GetxController {
     }
   }
 
-
   Future<void> deleteStudent() async {
     try {
+      isDeleting.value = true; // Set loading state
+
       final UserResponse? deletedUser =
           await _userRepository.deleteUserAdmin(studentId.value);
 
@@ -187,7 +194,17 @@ class DetailStudentController extends GetxController {
         CustomSnackbar.show(title: "Sukses", message: "User berhasil dihapus");
         final adminController = Get.find<AdminManageStudentController>();
         await adminController.fetchStudents();
-        Get.back();
+
+        // Panggil callback tambahan jika tersedia
+        if (onStudentDeleted != null) {
+          onStudentDeleted!();
+        }
+
+        // Tunggu sebentar agar user bisa melihat notifikasi sukses
+        await Future.delayed(const Duration(seconds: 1));
+
+        // Tutup semua overlay (dialog, snackbar, dll) dan kembali ke halaman sebelumnya
+        Get.close(1); // Tutup 1 halaman dari stack navigasi
       } else {
         CustomSnackbar.show(
             title: "Gagal", message: "Gagal menghapus user", isError: true);
@@ -198,6 +215,8 @@ class DetailStudentController extends GetxController {
           title: "Error",
           message: "Terjadi kesalahan saat menghapus user",
           isError: true);
+    } finally {
+      isDeleting.value = false; // Reset loading state
     }
   }
 

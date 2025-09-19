@@ -96,8 +96,10 @@ class AdminManageCourseListScreen extends StatelessWidget {
                     actionButtonText: "Lihat Materi",
                     onTapAction: () {
                       print("Navigasi ke detail materi: ${item['title']}");
-                      Get.toNamed(AppRoutes.adminCourseDetail,
-                          arguments: {'courseId': item['id']});
+                      Get.toNamed(AppRoutes.adminCourseDetail, arguments: {
+                        'courseId': item['id'],
+                        'onCourseDeleted': () => controller.refreshCourses(),
+                      });
                     },
                   );
                 } else {
@@ -130,6 +132,7 @@ class AdminManageCourseListScreen extends StatelessWidget {
           Get.toNamed(AppRoutes.adminCreateCourse, arguments: {
             'subjectId': controller.subjectId,
             'kelas': controller.kelas,
+            'onCourseCreated': () => controller.refreshCourses(),
           });
         },
       ),

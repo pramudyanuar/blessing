@@ -10,7 +10,8 @@ class AdminManageStudentController extends GetxController {
   final RxList<Map<String, String>> filteredStudents =
       <Map<String, String>>[].obs;
 
-  final RxString searchQuery = ''.obs; // tambah ini
+  final RxString searchQuery = ''.obs;
+  final RxBool isLoading = false.obs; // Tambahkan loading state
 
   final _cacheKey = 'all_students';
 
@@ -37,11 +38,16 @@ class AdminManageStudentController extends GetxController {
             .toList(),
       );
       filterStudents();
+    } else {
+      // Jika tidak ada cache, set loading true sampai fetch selesai
+      isLoading.value = true;
     }
   }
 
   Future<void> fetchStudents() async {
     try {
+      isLoading.value = true; // Set loading state
+
       final repository = UserRepository();
 
       final students = await repository.getAllUsersComplete();
@@ -61,6 +67,11 @@ class AdminManageStudentController extends GetxController {
       filterStudents();
     } catch (e) {
       print('Error fetching students: $e');
+      // Tetap reset loading state meski ada error
+      allStudents.clear();
+      filteredStudents.clear();
+    } finally {
+      isLoading.value = false; // Reset loading state
     }
   }
 

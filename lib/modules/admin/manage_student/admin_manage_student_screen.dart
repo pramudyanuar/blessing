@@ -1,6 +1,7 @@
 import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/search_bar.dart';
+import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/modules/admin/manage_student/controller/admin_manage_student_controller.dart';
 import 'package:blessing/modules/admin/manage_student/widgets/user_card.dart';
@@ -27,32 +28,60 @@ class AdminManageStudentScreen extends StatelessWidget {
           _buildSearchAndFilter(),
           Expanded(
             child: Obx(
-              () => RefreshIndicator(
-                onRefresh: () async {
-                  await controller.fetchStudents();
-                },
-                child: ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: controller.filteredStudents.length,
-                  itemBuilder: (context, index) {
-                    final student = controller.filteredStudents[index];
-                    return UserCard(
-                      userName: student['nama']!,
-                      userClass: student['kelas']!,
-                      onTap: () {
-                        Get.toNamed(
-                          AppRoutes.detailStudent,
-                          arguments: {
-                            'id': student['id'],
-                          },
-                        );
+              () => controller.isLoading.value
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.c2),
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: () async {
+                        await controller.fetchStudents();
                       },
-                      onOptionsTap: () =>
-                          print("Options for ${student['nama']}"),
-                    );
-                  },
-                ),
-              ),
+                      child: controller.filteredStudents.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.people_outline,
+                                    size: 64.sp,
+                                    color: Colors.grey.shade400,
+                                  ),
+                                  SizedBox(height: 16.h),
+                                  GlobalText.medium(
+                                    "Tidak ada siswa di kelas ini",
+                                    fontSize: 16.sp,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ListView.builder(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              itemCount: controller.filteredStudents.length,
+                              itemBuilder: (context, index) {
+                                final student =
+                                    controller.filteredStudents[index];
+                                return UserCard(
+                                  userName: student['nama']!,
+                                  userClass: student['kelas']!,
+                                  onTap: () {
+                                    Get.toNamed(
+                                      AppRoutes.detailStudent,
+                                      arguments: {
+                                        'id': student['id'],
+                                        'onStudentDeleted': () =>
+                                            controller.fetchStudents(),
+                                      },
+                                    );
+                                  },
+                                  onOptionsTap: () =>
+                                      print("Options for ${student['nama']}"),
+                                );
+                              },
+                            ),
+                    ),
             ),
           ),
         ],
@@ -60,7 +89,7 @@ class AdminManageStudentScreen extends StatelessWidget {
     );
   }
 
-    Widget _buildKelasFilter(AdminManageStudentController controller) {
+  Widget _buildKelasFilter(AdminManageStudentController controller) {
     // ... (Tidak ada perubahan di method ini)
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -127,7 +156,9 @@ class AdminManageStudentScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12.r))),
             icon: const Icon(Icons.person_add_alt_1, color: Colors.white),
             onPressed: () {
-              Get.toNamed(AppRoutes.addStudent);
+              Get.toNamed(AppRoutes.addStudent, arguments: {
+                'onStudentAdded': () => controller.fetchStudents(),
+              });
             },
           ),
         ],

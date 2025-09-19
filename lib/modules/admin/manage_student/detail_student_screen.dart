@@ -138,28 +138,33 @@ class DetailStudentScreen extends StatelessWidget {
                 color: AppColors.c2,
               ),
               SizedBox(height: 24.h),
-              GlobalButton(
-                text: "Hapus Siswa",
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return GlobalConfirmationDialog(
-                        message:
-                            "Tindakan ini tidak dapat diurungkan. Apakah Anda yakin ingin menghapus siswa ini?",
-                        onYes: () async {
-                          Navigator.of(context).pop();
-                          await controller.deleteStudent();
-                        },
-                        onNo: () => Navigator.of(context).pop(),
-                      );
-                    },
-                  );
-                },
-                width: double.infinity,
-                color: AppColors.c7,
-                // textColor: Colors.white,
-              ),
+              Obx(() => GlobalButton(
+                    text: controller.isDeleting.value
+                        ? "Menghapus..."
+                        : "Hapus Siswa",
+                    onPressed: controller.isDeleting.value
+                        ? null
+                        : () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return GlobalConfirmationDialog(
+                                  message:
+                                      "Tindakan ini tidak dapat diurungkan. Apakah Anda yakin ingin menghapus siswa ini?",
+                                  onYes: () async {
+                                    Navigator.of(context).pop();
+                                    await controller.deleteStudent();
+                                  },
+                                  onNo: () => Navigator.of(context).pop(),
+                                );
+                              },
+                            );
+                          },
+                    width: double.infinity,
+                    color: controller.isDeleting.value
+                        ? Colors.grey
+                        : AppColors.c7,
+                  )),
               SizedBox(height: 8.h),
             ],
           ),

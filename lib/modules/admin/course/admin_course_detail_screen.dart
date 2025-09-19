@@ -91,7 +91,9 @@ class AdminCourseDetailScreen extends StatelessWidget {
                       AppRoutes.adminManageCourseAccess,
                       arguments: {
                         'courseId': controller.course.value!.id,
-                        'gradeLevel': controller.course.value!.gradeLevel,
+                        'courseName': controller.course.value!.courseName ??
+                            'Kelola Akses',
+                        'onAccessChanged': () => controller.fetchCourseDetail(),
                       },
                     );
                   } else if (value == 'delete') {

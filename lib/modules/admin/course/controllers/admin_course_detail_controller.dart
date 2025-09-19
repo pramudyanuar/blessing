@@ -27,11 +27,15 @@ class AdminCourseDetailController extends GetxController {
   // --- TAMBAHAN: State untuk Kuis ---
   final quizzes = <QuizResponse>[].obs;
   final isQuizLoading = false.obs;
+  Function?
+      onCourseDeleted; // Callback untuk refresh course list setelah delete
 
   @override
   void onInit() {
     super.onInit();
     courseId = Get.arguments['courseId'] ?? '';
+    onCourseDeleted =
+        Get.arguments['onCourseDeleted']; // Ambil callback dari arguments
     if (courseId.isNotEmpty) {
       fetchCourseDetail();
     }
@@ -104,9 +108,18 @@ class AdminCourseDetailController extends GetxController {
       isLoading.value = true;
       final success = await _courseRepository.adminDeleteCourse(courseId);
       if (success) {
+        Get.snackbar('Berhasil', 'Materi berhasil dihapus');
+
+        // Tunggu sebentar agar user bisa melihat notifikasi sukses
+        await Future.delayed(const Duration(seconds: 1));
+
         Get.back(); // keluar dialog konfirmasi
         Get.back(); // keluar dari detail page
-        Get.snackbar('Berhasil', 'Materi berhasil dihapus');
+
+        // Panggil callback untuk refresh course list
+        if (onCourseDeleted != null) {
+          onCourseDeleted!();
+        }
       } else {
         Get.snackbar('Gagal', 'Materi gagal dihapus');
       }
