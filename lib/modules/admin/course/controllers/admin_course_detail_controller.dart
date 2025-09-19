@@ -121,8 +121,8 @@ class AdminCourseDetailController extends GetxController {
   Future<void> saveEdits() async {
     if (course.value == null) return;
 
-  // Update editedCourseName from controller before saving
-  editedCourseName.value = courseNameController.text;
+    // Update editedCourseName from controller before saving
+    editedCourseName.value = courseNameController.text;
 
     final textContents =
         course.value!.content!.where((c) => c.type == 'text').toList();

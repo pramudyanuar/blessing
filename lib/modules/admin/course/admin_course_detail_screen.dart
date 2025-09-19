@@ -158,6 +158,37 @@ class AdminCourseDetailScreen extends StatelessWidget {
     );
   }
 
+  /// Helper method to collect all images from course content
+  List<Map<String, dynamic>> _collectAllImages(
+      AdminCourseDetailController controller) {
+    if (controller.course.value?.content == null) return [];
+
+    final List<Map<String, dynamic>> allImages = [];
+    final contentItems = controller.course.value!.content!;
+
+    for (int i = 0; i < contentItems.length; i++) {
+      if (contentItems[i].type == 'image') {
+        allImages.add({
+          'url': contentItems[i].data.toString(),
+          'originalIndex': i,
+        });
+      }
+    }
+
+    return allImages;
+  }
+
+  /// Helper method to get current image index in the gallery
+  int _getImageIndexInGallery(
+      List<Map<String, dynamic>> allImages, int originalIndex) {
+    for (int i = 0; i < allImages.length; i++) {
+      if (allImages[i]['originalIndex'] == originalIndex) {
+        return i;
+      }
+    }
+    return 0;
+  }
+
   Widget _buildViewMode(AdminCourseDetailController controller) {
     final course = controller.course.value!;
     return SingleChildScrollView(
@@ -196,7 +227,7 @@ class AdminCourseDetailScreen extends StatelessWidget {
           GlobalText.semiBold("Isi Materi",
               fontSize: 18.sp, color: AppColors.c2),
           SizedBox(height: 12.h),
-          _buildContentView(course.content!),
+          _buildContentView(course.content!, controller),
         ],
       ),
     );
@@ -210,8 +241,10 @@ class AdminCourseDetailScreen extends StatelessWidget {
         children: [
           InkWell(
             onTap: () {
-              Get.toNamed(AppRoutes.adminCreateQuiz,
-                  arguments: {'courseId': controller.courseId});
+              Get.toNamed(AppRoutes.adminCreateQuiz, arguments: {
+                'courseId': controller.courseId,
+                'onQuizCreated': () => controller.fetchQuizzesForCourse()
+              });
             },
             borderRadius: BorderRadius.circular(20),
             child: Padding(
@@ -278,7 +311,9 @@ class AdminCourseDetailScreen extends StatelessWidget {
                         AppRoutes.adminDetailQuiz,
                         arguments: {
                           'quizId': quiz.id,
-                          'titleQuiz': quiz.quizName
+                          'titleQuiz': quiz.quizName,
+                          'onQuizDeleted': () =>
+                              controller.fetchQuizzesForCourse()
                         },
                       );
                     },
@@ -319,7 +354,8 @@ class AdminCourseDetailScreen extends StatelessWidget {
   }
 
   /// Widget untuk membangun tampilan konten dari List
-  Widget _buildContentView(List<dynamic> contentItems) {
+  Widget _buildContentView(
+      List<dynamic> contentItems, AdminCourseDetailController controller) {
     return Column(
       children: List.generate(
         _getProcessedContentLength(contentItems),
@@ -328,7 +364,7 @@ class AdminCourseDetailScreen extends StatelessWidget {
 
           if (processedItem['type'] == 'image_gallery') {
             final List<dynamic> images = processedItem['images'];
-            return _buildImageGallery(images);
+            return _buildImageGallery(images, controller);
           } else {
             final type = processedItem['type'];
             final data = processedItem['data'];
@@ -352,7 +388,8 @@ class AdminCourseDetailScreen extends StatelessWidget {
                   ),
                 );
               case 'image':
-                return _buildSingleImage(data.toString(), originalIndex);
+                return _buildSingleImage(
+                    data.toString(), originalIndex, controller);
               case 'link':
                 return _buildLinkContent(data.toString(), originalIndex);
               default:
@@ -452,7 +489,8 @@ class AdminCourseDetailScreen extends StatelessWidget {
   }
 
   /// Widget untuk menampilkan gallery gambar
-  Widget _buildImageGallery(List<dynamic> images) {
+  Widget _buildImageGallery(
+      List<dynamic> images, AdminCourseDetailController controller) {
     return Padding(
       padding: EdgeInsets.only(bottom: 16.h),
       child: Column(
@@ -481,55 +519,62 @@ class AdminCourseDetailScreen extends StatelessWidget {
             ),
           ),
           // Grid gambar
-          _buildImageGrid(images),
+          _buildImageGrid(images, controller),
         ],
       ),
     );
   }
 
   /// Widget untuk grid gambar
-  Widget _buildImageGrid(List<dynamic> images) {
+  Widget _buildImageGrid(
+      List<dynamic> images, AdminCourseDetailController controller) {
     if (images.length == 2) {
       return Row(
         children: [
-          Expanded(child: _buildGridImageItem(images[0], 0)),
+          Expanded(child: _buildGridImageItem(images[0], 0, controller)),
           SizedBox(width: 8.w),
-          Expanded(child: _buildGridImageItem(images[1], 1)),
+          Expanded(child: _buildGridImageItem(images[1], 1, controller)),
         ],
       );
     } else if (images.length == 3) {
       return Column(
         children: [
-          _buildGridImageItem(images[0], 0),
+          _buildGridImageItem(images[0], 0, controller),
           SizedBox(height: 8.h),
           Row(
             children: [
-              Expanded(child: _buildGridImageItem(images[1], 1)),
+              Expanded(child: _buildGridImageItem(images[1], 1, controller)),
               SizedBox(width: 8.w),
-              Expanded(child: _buildGridImageItem(images[2], 2)),
+              Expanded(child: _buildGridImageItem(images[2], 2, controller)),
             ],
           ),
         ],
       );
     } else if (images.length >= 4) {
+      // Logika: selalu tampilkan maksimal 4 gambar pertama
+      // Jika ada lebih dari 4 gambar, gambar terakhir digantikan dengan overlay
+      final maxVisibleImages = 4;
+      final showOverlay = images.length > maxVisibleImages;
+
       return Column(
         children: [
           Row(
             children: [
-              Expanded(child: _buildGridImageItem(images[0], 0)),
+              Expanded(child: _buildGridImageItem(images[0], 0, controller)),
               SizedBox(width: 8.w),
-              Expanded(child: _buildGridImageItem(images[1], 1)),
+              Expanded(child: _buildGridImageItem(images[1], 1, controller)),
             ],
           ),
           SizedBox(height: 8.h),
           Row(
             children: [
-              Expanded(child: _buildGridImageItem(images[2], 2)),
+              Expanded(child: _buildGridImageItem(images[2], 2, controller)),
               SizedBox(width: 8.w),
               Expanded(
-                child: images.length > 4
-                    ? _buildMoreImagesItem(images, 3)
-                    : _buildGridImageItem(images[3], 3),
+                child: showOverlay
+                    ? _buildMoreImagesItem(
+                        images, maxVisibleImages - 1, controller)
+                    : _buildGridImageItem(images[3], 3, controller),
               ),
             ],
           ),
@@ -537,21 +582,28 @@ class AdminCourseDetailScreen extends StatelessWidget {
       );
     } else {
       // Fallback untuk 1 gambar (seharusnya tidak sampai sini)
-      return _buildGridImageItem(images[0], 0);
+      return _buildGridImageItem(images[0], 0, controller);
     }
   }
 
   /// Widget untuk item gambar dalam grid
-  Widget _buildGridImageItem(dynamic imageData, int index) {
+  Widget _buildGridImageItem(
+      dynamic imageData, int index, AdminCourseDetailController controller) {
     final imageUrl = imageData['data'].toString();
     final originalIndex = imageData['originalIndex'];
 
     return GestureDetector(
       onTap: () {
+        final allImages = _collectAllImages(controller);
+        final currentIndex = _getImageIndexInGallery(allImages, originalIndex);
+        final imageUrls = allImages.map((img) => img['url'] as String).toList();
+
         Get.to(
           () => ImageViewerScreen(
             imageUrl: imageUrl,
             heroTag: 'admin_course_image_$originalIndex',
+            imageUrls: imageUrls,
+            initialIndex: currentIndex,
           ),
           transition: Transition.fadeIn,
           duration: const Duration(milliseconds: 300),
@@ -614,17 +666,24 @@ class AdminCourseDetailScreen extends StatelessWidget {
   }
 
   /// Widget untuk item "more images" (+X more)
-  Widget _buildMoreImagesItem(List<dynamic> images, int startIndex) {
+  Widget _buildMoreImagesItem(List<dynamic> images, int startIndex,
+      AdminCourseDetailController controller) {
     final remainingCount = images.length - startIndex;
     final imageUrl = images[startIndex]['data'].toString();
     final originalIndex = images[startIndex]['originalIndex'];
 
     return GestureDetector(
       onTap: () {
+        final allImages = _collectAllImages(controller);
+        final currentIndex = _getImageIndexInGallery(allImages, originalIndex);
+        final imageUrls = allImages.map((img) => img['url'] as String).toList();
+
         Get.to(
           () => ImageViewerScreen(
             imageUrl: imageUrl,
             heroTag: 'admin_course_image_$originalIndex',
+            imageUrls: imageUrls,
+            initialIndex: currentIndex,
           ),
           transition: Transition.fadeIn,
           duration: const Duration(milliseconds: 300),
@@ -697,7 +756,8 @@ class AdminCourseDetailScreen extends StatelessWidget {
   }
 
   /// Widget untuk menampilkan gambar tunggal
-  Widget _buildSingleImage(String imageUrl, int originalIndex) {
+  Widget _buildSingleImage(String imageUrl, int originalIndex,
+      AdminCourseDetailController controller) {
     return Padding(
       padding: EdgeInsets.only(bottom: 16.h),
       child: GestureDetector(

@@ -21,12 +21,15 @@ class AdminDetailQuizController extends GetxController {
 
   late final String titleQuiz;
   late final String quizId;
+  Function? onQuizDeleted; // Callback untuk refresh data quiz
 
   @override
   void onInit() {
     super.onInit();
     quizId = Get.arguments['quizId'];
     titleQuiz = Get.arguments['titleQuiz'];
+    onQuizDeleted =
+        Get.arguments['onQuizDeleted']; // Ambil callback dari arguments
     fetchQuestionsByQuizId();
     // fetchReport(quizId);
   }
@@ -82,6 +85,10 @@ class AdminDetailQuizController extends GetxController {
       if (success) {
         Get.back(); // keluar dari detail quiz
         Get.snackbar("Berhasil", "Kuis berhasil dihapus");
+        // Panggil callback untuk refresh data quiz di halaman sebelumnya
+        if (onQuizDeleted != null) {
+          onQuizDeleted!();
+        }
       } else {
         Get.snackbar("Gagal", "Tidak bisa menghapus kuis");
       }

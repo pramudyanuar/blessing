@@ -35,12 +35,15 @@ class CreateQuizController extends GetxController {
 
   final RxBool isLoading = false.obs;
   late final String courseId;
+  Function? onQuizCreated; // Callback untuk refresh data quiz
 
   @override
   void onInit() {
     super.onInit();
     addQuestion();
     courseId = (Get.arguments as Map<String, dynamic>)['courseId'];
+    onQuizCreated =
+        Get.arguments['onQuizCreated']; // Ambil callback dari arguments
   }
 
   void addQuestion() {
@@ -188,7 +191,16 @@ class CreateQuizController extends GetxController {
 
         CustomSnackbar.show(
             title: "Sukses", message: "Kuis berhasil diunggah.");
-        Get.back();
+
+        // Tunggu sebentar agar user bisa melihat notifikasi sukses
+        await Future.delayed(const Duration(seconds: 1));
+
+        // Kembali ke halaman sebelumnya
+        Get.back(closeOverlays: true);
+        // Panggil callback untuk refresh data quiz di halaman sebelumnya
+        if (onQuizCreated != null) {
+          onQuizCreated!();
+        }
       } else {
         CustomSnackbar.show(title: "Gagal", message: "Gagal membuat kuis.");
       }
