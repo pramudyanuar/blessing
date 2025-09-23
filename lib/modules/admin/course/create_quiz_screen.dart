@@ -6,6 +6,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'dart:io';
 
 class CreateQuizScreen extends StatelessWidget {
   const CreateQuizScreen({super.key});
@@ -107,12 +108,22 @@ class CreateQuizScreen extends StatelessWidget {
           SizedBox(height: 16.h),
 
           // Input Time Limit
-          Text("Batas Waktu (menit)",
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600)),
+          Row(
+            children: [
+              Text("Batas Waktu (menit)",
+                  style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600)),
+              Text(" *",
+                  style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.red)),
+            ],
+          ),
           SizedBox(height: 8.h),
           _buildTextFormField(
             hint: 'Contoh: 30',
             controller: controller.timeLimitController,
+            keyboardType: TextInputType.number,
           ),
         ],
       ),
@@ -238,11 +249,25 @@ class CreateQuizScreen extends StatelessWidget {
           child: Stack(
             alignment: Alignment.topRight,
             children: [
-              Image.file(
-                question.imageFile.value!,
-                width: double.infinity,
-                height: 180.h,
-                fit: BoxFit.cover,
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return GestureDetector(
+                    onTap: () => _showFullImageDialog(context, question.imageFile.value!),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: constraints.maxWidth,
+                          maxHeight: MediaQuery.of(context).size.height * 0.6, // Max 60% of screen height
+                        ),
+                        child: Image.file(
+                          question.imageFile.value!,
+                          fit: BoxFit.scaleDown, // Scale down if too large, but show original size if smaller
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
               Container(
                 margin: EdgeInsets.all(8.w),
@@ -262,6 +287,43 @@ class CreateQuizScreen extends StatelessWidget {
         );
       }
     });
+  }
+
+  void _showFullImageDialog(BuildContext context, File imageFile) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.black,
+          insetPadding: EdgeInsets.all(10.w),
+          child: Stack(
+            alignment: Alignment.topRight,
+            children: [
+              InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 4.0,
+                child: Image.file(
+                  imageFile,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.all(8.w),
+                decoration: const BoxDecoration(
+                  color: Colors.black54,
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white, size: 24),
+                  onPressed: () => Navigator.of(context).pop(),
+                  tooltip: 'Tutup',
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildBottomButton(CreateQuizController controller) {
@@ -330,10 +392,12 @@ class CreateQuizScreen extends StatelessWidget {
   Widget _buildTextFormField(
       {required String hint,
       int maxLines = 1,
-      TextEditingController? controller}) {
+      TextEditingController? controller,
+      TextInputType? keyboardType}) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
+      keyboardType: keyboardType,
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14.sp),

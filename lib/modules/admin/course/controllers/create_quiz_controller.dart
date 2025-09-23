@@ -106,11 +106,104 @@ class CreateQuizController extends GetxController {
   }
   // --- SELESAI FUNGSI BARU ---
 
+  // --- FUNGSI BARU UNTUK VALIDASI ---
+  bool _validateInputs() {
+    // Validasi nama kuis
+    if (quizTitleController.text.trim().isEmpty) {
+      _showErrorMessage("Nama kuis tidak boleh kosong.");
+      return false;
+    }
+
+    // Validasi batas waktu - WAJIB diisi dan harus angka positif
+    if (timeLimitController.text.trim().isEmpty) {
+      _showErrorMessage("Batas waktu harus diisi.");
+      return false;
+    }
+
+    final timeLimit = int.tryParse(timeLimitController.text.trim());
+    if (timeLimit == null || timeLimit <= 0) {
+      _showErrorMessage("Batas waktu harus berupa angka positif.");
+      return false;
+    }
+
+    // Validasi pertanyaan
+    if (questions.isEmpty) {
+      _showErrorMessage("Kuis harus memiliki setidaknya satu pertanyaan.");
+      return false;
+    }
+
+    for (int i = 0; i < questions.length; i++) {
+      final question = questions[i];
+
+      // Validasi deskripsi pertanyaan
+      if (question.descriptionController.text.trim().isEmpty) {
+        _showErrorMessage("Pertanyaan ${i + 1} tidak boleh kosong.");
+        return false;
+      }
+
+      // Validasi opsi jawaban
+      if (question.optionControllers.length < 2) {
+        _showErrorMessage("Pertanyaan ${i + 1} harus memiliki setidaknya 2 opsi jawaban.");
+        return false;
+      }
+
+      // Validasi isi opsi jawaban
+      for (int j = 0; j < question.optionControllers.length; j++) {
+        if (question.optionControllers[j].text.trim().isEmpty) {
+          _showErrorMessage("Opsi ${j + 1} pada pertanyaan ${i + 1} tidak boleh kosong.");
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  // --- FUNGSI UNTUK MENAMPILKAN PESAN ERROR DENGAN WARNA MERAH DAN TANDA X ---
+  void _showErrorMessage(String message) {
+    Get.snackbar(
+      "",
+      "",
+      titleText: Row(
+        children: [
+          Icon(Icons.close, color: Colors.white, size: 20),
+          SizedBox(width: 8),
+          Text(
+            "Error",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+      messageText: Text(
+        message,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 14,
+        ),
+      ),
+      backgroundColor: Colors.red.shade600,
+      snackPosition: SnackPosition.TOP,
+      duration: Duration(seconds: 4),
+      margin: EdgeInsets.all(16),
+      borderRadius: 8,
+      icon: Icon(Icons.close, color: Colors.white),
+    );
+  }
+
   // --- FUNGSI UNTUK UPLOAD KUIS ---
   // lib/modules/admin/course/controllers/create_quiz_controller.dart
 
-// --- FUNGSI UNTUK UPLOAD KUIS ---
+  // --- FUNGSI UNTUK UPLOAD KUIS ---
   Future<void> uploadQuiz() async {
+    // Validasi input sebelum upload
+    if (!_validateInputs()) {
+      return;
+    }
+
     isLoading.value = true;
     try {
       // 1. Buat Kuis
@@ -202,16 +295,14 @@ class CreateQuizController extends GetxController {
           onQuizCreated!();
         }
       } else {
-        CustomSnackbar.show(title: "Gagal", message: "Gagal membuat kuis.");
+        _showErrorMessage("Gagal membuat kuis. Silakan coba lagi.");
       }
     } catch (e) {
-      CustomSnackbar.show(title: "Error", message: "Terjadi kesalahan: $e");
+      _showErrorMessage("Terjadi kesalahan: ${e.toString()}");
     } finally {
       isLoading.value = false;
     }
-  }
-
-  @override
+  }  @override
   void onClose() {
     quizTitleController.dispose();
     timeLimitController.dispose();
