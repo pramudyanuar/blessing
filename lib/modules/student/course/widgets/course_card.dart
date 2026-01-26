@@ -1,6 +1,5 @@
 // lib/modules/student/course/widgets/course_card.dart
 
-import 'dart:ui';
 import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:flutter/material.dart';

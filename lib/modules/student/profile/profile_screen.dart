@@ -93,7 +93,7 @@ class ProfileScreen extends StatelessWidget {
                             if (controller.mode == ProfileMode.initialSetup)
                               DropdownButtonFormField<String>(
                                 dropdownColor: Colors.white,
-                                value: controller.selectedClass.value,
+                                initialValue: controller.selectedClass.value,
                                 decoration: InputDecoration(
                                   prefixIcon: const Icon(Icons.book_outlined),
                                   hintText: 'Pilih kelas anda',

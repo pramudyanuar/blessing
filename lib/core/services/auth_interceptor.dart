@@ -17,7 +17,7 @@ class AuthInterceptor extends Interceptor {
         'AuthInterceptor: Retrieved token: ${accessToken?.substring(0, 8)}...'); // Log partial token for debugging
 
     if (accessToken != null && accessToken.isNotEmpty) {
-      options.headers['Authorization'] = '$accessToken';
+      options.headers['Authorization'] = accessToken;
       print('AuthInterceptor: Added Authorization header for ${options.path}');
     } else {
       print('AuthInterceptor: No token available for ${options.path}');

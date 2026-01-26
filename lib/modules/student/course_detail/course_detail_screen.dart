@@ -465,7 +465,7 @@ class CourseDetailScreen extends StatelessWidget {
                   width: double.infinity,
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
-                    return Container(
+                    return SizedBox(
                       height: 200.h,
                       child: const Center(child: CircularProgressIndicator()),
                     );

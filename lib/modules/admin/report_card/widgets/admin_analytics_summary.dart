@@ -61,7 +61,7 @@ class AdminAnalyticsSummary extends StatelessWidget {
                     child: _buildStatCard(
                       icon: Icons.trending_up,
                       title: "Rata-rata",
-                      value: "${controller.averageScore.toStringAsFixed(1)}",
+                      value: controller.averageScore.toStringAsFixed(1),
                       color: Colors.orange,
                     ),
                   ),

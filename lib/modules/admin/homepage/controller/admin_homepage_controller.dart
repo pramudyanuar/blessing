@@ -20,7 +20,7 @@ class AdminHomepageController extends GetxController {
   var selectedKelas = 7.obs;
   final List<int> kelasList = [7, 8, 9, 10, 11, 12];
 
-  var _allSubjects = <SubjectResponse>[].obs; // Menyimpan semua data asli
+  final _allSubjects = <SubjectResponse>[].obs; // Menyimpan semua data asli
   var displayedSubjects =
       <SubjectResponse>[].obs; // Data yang akan ditampilkan (setelah filter)
   var searchQuery = ''.obs; // Menyimpan query pencarian

@@ -101,7 +101,7 @@ class ReportCardFilters extends StatelessWidget {
                         value: subject,
                         child: GlobalText.regular(subject, fontSize: 14.sp),
                       );
-                    }).toList(),
+                    }),
                   ],
                   onChanged: (value) {
                     if (value != null) {

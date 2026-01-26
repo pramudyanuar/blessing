@@ -45,7 +45,7 @@ class QuestionCard extends StatelessWidget {
                     () => ImageViewerScreen(
                       imageUrl: content.data,
                       heroTag:
-                          'quiz_question_image_${questionData.id}_${questionIndex}',
+                          'quiz_question_image_${questionData.id}_$questionIndex',
                     ),
                     transition: Transition.fadeIn,
                     duration: const Duration(milliseconds: 300),
@@ -53,7 +53,7 @@ class QuestionCard extends StatelessWidget {
                 },
                 child: Hero(
                   tag:
-                      'quiz_question_image_${questionData.id}_${questionIndex}',
+                      'quiz_question_image_${questionData.id}_$questionIndex',
                   child: Container(
                     margin: EdgeInsets.only(bottom: 8.h),
                     padding: EdgeInsets.all(4.w),
@@ -116,7 +116,7 @@ class QuestionCard extends StatelessWidget {
               );
             }
             return const SizedBox.shrink();
-          }).toList(),
+          }),
 
           SizedBox(height: 24.h),
 

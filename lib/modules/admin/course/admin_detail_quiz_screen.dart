@@ -159,7 +159,7 @@ class _DetailTab extends StatelessWidget {
                           } else {
                             return const SizedBox.shrink();
                           }
-                        }).toList(),
+                        }),
                         const SizedBox(height: 12),
                         Text(
                           "Pilihan Jawaban:",

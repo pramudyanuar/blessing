@@ -1,2 +1,0 @@
-C:/Kerjaan/Blessing/blessing-fe/android/app/.cxx/RelWithDebInfo/q5y664g6/arm64-v8a/CMakeFiles/edit_cache.dir
-C:/Kerjaan/Blessing/blessing-fe/android/app/.cxx/RelWithDebInfo/q5y664g6/arm64-v8a/CMakeFiles/rebuild_cache.dir
