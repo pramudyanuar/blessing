@@ -1,5 +1,3 @@
-// lib/data/course/models/response/course_response.dart
-
 import '../../../core/models/content_block.dart';
 import '../../../subject/models/response/subject_response.dart';
 
@@ -40,4 +38,17 @@ class CourseResponse {
             ? null
             : SubjectResponse.fromJson(json["subject"]),
       );
+
+  // --- PASTIKAN METHOD INI ADA ---
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "course_name": courseName,
+        "content": content == null
+            ? []
+            : List<dynamic>.from(content!.map((x) => x.toJson())),
+        "grade_level": gradeLevel,
+        "created_at": createdAt?.toIso8601String(),
+        "updated_at": updatedAt?.toIso8601String(),
+        "subject": subject?.toJson(), // Membutuhkan subject.toJson() juga
+      };
 }

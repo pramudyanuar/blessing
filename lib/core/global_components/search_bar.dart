@@ -5,12 +5,14 @@ class CustomSearchBar extends StatelessWidget {
   final double width;
   final double height;
   final String hintText;
+  final ValueChanged<String>? onChanged; // tambahkan ini
 
   const CustomSearchBar({
     super.key,
     this.width = 358,
     this.height = 50,
     this.hintText = "Cari Mata Pelajaran/kuis",
+    this.onChanged, // tambahkan ini
   });
 
   @override
@@ -53,6 +55,7 @@ class CustomSearchBar extends StatelessWidget {
                 color: Colors.black,
                 fontSize: 14.sp,
               ),
+              onChanged: onChanged, // hubungkan di sini
             ),
           ),
         ],

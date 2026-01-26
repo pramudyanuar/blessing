@@ -1,7 +1,6 @@
 import 'package:blessing/core/utils/app_routes.dart';
+import 'package:blessing/core/utils/secure_storage_util.dart';
 import 'package:get/get.dart';
-import 'package:flutter/material.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
 
 class RoleMiddleware extends GetMiddleware {
   final String requiredRole;
@@ -9,15 +8,14 @@ class RoleMiddleware extends GetMiddleware {
   RoleMiddleware({required this.requiredRole});
 
   @override
-  RouteSettings? redirect(String? route) {
-    // final prefs = SharedPreferences.getInstance();
-    // final userRole = prefs.getString('role');
-
-    final userRole = 'student'; // Simulating a user role for demonstration purposes
+  Future<GetNavConfig?> redirectDelegate(GetNavConfig route) async {
+    final storage = Get.find<SecureStorageUtil>();
+    final userRole = await storage.getUserRole();
 
     if (userRole != requiredRole) {
-      return RouteSettings(name: AppRoutes.accessDenied);
+      return GetNavConfig.fromRoute(AppRoutes.accessDenied);
     }
+
     return null;
   }
 }

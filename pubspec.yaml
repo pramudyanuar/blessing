@@ -2,7 +2,7 @@ name: blessing
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -40,13 +40,28 @@ dependencies:
   lottie: ^3.3.1
   no_screenshot: ^0.3.1
   fluttertoast: ^8.2.12
-  flutter_secure_storage: ^9.2.4
-  build_runner: ^2.5.4
+  flutter_secure_storage: ^9.2.2
+  build_runner: ^2.4.13
   hive_generator: ^2.0.1
   path_provider: ^2.1.5
   hive_flutter: ^1.1.0
   flutter_launcher_icons: ^0.14.4
   provider: ^6.1.5
+  flutter_speed_dial: ^7.0.0
+  font_awesome_flutter: ^10.9.0
+  youtube_player_flutter: ^9.1.2
+  flutter_inappwebview: ^6.1.5
+  youtube_player_iframe: ^5.2.2
+  webview_flutter: ^4.13.0
+  dio: ^5.9.0
+  mime: ^2.0.0
+  dartz: ^0.10.1
+  equatable: ^2.0.7
+  intl: ^0.20.2
+  image_picker: ^1.1.2
+  timeago: ^3.7.1
+  dotted_border: ^3.1.0
+  photo_view: ^0.15.0
 
 dev_dependencies:
   flutter_test:
@@ -64,7 +79,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -170,7 +184,7 @@ flutter:
         - asset: assets/fonts/Inter/Inter_28pt-ThinItalic.ttf
           weight: 100
           style: italic
-          
+
   # fonts:
   #   - family: Schyler
   #     fonts:
@@ -185,7 +199,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
-  
+
 flutter_launcher_icons:
   android: true
   ios: true

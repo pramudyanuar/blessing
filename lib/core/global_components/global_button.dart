@@ -10,7 +10,8 @@ class GlobalButton extends StatelessWidget {
   final double height;
   final bool isLoading;
   final Color? color;
-  final double borderRadius; // <-- Tambahkan parameter baru
+  final double borderRadius;
+  final double fontSize; // <-- Tambah ini
 
   const GlobalButton({
     super.key,
@@ -20,7 +21,8 @@ class GlobalButton extends StatelessWidget {
     this.height = 60,
     this.isLoading = false,
     this.color,
-    this.borderRadius = 10, // <-- Default radius
+    this.borderRadius = 10,
+    this.fontSize = 18, // <-- Default font size
   });
 
   @override
@@ -33,8 +35,7 @@ class GlobalButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: color ?? AppColors.c2,
           shape: RoundedRectangleBorder(
-            borderRadius:
-                BorderRadius.circular(borderRadius.r), // <-- Gunakan parameter
+            borderRadius: BorderRadius.circular(borderRadius.r),
           ),
           elevation: 0,
         ),
@@ -59,7 +60,7 @@ class GlobalButton extends StatelessWidget {
               : GlobalText.medium(
                   text,
                   key: const ValueKey('text'),
-                  fontSize: 18,
+                  fontSize: fontSize, // <-- Gunakan parameter fontSize
                   color: Colors.white,
                   fontFamily: 'Inter',
                 ),

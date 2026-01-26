@@ -1,4 +1,5 @@
 import 'package:blessing/core/constants/images.dart';
+import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,57 +10,110 @@ class ClassCard extends StatelessWidget {
   final String subjectName;
   final String subtitle;
   final String classLevel;
+  final String? subjectId;
 
   const ClassCard({
     super.key,
+    this.subjectId, 
     required this.imageUrl,
     required this.subjectName,
-    // Kita bisa berikan nilai default jika datanya seragam
-    this.subtitle = 'SMA 1 Jakarta - A',
+    this.subtitle = 'SMA Blessing',
     this.classLevel = 'Kelas 10',
   });
 
+  static String getImageForSubject(String? subjectName) {
+    switch (subjectName?.toLowerCase()) {
+      case 'matematika minat':
+        return Images.matematikaMinat;
+      case 'matematika wajib':
+        return Images.matematikaWajib;
+      case 'kimia':
+        return Images.kimia;
+      case 'akuntansi':
+        return Images.akuntansi;
+      case 'fisika':
+        return Images.fisika;
+      case 'biologi':
+        return Images.biologi;
+      case 'ekonomi':
+        return Images.ekonomi;
+      default:
+        // Gambar default jika nama tidak cocok
+        return Images.adminMainSubject;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // 1. Dibungkus dengan GestureDetector agar bisa di-tap
+    final bool isDefaultImage = imageUrl == Images.adminMainSubject;
+
     return GestureDetector(
-      onTap: () {
-        // 2. Aksi saat di-tap: navigasi ke halaman daftar materi
+    onTap: () {
+        final String finalImagePath = isDefaultImage
+            ? imageUrl
+            : imageUrl.replaceFirst(
+                'assets/images/',
+                'assets/images/detail-',
+              );
+
         Get.toNamed(
           AppRoutes.courseMain,
           arguments: {
-            // 3. Kirim data spesifik dari kartu ini
+            'subjectId': subjectId,
             'title': subjectName,
             'subtitle': subtitle,
             'classLevel': classLevel,
-            'imagePath': imageUrl,
+            'imagePath': finalImagePath,
           },
         );
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 8.h),
         width: 1.sw,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(imageUrl),
-            fit: BoxFit.contain,
-          ),
-        ),
         child: AspectRatio(
           aspectRatio: 677 / 189,
-          child: Container(),
+          child: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(imageUrl),
+                fit: BoxFit
+                    .cover,
+                colorFilter: isDefaultImage
+                    ? ColorFilter.mode(
+                        Colors.black.withOpacity(0.4),
+                        BlendMode.darken,
+                      )
+                    : null,
+              ),
+              borderRadius: BorderRadius.circular(
+                  12), 
+            ),
+              child: isDefaultImage
+                ? Align(
+                    // Ganti Center dengan Align
+                    alignment:
+                        Alignment.centerLeft, // Atur alignment ke kiri-tengah
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: GlobalText.semiBold(
+                        subjectName,
+                        color: Colors.white,
+                        textAlign: TextAlign.left,
+                        fontSize: 18.sp,
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
         ),
       ),
     );
   }
 
-  // --- Varian Khusus ---
-  // Factory constructor sekarang juga menyertakan data yang relevan
   factory ClassCard.matematikaMinat() => const ClassCard(
-        imageUrl: Images.matematikaMinat,
-        subjectName: 'Matematika Minat',
-        classLevel: 'Kelas 12', // Contoh data spesifik
-      );
+      imageUrl: Images.matematikaMinat,
+      subjectName: 'Matematika Minat',
+      classLevel: 'Kelas 12');
   factory ClassCard.matematikaWajib() => const ClassCard(
         imageUrl: Images.matematikaWajib,
         subjectName: 'Matematika Wajib',
@@ -83,5 +137,9 @@ class ClassCard extends StatelessWidget {
   factory ClassCard.ekonomi() => const ClassCard(
         imageUrl: Images.ekonomi,
         subjectName: 'Ekonomi',
+      );
+  factory ClassCard.not_found() => const ClassCard(
+        imageUrl: Images.adminMainSubject,
+        subjectName: 'Mata Pelajaran',
       );
 }

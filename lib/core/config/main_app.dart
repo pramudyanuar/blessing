@@ -11,7 +11,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 final _noScreenshot = NoScreenshot.instance;
 
 class MainAppWrapper extends StatefulWidget {
-  const MainAppWrapper({Key? key}) : super(key: key);
+  const MainAppWrapper({super.key});
 
   @override
   State<MainAppWrapper> createState() => _MainAppWrapperState();

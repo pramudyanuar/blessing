@@ -18,8 +18,9 @@ class UpdateCourseRequest {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
     if (courseName != null) data['course_name'] = courseName;
-    if (content != null)
+    if (content != null) {
       data['content'] = List<dynamic>.from(content!.map((x) => x.toJson()));
+    }
     if (gradeLevel != null) data['grade_level'] = gradeLevel;
     if (subjectId != null) data['subject_id'] = subjectId;
     return data;

@@ -2,11 +2,11 @@
 
 class CreateQuizAnswerRequest {
   final String optionId;
-  final String questionId;
+  final String? questionId;
 
   CreateQuizAnswerRequest({
     required this.optionId,
-    required this.questionId,
+    this.questionId,
   });
 
   Map<String, dynamic> toJson() => {

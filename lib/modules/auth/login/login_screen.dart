@@ -4,7 +4,7 @@ import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_button.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/modules/auth/login/controllers/login_controller.dart';
-import 'package:blessing/modules/auth/widgets/auth_textfield.dart';
+import 'package:blessing/modules/auth/login/widgets/auth_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';

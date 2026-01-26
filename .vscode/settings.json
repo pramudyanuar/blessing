@@ -1,4 +1,4 @@
 {
   "java.configuration.updateBuildConfiguration": "interactive",
-  "cmake.sourceDirectory": "C:/Kerjaan/Blessing/blessing/linux"
+  "cmake.sourceDirectory": "${workspaceFolder}/linux"
 }
