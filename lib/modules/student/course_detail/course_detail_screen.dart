@@ -234,21 +234,21 @@ class CourseDetailScreen extends StatelessWidget {
     if (images.length == 2) {
       return Row(
         children: [
-          Expanded(child: _buildGridImageItem(images[0], 0)),
+          Expanded(child: _buildGridImageItem(images, images[0], 0)),
           SizedBox(width: 8.w),
-          Expanded(child: _buildGridImageItem(images[1], 1)),
+          Expanded(child: _buildGridImageItem(images, images[1], 1)),
         ],
       );
     } else if (images.length == 3) {
       return Column(
         children: [
-          _buildGridImageItem(images[0], 0),
+          _buildGridImageItem(images, images[0], 0),
           SizedBox(height: 8.h),
           Row(
             children: [
-              Expanded(child: _buildGridImageItem(images[1], 1)),
+              Expanded(child: _buildGridImageItem(images, images[1], 1)),
               SizedBox(width: 8.w),
-              Expanded(child: _buildGridImageItem(images[2], 2)),
+              Expanded(child: _buildGridImageItem(images, images[2], 2)),
             ],
           ),
         ],
@@ -258,20 +258,20 @@ class CourseDetailScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: _buildGridImageItem(images[0], 0)),
+              Expanded(child: _buildGridImageItem(images, images[0], 0)),
               SizedBox(width: 8.w),
-              Expanded(child: _buildGridImageItem(images[1], 1)),
+              Expanded(child: _buildGridImageItem(images, images[1], 1)),
             ],
           ),
           SizedBox(height: 8.h),
           Row(
             children: [
-              Expanded(child: _buildGridImageItem(images[2], 2)),
+              Expanded(child: _buildGridImageItem(images, images[2], 2)),
               SizedBox(width: 8.w),
               Expanded(
                 child: images.length > 4
                     ? _buildMoreImagesItem(images, 3)
-                    : _buildGridImageItem(images[3], 3),
+                    : _buildGridImageItem(images, images[3], 3),
               ),
             ],
           ),
@@ -279,21 +279,25 @@ class CourseDetailScreen extends StatelessWidget {
       );
     } else {
       // Fallback untuk 1 gambar (seharusnya tidak sampai sini)
-      return _buildGridImageItem(images[0], 0);
+      return _buildGridImageItem(images, images[0], 0);
     }
   }
 
   /// Widget untuk item gambar dalam grid
-  Widget _buildGridImageItem(dynamic imageData, int index) {
+  Widget _buildGridImageItem(List<dynamic> allImages, dynamic imageData, int gridIndex) {
     final imageUrl = imageData['data'].toString();
     final originalIndex = imageData['originalIndex'];
 
     return GestureDetector(
       onTap: () {
+        final imageUrls = allImages.map((img) => img['data'] as String).toList();
+
         Get.to(
           () => ImageViewerScreen(
             imageUrl: imageUrl,
             heroTag: 'course_image_$originalIndex',
+            imageUrls: imageUrls,
+            initialIndex: gridIndex,
           ),
           transition: Transition.fadeIn,
           duration: const Duration(milliseconds: 300),
@@ -363,10 +367,16 @@ class CourseDetailScreen extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
+        // Collect all remaining images starting from startIndex
+        final remainingImages = images.sublist(startIndex);
+        final imageUrls = remainingImages.map((img) => img['data'] as String).toList();
+
         Get.to(
           () => ImageViewerScreen(
             imageUrl: imageUrl,
             heroTag: 'course_image_$originalIndex',
+            imageUrls: imageUrls,
+            initialIndex: 0,
           ),
           transition: Transition.fadeIn,
           duration: const Duration(milliseconds: 300),

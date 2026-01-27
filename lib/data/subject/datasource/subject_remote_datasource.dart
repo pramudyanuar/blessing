@@ -24,11 +24,14 @@ class SubjectDataSource {
       if (response['statusCode'] == 200) {
         debugPrint('getAllSubjects DataSource response: ${response['data']}');
 
-        final subjects = (response['data']['data'] as List)
-            .map((e) => SubjectResponse.fromJson(e))
-            .toList();
+        final responseData = response['data'] as Map<String, dynamic>?;
+        final subjects = (responseData?['data'] as List?)
+                ?.map((e) => SubjectResponse.fromJson(e as Map<String, dynamic>))
+                .toList() ??
+            [];
 
-        final paging = PagingResponse.fromJson(response['data']['paging']);
+        final paging = PagingResponse.fromJson(
+            responseData?['paging'] as Map<String, dynamic>? ?? {});
 
         return (subjects: subjects, paging: paging);
       } else {
@@ -75,7 +78,12 @@ class SubjectDataSource {
 
       if (response['statusCode'] == 200 || response['statusCode'] == 201) {
         debugPrint('createSubject DataSource response: ${response['data']}');
-        return SubjectResponse.fromJson(response['data']['data']);
+        final responseData = response['data'] as Map<String, dynamic>?;
+        final data = responseData?['data'];
+        if (data != null) {
+          return SubjectResponse.fromJson(data as Map<String, dynamic>);
+        }
+        return null;
       } else {
         debugPrint(
             'createSubject DataSource failed: ${response['statusMessage']}');
@@ -99,10 +107,15 @@ class SubjectDataSource {
         method: HttpMethods.put,
         body: data.toJson(),
       );
-
+      
       if (response['statusCode'] == 200) {
-        debugPrint('updateSubject DataSource response: ${response['data']}');
-        return SubjectResponse.fromJson(response['data']['data']);
+        debugPrint('updateSubject DataSource success: ${response['data']}');
+        final responseData = response['data'] as Map<String, dynamic>?;
+        final result = responseData?['data'];
+        if (result != null) {
+          return SubjectResponse.fromJson(result as Map<String, dynamic>);
+        }
+        return null;
       } else {
         debugPrint(
             'updateSubject DataSource failed: ${response['statusMessage']}');

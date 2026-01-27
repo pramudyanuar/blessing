@@ -187,7 +187,10 @@ class CourseCard extends StatelessWidget {
         SizedBox(width: 16.w),
         // Sisi Kanan: Menampilkan Tombol "Mulai" atau Nilai
         if (isCompleted)
-          _buildScoreDisplay()
+          GestureDetector(
+            onTap: onTapAction,
+            child: _buildScoreDisplay(),
+          )
         else
           ElevatedButton(
             onPressed: onTapAction,
@@ -196,8 +199,11 @@ class CourseCard extends StatelessWidget {
               shape: const StadiumBorder(),
               padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),
             ),
-            child:
-                GlobalText.bold("Mulai", fontSize: 13.sp, color: Colors.white),
+            child: GlobalText.bold(
+              "Mulai",
+              fontSize: 13.sp,
+              color: Colors.white,
+            ),
           ),
       ],
     );

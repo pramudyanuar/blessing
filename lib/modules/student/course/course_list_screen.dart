@@ -82,7 +82,18 @@ class CourseListScreen extends StatelessWidget {
                       isCompleted: item['isCompleted'],
                       score: item['score'],
                       onTapAction: () {
-                        if (!(item['isCompleted'] as bool)) {
+                        if (item['isCompleted'] as bool) {
+                          // Navigasi langsung ke pembahasan quiz jika sudah dikerjakan
+                          Get.toNamed(AppRoutes.quizReview,
+                              arguments: {
+                                'quizId': item['id'],
+                                'quizName': item['title'],
+                                'score': item['score'] ?? 0,
+                                'sessionId': '',
+                                'reviewItems': [],
+                                'fetchFromServer': true,
+                              });
+                        } else {
                           print("Memulai kuis: ${item['title']}");
                           Get.toNamed(AppRoutes.quizIntro,
                               arguments: item['id']); 

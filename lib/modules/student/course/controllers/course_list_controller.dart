@@ -2,6 +2,8 @@
 
 import 'package:blessing/data/course/models/response/course_with_quizzes_response.dart';
 import 'package:blessing/data/course/repository/course_repository_impl.dart';
+import 'package:blessing/data/report/model/response/quiz_report.dart';
+import 'package:blessing/data/report/repository/report_repository_impl.dart';
 import 'package:blessing/modules/student/course/widgets/course_card.dart';
 import 'package:get/get.dart';
 import 'package:blessing/core/utils/cache_util.dart';
@@ -19,8 +21,12 @@ class CourseListController extends GetxController {
 
   // Dependensi dan Cache
   final _courseRepo = CourseRepository();
+  final _reportRepo = ReportRepository();
   String? _subjectId;
   String get _cacheKey => 'course_list_detailed_$_subjectId';
+  
+  // Cache untuk attempted quizzes
+  Map<String, QuizReport> _attemptedQuizzesMap = {};
 
   @override
   void onInit() {
@@ -68,7 +74,16 @@ class CourseListController extends GetxController {
 
   Future<void> _fetchFromNetwork() async {
     try {
-      // PANGGIL FUNGSI REPOSITORY YANG BARU
+      // 1. Load report card untuk get info quiz yang sudah dikerjakan
+      final reportCard = await _reportRepo.getMyCompleteReportCard();
+      if (reportCard != null) {
+        _attemptedQuizzesMap = {
+          for (var quiz in reportCard.data.quizzes)
+            quiz.quizId: quiz
+        };
+      }
+      
+      // 2. Load course dan quizzes
       final allCoursesFromApi =
           await _courseRepo.getAllAccessibleCoursesWithQuizzes();
 
@@ -107,6 +122,10 @@ class CourseListController extends GetxController {
 
       // Tambahkan item untuk setiap kuis di dalam course
       for (final quiz in course.quizzes) {
+        // Cek apakah quiz ini sudah dikerjakan
+        final attemptedQuiz = _attemptedQuizzesMap[quiz.id];
+        final isQuizCompleted = attemptedQuiz != null && attemptedQuiz.isAttempted;
+        
         items.add({
           'id': quiz.id,
           'type': CourseContentType.quiz,
@@ -116,8 +135,8 @@ class CourseListController extends GetxController {
           'description': 'Kuis untuk menguji pemahaman materi.',
           'timeLimit': quiz.timeLimit,
           'questionCount': quiz.questionCount ?? 0,
-          'isCompleted': false,
-          'score': null,
+          'isCompleted': isQuizCompleted,
+          'score': attemptedQuiz?.score,
         });
       }
     }

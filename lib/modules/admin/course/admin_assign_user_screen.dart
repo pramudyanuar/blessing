@@ -14,13 +14,18 @@ class AdminAssignUserScreen extends StatelessWidget {
     final controller = Get.find<AdminAssignUserController>();
 
     return BaseWidgetContainer(
+      backgroundColor: AppColors.c1,
       appBar: AppBar(
         title: GlobalText.semiBold("Tambah Akses",
             fontSize: 18.sp, color: AppColors.c2),
+        backgroundColor: AppColors.c1,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.c2),
+          onPressed: () => Get.back(),
         ),
+        shadowColor: Colors.black.withOpacity(0.4),
+        surfaceTintColor: Colors.white,
+        elevation: 0.5,
         actions: [
           Obx(() {
             return TextButton(
@@ -50,21 +55,29 @@ class AdminAssignUserScreen extends StatelessWidget {
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator(color: AppColors.c2));
               }
               if (controller.errorMessage.isNotEmpty) {
                 return Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
+                    padding: EdgeInsets.all(16.w),
+                    child: GlobalText.medium(
                       controller.errorMessage.value,
                       textAlign: TextAlign.center,
+                      color: AppColors.c2,
+                      fontSize: 14.sp,
                     ),
                   ),
                 );
               }
               if (controller.filteredUsers.isEmpty) {
-                return const Center(child: Text('Tidak ada siswa ditemukan.'));
+                return Center(
+                  child: GlobalText.medium(
+                    'Tidak ada siswa ditemukan.',
+                    color: AppColors.c2,
+                    fontSize: 14.sp,
+                  ),
+                );
               }
 
               return ListView.builder(
