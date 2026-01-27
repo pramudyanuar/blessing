@@ -19,8 +19,12 @@ class AnswerDataSource {
 
       if (response['statusCode'] == 200 || response['statusCode'] == 201) {
         debugPrint('createUserAnswer DataSource success: ${response['data']}');
-        final data = response['data']['data'];
-        return UserAnswerResponse.fromJson(data);
+        final responseData = response['data'] as Map<String, dynamic>?;
+        final data = responseData?['data'];
+        if (data != null) {
+          return UserAnswerResponse.fromJson(data as Map<String, dynamic>);
+        }
+        return null;
       } else {
         debugPrint(
             'createUserAnswer DataSource failed: ${response['statusMessage']}');
@@ -44,8 +48,12 @@ class AnswerDataSource {
 
       if (response['statusCode'] == 200 || response['statusCode'] == 201) {
         debugPrint('updateUserAnswer DataSource success: ${response['data']}');
-        final data = response['data']['data'];
-        return UserAnswerResponse.fromJson(data);
+        final responseData = response['data'] as Map<String, dynamic>?;
+        final data = responseData?['data'];
+        if (data != null) {
+          return UserAnswerResponse.fromJson(data as Map<String, dynamic>);
+        }
+        return null;
       } else {
         debugPrint(
             'updateUserAnswer DataSource failed: ${response['statusMessage']}');

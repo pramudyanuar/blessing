@@ -3,6 +3,7 @@ import 'package:blessing/core/utils/app_pages.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/modules/error/not_found_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:no_screenshot/no_screenshot.dart';
@@ -26,8 +27,10 @@ class _MainAppWrapperState extends State<MainAppWrapper> {
 
   void listenForScreenshot() {
     _noScreenshot.screenshotStream.listen((value) {
-      debugPrint('Screenshot taken: ${value.wasScreenshotTaken}');
-      debugPrint('Screenshot path: ${value.screenshotPath}');
+      if (kDebugMode) {
+        debugPrint('Screenshot taken: ${value.wasScreenshotTaken}');
+        debugPrint('Screenshot path: ${value.screenshotPath}');
+      }
 
       Fluttertoast.showToast(
         msg: "Screenshot detected!",

@@ -15,8 +15,6 @@ import 'package:blessing/modules/admin/course/bindings/create_quiz_bindings.dart
 import 'package:blessing/modules/admin/course/create_quiz_screen.dart';
 import 'package:blessing/modules/admin/course/quiz_result_screen.dart';
 import 'package:blessing/modules/admin/course/upload_course_screen.dart';
-import 'package:blessing/modules/admin/homepage/admin_create_subject_screen.dart';
-import 'package:blessing/modules/admin/homepage/bindings/admin_create_subject_binding.dart';
 import 'package:blessing/modules/admin/homepage/bindings/admin_homepage_binding.dart';
 import 'package:blessing/modules/admin/homepage/admin_homepage_screen.dart';
 import 'package:blessing/modules/admin/main/bindings/main_admin_binding.dart';
@@ -30,7 +28,13 @@ import 'package:blessing/modules/admin/manage_student/detail_student_screen.dart
 import 'package:blessing/modules/admin/report_card/admin_report_card_screen.dart';
 import 'package:blessing/modules/admin/report_card/bindings/admin_report_card_binding.dart';
 import 'package:blessing/modules/admin/subject/admin_manage_subject_main_screen.dart';
+import 'package:blessing/modules/admin/subject/admin_subject_list_screen.dart';
+import 'package:blessing/modules/admin/subject/admin_subject_detail_screen.dart';
+import 'package:blessing/modules/admin/subject/admin_create_subject_screen.dart';
+import 'package:blessing/modules/admin/subject/admin_edit_subject_screen.dart';
 import 'package:blessing/modules/admin/subject/bindings/subject_bindings.dart';
+import 'package:blessing/modules/admin/report_card/admin_quiz_detail_screen.dart';
+import 'package:blessing/modules/admin/report_card/admin_answer_review_screen.dart';
 import 'package:blessing/modules/auth/login/bindings/login_binding.dart';
 import 'package:blessing/modules/auth/login/login_screen.dart';
 import 'package:blessing/modules/error/access_denied_screen.dart';
@@ -51,6 +55,7 @@ import 'package:blessing/modules/student/quiz_attempt/bindings/quiz_intro_bindin
 import 'package:blessing/modules/student/quiz_attempt/quiz_attempt_screen.dart';
 import 'package:blessing/modules/student/quiz_attempt/quiz_intro_screen.dart';
 import 'package:blessing/modules/student/quiz_attempt/quiz_result_screen.dart';
+import 'package:blessing/modules/student/quiz_attempt/quiz_review_screen.dart';
 import 'package:blessing/modules/student/subject/bindings/subject_bindings.dart';
 import 'package:blessing/modules/student/subject/subject_main_screen.dart';
 import 'package:blessing/modules/student/main/main_student_screen.dart';
@@ -150,6 +155,22 @@ class AppPages {
       middlewares: [RoleMiddleware(requiredRole: 'admin')],
     ),
     GetPage(
+      name: AppRoutes.adminSubjectList,
+      page: () => const AdminSubjectListScreen(),
+      binding: AdminSubjectListBinding(),
+      middlewares: [RoleMiddleware(requiredRole: 'admin')],
+    ),
+    GetPage(
+      name: AppRoutes.adminSubjectDetail,
+      page: () => const AdminSubjectDetailScreen(),
+      middlewares: [RoleMiddleware(requiredRole: 'admin')],
+    ),
+    GetPage(
+      name: AppRoutes.adminEditSubject,
+      page: () => const AdminEditSubjectScreen(),
+      middlewares: [RoleMiddleware(requiredRole: 'admin')],
+    ),
+    GetPage(
       name: AppRoutes.adminQuizResult,
       page: () => AdminQuizResultScreen(),
       middlewares: [RoleMiddleware(requiredRole: 'admin')],
@@ -182,6 +203,16 @@ class AppPages {
       name: AppRoutes.adminStudentReport,
       page: () => const AdminReportCardScreen(),
       binding: AdminReportCardBinding(),
+      middlewares: [RoleMiddleware(requiredRole: 'admin')],
+    ),
+    GetPage(
+      name: AppRoutes.adminQuizDetail,
+      page: () => const AdminQuizDetailScreen(),
+      middlewares: [RoleMiddleware(requiredRole: 'admin')],
+    ),
+    GetPage(
+      name: AppRoutes.adminAnswerReview,
+      page: () => const AdminAnswerReviewScreen(),
       middlewares: [RoleMiddleware(requiredRole: 'admin')],
     ),
 
@@ -230,6 +261,11 @@ class AppPages {
     GetPage(
       name: AppRoutes.quizResult,
       page: () => const QuizResultScreen(),
+      middlewares: [RoleMiddleware(requiredRole: 'student')],
+    ),
+    GetPage(
+      name: AppRoutes.quizReview,
+      page: () => const QuizReviewScreen(),
       middlewares: [RoleMiddleware(requiredRole: 'student')],
     ),
     GetPage(

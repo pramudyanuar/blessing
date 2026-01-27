@@ -17,10 +17,15 @@ abstract class AppRoutes {
   static const addStudent = '/add-student';
   static const adminHomepage = '/homepage';
   static const manageSubject = '/manage-subject';
+  static const adminSubjectList = '/admin-subject-list';
+  static const adminSubjectDetail = '/admin-subject-detail';
+  static const adminCreateSubject = '/admin-create-subject-screen';
+  static const adminEditSubject = '/admin-edit-subject';
   static const adminCreateCourse = '/admin-create-course';
   static const adminCreateQuiz = '/admin-create-quiz';
-  static const adminCreateSubject = '/admin-create-subject';
   static const adminQuizResult = '/admin-quiz-result';
+  static const adminQuizDetail = '/admin-quiz-detail';
+  static const adminAnswerReview = '/admin-answer-review';
   static const adminCourseDetail = '/admin-course-detail';
   static const adminManageCourseAccess = '/admin-manage-course-access';
   static const adminAssignUser = '/admin-assign-user';
@@ -37,5 +42,6 @@ abstract class AppRoutes {
   static const quizList = '/quiz-list';
   static const quizAttempt = '/quiz-attempt';
   static const quizResult = '/quiz-result';
+  static const quizReview = '/quiz-review';
   static const quizIntro = '/quiz-intro';
 }

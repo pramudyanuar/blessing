@@ -15,27 +15,30 @@ class AdminManageAccessCourseScreen extends StatelessWidget {
     final controller = Get.find<AdminManageAccessCourseController>();
 
     return BaseWidgetContainer(
+      backgroundColor: AppColors.c1,
       appBar: AppBar(
-        centerTitle: false,
         title: GlobalText.semiBold(
           "Akses Materi",
-          fontSize: 16.sp,
+          fontSize: 18.sp,
           color: AppColors.c2,
         ),
-        backgroundColor: Colors.white,
-        elevation: 0.5,
+        backgroundColor: AppColors.c1,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.c2),
-          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.c2),
+          onPressed: () => Get.back(),
         ),
+        shadowColor: Colors.black.withOpacity(0.4),
+        surfaceTintColor: Colors.white,
+        elevation: 0.5,
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.c2,
         onPressed: controller.navigateToAddUsers,
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: AppColors.c2));
         }
 
         if (controller.errorMessage.isNotEmpty) {
@@ -43,8 +46,12 @@ class AdminManageAccessCourseScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(controller.errorMessage.value),
-                const SizedBox(height: 16),
+                GlobalText.medium(
+                  controller.errorMessage.value,
+                  color: AppColors.c2,
+                  fontSize: 14.sp,
+                ),
+                SizedBox(height: 16.h),
                 ElevatedButton.icon(
                   onPressed: controller.refreshUserAccess,
                   icon: const Icon(Icons.refresh),
@@ -60,11 +67,13 @@ class AdminManageAccessCourseScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                GlobalText.medium(
                   'Belum ada pengguna yang memiliki akses ke materi ini.',
                   textAlign: TextAlign.center,
+                  color: AppColors.c2,
+                  fontSize: 14.sp,
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 ElevatedButton.icon(
                   onPressed: controller.refreshUserAccess,
                   icon: const Icon(Icons.refresh),
@@ -78,11 +87,12 @@ class AdminManageAccessCourseScreen extends StatelessWidget {
         return RefreshIndicator(
           onRefresh: controller.fetchUserAccess,
           child: ListView.builder(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
             itemCount: controller.userAccessList.length,
             itemBuilder: (context, index) {
               final userAccess = controller.userAccessList[index];
               return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                margin: EdgeInsets.symmetric(vertical: 4.h),
                 child: ListTile(
                   leading: CircleAvatar(
                     child: Text(userAccess.user.username!

@@ -2,7 +2,6 @@ import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_button.dart';
 import 'package:blessing/core/global_components/global_text.dart';
-import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/modules/student/quiz_attempt/controller/quiz_intro_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -67,6 +66,81 @@ class QuizIntroScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Show score prominently if submitted
+                      Obx(() {
+                        if (controller.quizStatus.value ==
+                            QuizAttemptStatus.submitted) {
+                          return Column(
+                            children: [
+                              Center(
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      width: 120.r,
+                                      height: 120.r,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                          colors: [
+                                            AppColors.c2.withOpacity(0.8),
+                                            AppColors.c2,
+                                          ],
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppColors.c2
+                                                .withOpacity(0.3),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Center(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              controller
+                                                  .previousScore.value
+                                                  .toString(),
+                                              style: TextStyle(
+                                                fontSize: 48.sp,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            Text(
+                                              'dari 100',
+                                              style: TextStyle(
+                                                fontSize: 12.sp,
+                                                color: Colors.white70,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 16.h),
+                                    Text(
+                                      'Kuis Selesai',
+                                      style: TextStyle(
+                                        fontSize: 18.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.c2,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 16.h),
+                            ],
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      }),
                       Text(
                         details['title'] ?? 'Judul Kuis',
                         style: const TextStyle(
@@ -87,21 +161,117 @@ class QuizIntroScreen extends StatelessWidget {
                         label: 'Jumlah Soal',
                         value: '${details['totalQuestions'] ?? 0} soal',
                       ),
+                      // Status indicator
+                      SizedBox(height: 12.h),
+                      Obx(() {
+                        String statusText = '';
+                        Color statusColor = Colors.blue;
+
+                        switch (controller.quizStatus.value) {
+                          case QuizAttemptStatus.notStarted:
+                            statusText = 'Belum dimulai';
+                            statusColor = Colors.grey;
+                            break;
+                          case QuizAttemptStatus.inProgress:
+                            statusText = 'Sedang dikerjakan';
+                            statusColor = Colors.orange;
+                            break;
+                          case QuizAttemptStatus.submitted:
+                            statusText = 'Sudah diselesaikan';
+                            statusColor = Colors.green;
+                            break;
+                        }
+
+                        return Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12.w,
+                            vertical: 6.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: statusColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(6.r),
+                            border: Border.all(color: statusColor),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                controller.quizStatus.value ==
+                                        QuizAttemptStatus.inProgress
+                                    ? Icons.schedule
+                                    : controller.quizStatus.value ==
+                                            QuizAttemptStatus.submitted
+                                        ? Icons.check_circle
+                                        : Icons.pending,
+                                color: statusColor,
+                                size: 14.sp,
+                              ),
+                              SizedBox(width: 6.w),
+                              Text(
+                                statusText,
+                                style: TextStyle(
+                                  color: statusColor,
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
                     ],
                   ),
                 ),
               ),
               const Spacer(),
-              GlobalButton(
-                text: "Mulai Kuis",
-                onPressed: () {
-                  if (controller.quizId.isNotEmpty) {
-                    Get.toNamed(AppRoutes.quizAttempt, arguments: controller.quizId);
-                  } else {
-                    Get.snackbar("Error", "ID Kuis tidak valid.");
-                  }
-                },
-              ),
+              // Dynamic button based on quiz status
+              Obx(() {
+                switch (controller.quizStatus.value) {
+                  case QuizAttemptStatus.notStarted:
+                    return GlobalButton(
+                      text: "Mulai Kuis",
+                      onPressed: controller.startNewQuiz,
+                    );
+
+                  case QuizAttemptStatus.inProgress:
+                    return Column(
+                      children: [
+                        GlobalButton(
+                          text: "Lanjutkan Kuis",
+                          onPressed: controller.resumeQuiz,
+                        ),
+                        SizedBox(height: 8.h),
+                        OutlinedButton(
+                          onPressed: controller.startNewQuiz,
+                          child: const Text(
+                            'Mulai Ulang',
+                            style: TextStyle(color: AppColors.c2),
+                          ),
+                        ),
+                      ],
+                    );
+
+                  case QuizAttemptStatus.submitted:
+                    return Column(
+                      children: [
+                        GlobalButton(
+                          text: "Lihat Detail Jawaban",
+                          onPressed: controller.viewResult,
+                        ),
+                        if (controller.canRetake.value) ...[
+                          SizedBox(height: 8.h),
+                          OutlinedButton(
+                            onPressed: controller.retakeQuiz,
+                            child: const Text(
+                              'Coba Lagi',
+                              style: TextStyle(color: AppColors.c2),
+                            ),
+                          ),
+                        ],
+                      ],
+                    );
+                }
+              }),
               const SizedBox(height: 16),
             ],
           ),

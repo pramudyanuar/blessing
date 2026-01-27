@@ -36,11 +36,14 @@ class SessionDataSource {
       if (response['statusCode'] == 200) {
         debugPrint('getAllSessions DataSource response: ${response['data']}');
 
-        final sessions = (response['data']['data'] as List)
-            .map((e) => UserQuizSessionResponse.fromJson(e))
-            .toList();
+        final responseData = response['data'] as Map<String, dynamic>?;
+        final sessions = (responseData?['data'] as List?)
+                ?.map((e) => UserQuizSessionResponse.fromJson(e as Map<String, dynamic>))
+                .toList() ??
+            [];
 
-        final paging = PagingResponse.fromJson(response['data']['paging']);
+        final paging = PagingResponse.fromJson(
+            responseData?['paging'] as Map<String, dynamic>? ?? {});
 
         return (sessions: sessions, paging: paging);
       } else {
@@ -66,8 +69,12 @@ class SessionDataSource {
       if (response['statusCode'] == 200) {
         debugPrint('getSessionById DataSource response: ${response['data']}');
 
-        final data = response['data']['data'];
-        return UserQuizSessionResponse.fromJson(data);
+        final responseData = response['data'] as Map<String, dynamic>?;
+        final data = responseData?['data'];
+        if (data != null) {
+          return UserQuizSessionResponse.fromJson(data as Map<String, dynamic>);
+        }
+        return null;
       } else {
         debugPrint(
             'getSessionById DataSource failed: ${response['statusMessage']}');
@@ -89,7 +96,7 @@ class SessionDataSource {
         method: HttpMethods.post,
         body: request.toJson(),
       );
-
+      
       if (response['statusCode'] == 200 || response['statusCode'] == 201) {
         debugPrint('createSession DataSource success: ${response['data']}');
         final data = response['data']['data'];
@@ -118,7 +125,7 @@ class SessionDataSource {
         url: url,
         method: HttpMethods.post,
       );
-
+      
       if (response['statusCode'] == 200) {
         debugPrint('submitSession DataSource success: ${response['data']}');
         final data = response['data']['data'];

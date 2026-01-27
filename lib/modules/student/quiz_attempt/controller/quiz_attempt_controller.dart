@@ -14,7 +14,7 @@ import 'package:blessing/data/session/repository/session_repository_impl.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class QuizAttemptController extends GetxController {
+class QuizAttemptController extends GetxController with WidgetsBindingObserver {
   // --- Dependencies ---
   final SessionRepository _sessionRepository = SessionRepository();
   final QuestionRepository _questionRepository = QuestionRepository();
@@ -45,14 +45,33 @@ class QuizAttemptController extends GetxController {
   final RxMap<String, List<QuestionOptionResponse>> optionsByQuestion =
       <String, List<QuestionOptionResponse>>{}.obs;
 
+  // Resume session
+  bool isResume = false;
+  String? resumeSessionId;
+
   // --- Lifecycle & Initialization ---
   @override
   void onInit() {
     super.onInit();
+    // Register observer untuk lifecycle changes
+    WidgetsBinding.instance.addObserver(this);
+    pageController = PageController();
+
+    // Handle arguments - bisa String (quizId) atau Map (for resume)
     if (Get.arguments is String) {
       quizId = Get.arguments;
-      pageController = PageController();
       initiateQuiz();
+    } else if (Get.arguments is Map) {
+      final args = Get.arguments as Map<String, dynamic>;
+      quizId = args['quizId'] ?? '';
+      resumeSessionId = args['sessionId'];
+      isResume = args['isResume'] ?? false;
+
+      if (isResume && resumeSessionId != null) {
+        resumeQuiz();
+      } else {
+        initiateQuiz();
+      }
     } else {
       isLoading.value = false;
       errorMessage.value = "ID Kuis tidak valid atau tidak ditemukan.";
@@ -62,9 +81,33 @@ class QuizAttemptController extends GetxController {
 
   @override
   void onClose() {
+    // Remove observer saat controller ditutup
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     pageController.dispose();
     super.onClose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    // Cek jika user menekan home button atau switch app
+    if (state == AppLifecycleState.paused) {
+      debugPrint('Quiz: App moved to background (home button atau switch app)');
+      
+      // Auto-submit quiz jika sedang berjalan
+      final isQuizRunning = !isLoading.value &&
+          errorMessage.value.isEmpty &&
+          remainingSeconds.value > 0;
+      
+      if (isQuizRunning) {
+        debugPrint('Quiz: Auto-submitting due to app background');
+        submitQuiz(autoSubmitted: true);
+      }
+    } else if (state == AppLifecycleState.resumed) {
+      debugPrint('Quiz: App resumed');
+    }
   }
 
   Future<bool> onWillPop() async {
@@ -78,22 +121,21 @@ class QuizAttemptController extends GetxController {
     }
 
     // 2. Jika kuis sedang berjalan, tampilkan dialog konfirmasi.
-    Get.dialog(
+    final shouldExit = await Get.dialog<bool>(
       GlobalConfirmationDialog(
         message: 'Anda yakin ingin keluar dari kuis ini? Semua jawaban akan hilang.',
         onYes: () {
-          Get.back(); // Tutup dialog
+          Get.back(result: true); // Tutup dialog dengan result true
           submitQuiz(autoSubmitted: true);
         },
         onNo: () {
-          Get.back();
+          Get.back(result: false); // Tutup dialog dengan result false
         },
       )
-    );
+    ) ?? false;
 
-    // 3. Selalu kembalikan 'false' saat dialog ditampilkan,
-    // karena navigasi akan ditangani oleh tombol pada dialog, bukan oleh sistem.
-    return false;
+    // 3. Kembalikan hasil dari dialog (true = exit, false = stay)
+    return shouldExit;
   }
 
   /// Memulai sesi kuis, mengambil data soal, dan memulai timer.
@@ -151,6 +193,72 @@ class QuizAttemptController extends GetxController {
       debugPrint("Error during quiz initiation: $e");
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  /// Lanjutkan kuis yang sudah ada (resume session)
+  Future<void> resumeQuiz() async {
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+      isQuizAlreadyAttempted.value = false;
+
+      if (resumeSessionId == null) {
+        throw Exception("Session ID tidak valid untuk resume.");
+      }
+
+      // 1. Fetch existing session untuk get remaining time
+      final sessionResponse =
+          await _sessionRepository.getSessionById(resumeSessionId!);
+      if (sessionResponse == null) {
+        throw Exception("Gagal memuat data sesi yang disimpan.");
+      }
+
+      sessionId = sessionResponse.id;
+
+      // 2. Get remaining time
+      final remainingTime =
+          await _sessionRepository.getSessionRemainingTime(sessionId!);
+      if (remainingTime == null || remainingTime <= 0) {
+        throw Exception("Waktu untuk kuis ini sudah habis.");
+      }
+      totalDuration.value = remainingTime;
+
+      // 3. Fetch questions and options
+      await _fetchQuestionsAndOptions();
+
+      // 4. Fetch existing answers dari session
+      await _loadExistingAnswers();
+
+      // 5. Start timer dengan remaining time
+      startTimer();
+
+      debugPrint("Quiz resumed successfully. Session ID: $sessionId");
+    } catch (e) {
+      errorMessage.value = "Gagal melanjutkan kuis: ${e.toString()}";
+      debugPrint("Error during quiz resume: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Load jawaban yang sudah disimpan sebelumnya
+  Future<void> _loadExistingAnswers() async {
+    try {
+      // TODO: Implement API call untuk fetch existing answers dari session
+      // const String answersUrl = '/api/answers?session_id=$sessionId';
+      // final response = await _httpManager.restRequest(url: answersUrl);
+      // if (response['statusCode'] == 200) {
+      //   final answers = response['data']['data'] as List;
+      //   for (var answer in answers) {
+      //     userAnswers[answer['question_id']] = answer['selected_option_id'];
+      //   }
+      // }
+
+      debugPrint("Existing answers loaded for session: $sessionId");
+    } catch (e) {
+      debugPrint("Error loading existing answers: $e");
+      // Don't throw - continue with empty answers
     }
   }
 
@@ -329,14 +437,50 @@ class QuizAttemptController extends GetxController {
     Get.back(); // Tutup dialog loading
 
     if (result != null) {
-      Get.toNamed(AppRoutes.quizResult, arguments: {
-        'quizname': result.quiz?.quizName,
-        'result': result.score,
+      // Kumpulkan data untuk review
+      final reviewItems = _buildReviewItems();
+
+      // Navigate ke review screen dengan data lengkap
+      Get.toNamed(AppRoutes.quizReview, arguments: {
+        'sessionId': sessionId,
+        'quizName': result.quiz?.quizName ?? 'Kuis',
+        'score': result.score ?? 0,
+        'reviewItems': reviewItems,
       });
       Get.snackbar("Sukses", "Kuis berhasil diselesaikan!");
     } else {
       Get.snackbar("Gagal", "Gagal mengirimkan kuis. Coba lagi.");
       startTimer(); // Mulai ulang timer jika submit gagal
     }
+  }
+
+  /// Build review items dari user answers dan options
+  List<Map<String, dynamic>> _buildReviewItems() {
+    final List<Map<String, dynamic>> items = [];
+
+    for (final question in questions) {
+      final userAnswerId = userAnswers[question.id];
+      final options = optionsByQuestion[question.id] ?? [];
+
+      // Cari jawaban user
+      QuestionOptionResponse? userAnswer;
+      if (userAnswerId != null) {
+        userAnswer = options.firstWhereOrNull((opt) => opt.id == userAnswerId);
+      }
+
+      // Untuk sekarang, kita belum punya cara untuk tahu jawaban benar dari API
+      // Ini perlu di-extend kemudian dengan API yang mengembalikan correct answer
+      final isCorrect = false; // Placeholder
+      final correctAnswer = null; // Placeholder
+
+      items.add({
+        'question': question,
+        'userAnswer': userAnswer,
+        'correctAnswer': correctAnswer,
+        'isCorrect': isCorrect,
+      });
+    }
+
+    return items;
   }
 }

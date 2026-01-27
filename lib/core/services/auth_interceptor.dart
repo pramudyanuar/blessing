@@ -1,5 +1,6 @@
 import 'package:blessing/main.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 class AuthInterceptor extends Interceptor {
   @override
@@ -7,23 +8,30 @@ class AuthInterceptor extends Interceptor {
       RequestOptions options, RequestInterceptorHandler handler) async {
     // Exclude login and register routes from having the token attached
     if (options.path.contains('/login') || options.path.contains('/register')) {
-      print('AuthInterceptor: Skipping token for ${options.path}');
+      if (kDebugMode) {
+        debugPrint('AuthInterceptor: Skipping token for ${options.path}');
+      }
       return handler.next(options);
     }
 
     final String? accessToken = await secureStorageUtil.getAccessToken();
 
-    print(
-        'AuthInterceptor: Retrieved token: ${accessToken?.substring(0, 8)}...'); // Log partial token for debugging
+    if (kDebugMode) {
+      debugPrint(
+          'AuthInterceptor: Retrieved token: ${accessToken?.substring(0, 8)}...');
+    }
 
     if (accessToken != null && accessToken.isNotEmpty) {
       options.headers['Authorization'] = accessToken;
-      print('AuthInterceptor: Added Authorization header for ${options.path}');
+      if (kDebugMode) {
+        debugPrint('AuthInterceptor: Added Authorization header for ${options.path}');
+      }
     } else {
-      print('AuthInterceptor: No token available for ${options.path}');
+      if (kDebugMode) {
+        debugPrint('AuthInterceptor: No token available for ${options.path}');
+      }
     }
 
-    // Continue with the request
     return handler.next(options);
   }
 
