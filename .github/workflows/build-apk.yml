@@ -41,8 +41,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: |
-            build/app/outputs/release/app-release.apk
+          files: build/app/outputs/flutter-apk/app-release.apk
           draft: false
           prerelease: false
         env:
@@ -53,5 +52,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: apk-builds
-          path: build/app/outputs/release/app-release.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
