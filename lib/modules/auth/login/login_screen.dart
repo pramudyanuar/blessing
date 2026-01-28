@@ -40,8 +40,8 @@ class LoginScreen extends StatelessWidget {
                 SizedBox(height: 20.h),
                 AuthTextField(
                   controller: controller.usernameController,
-                  label: 'Username',
-                  hintText: 'Masukkan username anda',
+                  label: 'Email',
+                  hintText: 'Masukkan email anda',
                 ),
                 SizedBox(height: 15.h),
                 AuthTextField(

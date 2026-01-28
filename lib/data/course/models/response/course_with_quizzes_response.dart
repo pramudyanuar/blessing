@@ -6,6 +6,7 @@ import 'package:blessing/data/subject/models/response/subject_response.dart'; //
 class CourseWithQuizzesResponse {
   final String id;
   final String courseName;
+  final String? description;
   final int gradeLevel;
   final SubjectResponse subject;
   final List<QuizNestedResponse> quizzes; // Ini perbedaannya!
@@ -16,6 +17,7 @@ class CourseWithQuizzesResponse {
   CourseWithQuizzesResponse({
     required this.id,
     required this.courseName,
+    this.description,
     required this.gradeLevel,
     required this.subject,
     required this.content,
@@ -33,6 +35,7 @@ class CourseWithQuizzesResponse {
     return CourseWithQuizzesResponse(
       id: json['id'] ?? '',
       courseName: json['course_name'] ?? 'Course Tanpa Nama',
+      description: json['description'],
       gradeLevel: json['grade_level'] ?? 0,
       subject: SubjectResponse.fromJson(json['subject'] ?? {}),
       quizzes: quizzesList,

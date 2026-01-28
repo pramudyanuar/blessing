@@ -52,7 +52,7 @@ class CourseCard extends StatelessWidget {
     final String headerText = isMaterial ? "Materi Pembelajaran" : "Kuis";
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -185,7 +185,7 @@ class CourseCard extends StatelessWidget {
           ),
         ),
         SizedBox(width: 16.w),
-        // Sisi Kanan: Menampilkan Tombol "Mulai" atau Nilai
+        // Sisi Kanan: Menampilkan Tombol "Mulai/Lanjutkan" atau Nilai
         if (isCompleted)
           GestureDetector(
             onTap: onTapAction,

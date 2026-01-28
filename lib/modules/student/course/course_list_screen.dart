@@ -52,7 +52,7 @@ class CourseListScreen extends StatelessWidget {
             onRefresh: () => controller.loadCourseData(),
             child: SafeArea(
               child: ListView.builder(
-                padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 8.w),
+                padding: EdgeInsets.symmetric(vertical: 3.h, horizontal: 2.w),
                 itemCount: controller.displayItems.length,
                 itemBuilder: (context, index) {
                   final item = controller.displayItems[index] as Map<String, dynamic>;
@@ -83,7 +83,7 @@ class CourseListScreen extends StatelessWidget {
                       score: item['score'],
                       onTapAction: () {
                         if (item['isCompleted'] as bool) {
-                          // Navigasi langsung ke pembahasan quiz jika sudah dikerjakan
+                          // Navigasi langsung ke pembahasan quiz jika sudah selesai (submitted)
                           Get.toNamed(AppRoutes.quizReview,
                               arguments: {
                                 'quizId': item['id'],
@@ -94,7 +94,8 @@ class CourseListScreen extends StatelessWidget {
                                 'fetchFromServer': true,
                               });
                         } else {
-                          print("Memulai kuis: ${item['title']}");
+                          // Buka quiz intro untuk mulai atau lanjutkan
+                          print("Membuka kuis: ${item['title']}");
                           Get.toNamed(AppRoutes.quizIntro,
                               arguments: item['id']); 
                         }

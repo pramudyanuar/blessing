@@ -68,10 +68,40 @@ class CourseDetailScreen extends StatelessWidget {
   Widget _buildContentView(CourseDetailController controller) {
     return ListView.builder(
       padding: EdgeInsets.all(16.w),
-      itemCount: _getProcessedContentLength(controller.contentItems),
+      itemCount: _getProcessedContentLength(controller.contentItems) + 
+                 (controller.course.value?.description != null ? 1 : 0),
       itemBuilder: (context, index) {
+        // Jika description ada, tampilkan di awal
+        if (controller.course.value?.description != null && index == 0) {
+          return Padding(
+            padding: EdgeInsets.only(bottom: 16.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GlobalText.bold(
+                  'Deskripsi',
+                  fontSize: 14.sp,
+                ),
+                SizedBox(height: 8.h),
+                GlobalText.regular(
+                  controller.course.value!.description!,
+                  textAlign: TextAlign.start,
+                  fontSize: 13.sp,
+                  lineHeight: 1.5,
+                  overflow: TextOverflow.visible,
+                ),
+              ],
+            ),
+          );
+        }
+
+        // Offset untuk content items jika ada description
+        final contentIndex = controller.course.value?.description != null 
+            ? index - 1 
+            : index;
+
         final processedItem =
-            _getProcessedContentItem(controller.contentItems, index);
+            _getProcessedContentItem(controller.contentItems, contentIndex);
 
         if (processedItem['type'] == 'image_gallery') {
           final List<dynamic> images = processedItem['images'];
@@ -79,7 +109,7 @@ class CourseDetailScreen extends StatelessWidget {
         } else {
           final type = processedItem['type'];
           final data = processedItem['data'];
-          final originalIndex = processedItem['originalIndex'] ?? index;
+          final originalIndex = processedItem['originalIndex'] ?? contentIndex;
 
           // Render widget berdasarkan tipe konten
           switch (type) {

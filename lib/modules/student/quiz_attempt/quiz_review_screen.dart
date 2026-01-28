@@ -14,19 +14,30 @@ class QuizReviewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(QuizReviewController());
+    
+    // Cek apakah diakses dari list (bisa back) atau dari quiz attempt (tidak bisa back)
+    final arguments = Get.arguments as Map<String, dynamic>? ?? {};
+    final fetchFromServer = arguments['fetchFromServer'] as bool? ?? false;
+    final canPop = fetchFromServer; // Jika dari list, bisa back
 
-    return BaseWidgetContainer(
-      backgroundColor: AppColors.c5,
-      appBar: AppBar(
-        centerTitle: false,
-        title: GlobalText.semiBold("Pembahasan Kuis", fontSize: 16.sp),
-        backgroundColor: Colors.white,
-        elevation: 0.5,
-      ),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    return PopScope(
+      canPop: canPop,
+      onPopInvoked: (didPop) {
+        // Jika tidak bisa back, jangan lakukan apa-apa
+      },
+      child: BaseWidgetContainer(
+        backgroundColor: AppColors.c5,
+        appBar: AppBar(
+          centerTitle: false,
+          title: GlobalText.semiBold("Pembahasan Kuis", fontSize: 16.sp),
+          backgroundColor: Colors.white,
+          elevation: 0.5,
+          automaticallyImplyLeading: canPop, // Sembunyikan back button jika tidak bisa back
+        ),
+        body: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
         return SingleChildScrollView(
           padding: EdgeInsets.all(16.w),
@@ -153,8 +164,10 @@ class QuizReviewScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () =>
-                      Get.offAllNamed(AppRoutes.studentMenu),
+                  onPressed: () {
+                    // Baik dari list maupun dari quiz attempt -> kembali ke menu utama
+                    Get.offAllNamed(AppRoutes.studentMenu);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.c2,
                     padding: EdgeInsets.symmetric(vertical: 12.h),
@@ -163,7 +176,7 @@ class QuizReviewScreen extends StatelessWidget {
                     ),
                   ),
                   child: GlobalText.semiBold(
-                    'Kembali ke Menu',
+                    'Kembali ke Menu Utama',
                     fontSize: 16.sp,
                     color: Colors.white,
                   ),
@@ -174,6 +187,7 @@ class QuizReviewScreen extends StatelessWidget {
           ),
         );
       }),
+      ),
     );
   }
 

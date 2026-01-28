@@ -221,19 +221,19 @@ class AppPages {
       name: AppRoutes.studentMenu,
       page: () => MainStudent(),
       binding: MainStudentBindings(),
-      middlewares: [RoleMiddleware(requiredRole: 'student')],
+      middlewares: [RoleMiddleware(requiredRole: 'user')],
     ),
     GetPage(
       name: AppRoutes.profile,
       page: () => const ProfileScreen(),
       binding: ProfileBinding(),
-      middlewares: [RoleMiddleware(requiredRole: 'student')],
+      middlewares: [RoleMiddleware(requiredRole: 'user')],
     ),
     GetPage(
       name: AppRoutes.reportCard,
       page: () => const ReportCardScreen(),
       binding: ReportCardBinding(),
-      middlewares: [RoleMiddleware(requiredRole: 'student')],
+      middlewares: [RoleMiddleware(requiredRole: 'user')],
     ),
     GetPage(
       name: AppRoutes.courseMain,
@@ -243,36 +243,36 @@ class AppPages {
         CourseListBinding(),
       ],
       middlewares: [
-        RoleMiddleware(requiredRole: 'student'),
+        RoleMiddleware(requiredRole: 'user'),
       ],
     ),
     GetPage(
       name: AppRoutes.quizAttempt,
       page: () => const QuizAttemptScreen(),
       binding: QuizAttemptBinding(),
-      middlewares: [RoleMiddleware(requiredRole: 'student')],
+      middlewares: [RoleMiddleware(requiredRole: 'user')],
     ),
     GetPage(
       name: AppRoutes.courseDetail,
       page: () => const CourseDetailScreen(),
       binding: CourseDetailBinding(),
-      middlewares: [RoleMiddleware(requiredRole: 'student')],
+      middlewares: [RoleMiddleware(requiredRole: 'user')],
     ),
     GetPage(
       name: AppRoutes.quizResult,
       page: () => const QuizResultScreen(),
-      middlewares: [RoleMiddleware(requiredRole: 'student')],
+      middlewares: [RoleMiddleware(requiredRole: 'user')],
     ),
     GetPage(
       name: AppRoutes.quizReview,
       page: () => const QuizReviewScreen(),
-      middlewares: [RoleMiddleware(requiredRole: 'student')],
+      middlewares: [RoleMiddleware(requiredRole: 'user')],
     ),
     GetPage(
       name: AppRoutes.quizIntro,
       page: () => const QuizIntroScreen(),
       binding: QuizIntroBinding(),
-      middlewares: [RoleMiddleware(requiredRole: 'student')],
+      middlewares: [RoleMiddleware(requiredRole: 'user')],
     ),
   ];
 }

@@ -122,9 +122,11 @@ class CourseListController extends GetxController {
 
       // Tambahkan item untuk setiap kuis di dalam course
       for (final quiz in course.quizzes) {
-        // Cek apakah quiz ini sudah dikerjakan
+        // Cek apakah quiz ini sudah SELESAI (submitted/completed, bukan hanya attempted)
         final attemptedQuiz = _attemptedQuizzesMap[quiz.id];
-        final isQuizCompleted = attemptedQuiz != null && attemptedQuiz.isAttempted;
+        final isQuizCompleted = attemptedQuiz != null && 
+                                 (attemptedQuiz.submitted == true || 
+                                  attemptedQuiz.status == 'submitted');
         
         items.add({
           'id': quiz.id,
