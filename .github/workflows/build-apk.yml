@@ -23,7 +23,6 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'latest'
           channel: 'stable'
 
       - name: Get dependencies
@@ -31,9 +30,6 @@ jobs:
 
       - name: Build APK
         run: flutter build apk --release
-
-      - name: Build App Bundle
-        run: flutter build appbundle --release
 
       - name: Extract version
         id: version
@@ -47,7 +43,6 @@ jobs:
         with:
           files: |
             build/app/outputs/release/app-release.apk
-            build/app/outputs/bundle/release/app-release.aab
           draft: false
           prerelease: false
         env:
@@ -58,7 +53,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: apk-builds
-          path: |
-            build/app/outputs/release/app-release.apk
-            build/app/outputs/bundle/release/app-release.aab
+          path: build/app/outputs/release/app-release.apk
           retention-days: 30
