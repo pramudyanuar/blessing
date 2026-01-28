@@ -15,19 +15,25 @@ class QuizResultScreen extends StatelessWidget {
     final String quizName = args['quizname'] ?? 'Kuis';
     final int score = args['result'] ?? 0;
 
-    return BaseWidgetContainer(
-      backgroundColor: AppColors.c5,
-      appBar: AppBar(
-        centerTitle: false,
-        title: GlobalText.semiBold("Hasil Kuis", fontSize: 16.sp),
-        backgroundColor: Colors.white,
-        elevation: 0.5,
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        // Tidak bisa back dengan tombol back device
+      },
+      child: BaseWidgetContainer(
+        backgroundColor: AppColors.c5,
+        appBar: AppBar(
+          centerTitle: false,
+          title: GlobalText.semiBold("Hasil Kuis", fontSize: 16.sp),
+          backgroundColor: Colors.white,
+          elevation: 0.5,
+          automaticallyImplyLeading: false, // Hapus back button di appbar
+        ),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(16.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
             // Container Nilai
             Container(
               padding: EdgeInsets.all(16.w),
@@ -77,11 +83,14 @@ class QuizResultScreen extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 30.h),
-                  // Tombol Kembali ke Menu Utama
+                  // Tombol Kembali ke Daftar Materi
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () => Get.offAllNamed(AppRoutes.studentMenu),
+                      onPressed: () => Get.offNamedUntil(
+                        AppRoutes.courseMain,
+                        (route) => route.isFirst,
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1976D2),
                         foregroundColor: Colors.white,
@@ -91,7 +100,7 @@ class QuizResultScreen extends StatelessWidget {
                         ),
                       ),
                       child: GlobalText.semiBold(
-                        "Kembali ke Menu Utama",
+                        "Kembali ke Daftar Materi",
                         fontSize: 16.sp,
                         color: Colors.white,
                       ),
@@ -100,7 +109,8 @@ class QuizResultScreen extends StatelessWidget {
                 ],
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );

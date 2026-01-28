@@ -96,15 +96,8 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
     if (state == AppLifecycleState.paused) {
       debugPrint('Quiz: App moved to background (home button atau switch app)');
       
-      // Auto-submit quiz jika sedang berjalan
-      final isQuizRunning = !isLoading.value &&
-          errorMessage.value.isEmpty &&
-          remainingSeconds.value > 0;
-      
-      if (isQuizRunning) {
-        debugPrint('Quiz: Auto-submitting due to app background');
-        submitQuiz(autoSubmitted: true);
-      }
+      // Jangan auto-submit saat paused, biarkan user lanjutin asalkan waktu masih ada
+      // Auto-submit hanya akan terjadi saat time habis (di _handleTimeUp)
     } else if (state == AppLifecycleState.resumed) {
       debugPrint('Quiz: App resumed');
     }

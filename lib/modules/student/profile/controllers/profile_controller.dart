@@ -33,12 +33,73 @@ class ProfileController extends GetxController {
   late final ProfileMode mode;
 
   ProfileController() {
-    mode = Get.arguments?['mode'] as ProfileMode? ?? ProfileMode.edit;
+    final modeArg = Get.arguments?['mode'];
+    
+    // Handle both string and enum values for mode
+    // Default to initialSetup jika birth date belum diisi (triggered by middleware)
+    if (modeArg is String) {
+      mode = modeArg.toLowerCase() == 'initialsetup' 
+          ? ProfileMode.initialSetup 
+          : ProfileMode.edit;
+    } else if (modeArg is ProfileMode) {
+      mode = modeArg;
+    } else {
+      // Jika tidak ada argument, check dari cache apakah birth_date sudah ada
+      mode = ProfileMode.edit;
+    }
   }
-
+  
+  /// Helper method untuk check apakah birth date sudah diisi
+  Future<bool> isBirthDateSet() async {
+    final userData = await CacheUtil().getData('user_data');
+    if (userData == null) return false;
+    
+    final birthDate = userData['birth_date'];
+    
+    if (birthDate == null) return false;
+    if (birthDate is String) {
+      final cleanDate = birthDate.trim();
+      return !cleanDate.isEmpty && 
+             !cleanDate.startsWith('0001-') &&
+             cleanDate != '0001-01-01T00:00:00Z';
+    }
+    if (birthDate is DateTime) {
+      return birthDate.year > 1;
+    }
+    
+    return false;
+  }
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
+    
+    // Check if we were redirected by BirthDateMiddleware (no birth date set)
+    // In this case, force initialSetup mode even if we're in edit mode
+    final userData = await CacheUtil().getData('user_data');
+    debugPrint('[ProfileController] onInit - userData: $userData');
+    
+    if (userData != null) {
+      final birthDate = userData['birth_date'];
+      debugPrint('[ProfileController] onInit - birthDate: $birthDate, type: ${birthDate.runtimeType}');
+      
+      bool isBirthDateEmpty = false;
+      if (birthDate == null) {
+        isBirthDateEmpty = true;
+      } else if (birthDate is String && (birthDate as String).trim().isEmpty) {
+        isBirthDateEmpty = true;
+      } else if (birthDate is String && (birthDate as String).contains('0001-01-01')) {
+        isBirthDateEmpty = true;
+      } else if (birthDate is DateTime && (birthDate as DateTime).year <= 1) {
+        isBirthDateEmpty = true;
+      }
+      
+      debugPrint('[ProfileController] onInit - isBirthDateEmpty: $isBirthDateEmpty');
+      
+      if (isBirthDateEmpty) {
+        mode = ProfileMode.initialSetup;
+      }
+    }
+    
     if (mode == ProfileMode.initialSetup) {
       isEditMode.value = true;
     } else {
@@ -132,8 +193,10 @@ class ProfileController extends GetxController {
   Future<void> saveProfile() async {
     // Validasi berbeda untuk initial setup vs edit mode
     if (mode == ProfileMode.initialSetup) {
-      if (fullNameController.text.isEmpty || selectedClass.value == null) {
-        Get.snackbar('Error', 'Nama Lengkap dan Kelas wajib diisi.',
+      if (fullNameController.text.isEmpty || 
+          selectedClass.value == null || 
+          birthDateController.text.isEmpty) {
+        Get.snackbar('Error', 'Nama Lengkap, Kelas, dan Tanggal Lahir wajib diisi.',
             backgroundColor: Colors.red, colorText: Colors.white);
         return;
       }

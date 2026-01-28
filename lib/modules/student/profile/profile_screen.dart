@@ -16,8 +16,19 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<ProfileController>();
 
-    return BaseWidgetContainer(
-      backgroundColor: const Color(0xFFE9EBF0),
+    return PopScope(
+      canPop: controller.mode != ProfileMode.initialSetup,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && controller.mode == ProfileMode.initialSetup) {
+          Get.snackbar(
+            'Penting',
+            'Anda harus mengisi data diri terlebih dahulu',
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+      },
+      child: BaseWidgetContainer(
+        backgroundColor: const Color(0xFFE9EBF0),
       body: SafeArea(
         child: Stack(
           children: [
@@ -25,6 +36,25 @@ class ProfileScreen extends StatelessWidget {
               padding: EdgeInsets.fromLTRB(24.w, 60.h, 24.w, 24.h),
               child: Column(
                 children: [
+                  // Show special message for initial setup
+                  if (controller.mode == ProfileMode.initialSetup)
+                    Container(
+                      padding: EdgeInsets.all(12.w),
+                      margin: EdgeInsets.only(bottom: 16.h),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF3CD),
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(
+                          color: const Color(0xFFFFD700),
+                          width: 1,
+                        ),
+                      ),
+                      child: GlobalText.medium(
+                        'Anda harus melengkapi data diri sebelum melanjutkan',
+                        fontSize: 12.sp,
+                        color: const Color(0xFF856404),
+                      ),
+                    ),
                   GlobalText.bold(
                     'Data Diri Siswa',
                     fontSize: 18.sp,
@@ -313,6 +343,7 @@ class ProfileScreen extends StatelessWidget {
               ),
           ],
         ),
+      ),
       ),
     );
   }

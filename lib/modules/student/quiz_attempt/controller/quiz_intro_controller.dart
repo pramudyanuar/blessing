@@ -41,6 +41,22 @@ class QuizIntroController extends GetxController {
     }
   }
 
+  @override
+  void onReady() {
+    super.onReady();
+    // Refresh status setiap kali screen di-visit (penting untuk handle resume setelah app close)
+    _refreshQuizStatus();
+  }
+
+  /// Refresh quiz status tanpa loading full data
+  Future<void> _refreshQuizStatus() async {
+    try {
+      await checkQuizStatus();
+    } catch (e) {
+      debugPrint("Error refreshing quiz status: $e");
+    }
+  }
+
   /// Load quiz details dan check status (selesai atau in-progress)
   Future<void> _loadInitialData() async {
     try {
@@ -82,15 +98,16 @@ class QuizIntroController extends GetxController {
   /// Check apakah quiz sudah dikerjakan, sedang dikerjakan, atau belum
   Future<void> checkQuizStatus() async {
     try {
-      // 1. Check report card untuk score (jika sudah selesai)
+      // 1. Check report card untuk score (jika sudah SELESAI/submitted)
       final reportCard = await _reportRepository.getMyCompleteReportCard();
       if (reportCard != null) {
-        // Cari apakah quiz ini sudah dikerjakan
+        // Cari apakah quiz ini sudah selesai (submitted)
         final completedQuiz = FirstWhereOrNullExt(reportCard.data.quizzes)
             .firstWhereOrNull((quiz) => quiz.quizId == quizId);
 
-        if (completedQuiz != null && completedQuiz.isAttempted) {
-          // Quiz sudah selesai (hanya jika isAttempted = true)
+        if (completedQuiz != null && 
+            (completedQuiz.submitted == true || completedQuiz.status == 'submitted')) {
+          // Quiz sudah selesai (submitted)
           quizStatus.value = QuizAttemptStatus.submitted;
           previousScore.value = completedQuiz.score ?? 0;
           canRetake.value = false; // TODO: Check dari backend admin setting
