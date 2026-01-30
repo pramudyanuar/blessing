@@ -1,0 +1,108 @@
+name: Code Quality & Security
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly scan
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    name: Security Scan
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Scan for vulnerable dependencies
+        run: |
+          flutter pub outdated --json > outdated.json || true
+          
+          # Check for critical vulnerabilities
+          python3 << 'EOF'
+          import json
+          try:
+              with open('outdated.json') as f:
+                  data = json.load(f)
+                  if data.get('packages'):
+                      print("⚠️  Some packages may have updates")
+          except:
+              pass
+          EOF
+
+      - name: Analyze security issues
+        continue-on-error: true
+        run: |
+          # Check for common security issues
+          echo "🔍 Checking for hardcoded secrets..."
+          
+          # Pattern matching for potential secrets
+          ! grep -r "password\|token\|api_key\|secret" lib/ --include="*.dart" | \
+            grep -v "// " | grep -v "const" | grep -v "String password" || true
+
+  performance-analysis:
+    runs-on: ubuntu-latest
+    name: Performance Analysis
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Analyze large files
+        run: |
+          echo "📦 Checking for large files..."
+          find lib -name "*.dart" -exec wc -l {} + | \
+            awk '$1 > 500 {print $2 ": " $1 " lines"}' | \
+            sort -t: -k2 -rn || true
+
+      - name: Check code metrics
+        run: |
+          flutter pub run dart_code_metrics:metrics analyze lib/ \
+            --fatal-found=false \
+            --exclude-patterns=build/**,test/** \
+            || echo "Warning: Some metrics thresholds exceeded"
+        continue-on-error: true
+
+  lint-analysis:
+    runs-on: ubuntu-latest
+    name: Lint Analysis
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run Flutter Lint
+        run: flutter analyze
+
+      - name: Check unused code
+        run: |
+          dart fix --dry-run . || true

@@ -1,6 +1,7 @@
 import 'package:blessing/core/config/main_app.dart';
 import 'package:blessing/core/utils/cache_util.dart';
 import 'package:blessing/core/utils/system_ui_util.dart';
+import 'package:blessing/core/services/crash_reporting_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -20,6 +21,10 @@ Future<void> disableScreenshot() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize crash reporting first
+  await crashReporting.initialize();
+  
   await secureStorageUtil.init();
   await cacheUtil.init();
   await disableScreenshot();

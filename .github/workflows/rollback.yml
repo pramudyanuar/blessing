@@ -1,0 +1,118 @@
+name: Rollback Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_to_rollback:
+        description: 'Version to rollback to (e.g., 1.0.0)'
+        required: true
+        type: string
+      release_track:
+        description: 'Release track'
+        required: true
+        default: 'beta'
+        type: choice
+        options:
+          - alpha
+          - beta
+          - production
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    name: Rollback Release
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          cache: true
+
+      - name: Verify rollback version exists
+        run: |
+          VERSION="${{ github.event.inputs.version_to_rollback }}"
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+            echo "Found version tag: v$VERSION"
+          else
+            echo "Error: Tag v$VERSION not found"
+            exit 1
+          fi
+
+      - name: Get rollback commit
+        id: rollback
+        run: |
+          VERSION="${{ github.event.inputs.version_to_rollback }}"
+          COMMIT=$(git rev-list -n 1 "v$VERSION")
+          echo "commit=$COMMIT" >> $GITHUB_OUTPUT
+          echo "Rollback commit: $COMMIT"
+
+      - name: Create rollback branch
+        run: |
+          VERSION="${{ github.event.inputs.version_to_rollback }}"
+          TRACK="${{ github.event.inputs.release_track }}"
+          git checkout -b "rollback/$TRACK/$VERSION" "${{ steps.rollback.outputs.commit }}"
+
+      - name: Update pubspec version
+        run: |
+          VERSION="${{ github.event.inputs.version_to_rollback }}"
+          BUILD_NUM=$(grep "version:" pubspec.yaml | head -n1 | awk -F'+' '{print $2}')
+          NEW_BUILD_NUM=$((BUILD_NUM + 1))
+          sed -i "s/^version: .*/version: $VERSION+$NEW_BUILD_NUM/" pubspec.yaml
+
+      - name: Commit rollback changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add pubspec.yaml
+          git commit -m "Rollback to version ${{ github.event.inputs.version_to_rollback }}"
+
+      - name: Push rollback branch
+        run: |
+          git push origin "rollback/${{ github.event.inputs.release_track }}/${{ github.event.inputs.version_to_rollback }}"
+
+      - name: Create Pull Request for rollback
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = context.payload.inputs.version_to_rollback;
+            const track = context.payload.inputs.release_track;
+            const branchName = `rollback/${track}/${version}`;
+            
+            const pr = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔄 Rollback: ${track} track to v${version}`,
+              body: `## Rollback Request\n\n**Version:** ${version}\n**Track:** ${track}\n\n### What's being rolled back:\n- Reverting to commit from v${version}\n- Build number incremented for release identification\n\n⚠️ **Action Required:** Please review and merge this PR to complete the rollback.`,
+              head: branchName,
+              base: 'main'
+            });
+            
+            core.notice(`Rollback PR created: ${pr.data.html_url}`);
+
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "🔄 Rollback Initiated",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Rollback Request* 🔄\n*From Version:* <${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ github.event.inputs.version_to_rollback }}|${{ github.event.inputs.version_to_rollback }}>\n*Track:* ${{ github.event.inputs.release_track }}\n*PR:* <${{ github.server_url }}/${{ github.repository }}/pulls|Review>\n\n⚠️ Waiting for approval to complete rollback"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

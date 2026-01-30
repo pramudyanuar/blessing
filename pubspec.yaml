@@ -62,6 +62,10 @@ dependencies:
   timeago: ^3.7.1
   dotted_border: ^3.1.0
   photo_view: ^0.15.0
+  
+  # Firebase Crashlytics
+  firebase_core: ^2.24.0
+  firebase_crashlytics: ^3.3.0
 
 dev_dependencies:
   flutter_test:

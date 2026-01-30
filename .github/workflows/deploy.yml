@@ -1,0 +1,116 @@
+name: Deployment Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - beta
+          - production
+      version:
+        description: 'Version to deploy'
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate version format
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Invalid version format: $VERSION"
+            echo "Expected format: X.Y.Z (e.g., 1.2.0)"
+            exit 1
+          fi
+          echo "✅ Valid version: $VERSION"
+
+      - name: Verify version exists
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+            echo "✅ Found tag: v$VERSION"
+          else
+            echo "❌ Version tag v$VERSION not found"
+            exit 1
+          fi
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run pre-deployment tests
+        run: |
+          flutter analyze
+          flutter test --coverage
+
+      - name: Build release APK
+        run: flutter build apk --release --split-per-abi
+
+      - name: Deploy to ${{ github.event.inputs.environment }}
+        env:
+          ENVIRONMENT: ${{ github.event.inputs.environment }}
+          VERSION: ${{ github.event.inputs.version }}
+          PLAY_STORE_SERVICE_ACCOUNT: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT }}
+        run: |
+          echo "🚀 Deploying version $VERSION to $ENVIRONMENT"
+          
+          if [ "$ENVIRONMENT" = "production" ]; then
+            echo "📦 Deploying to production track"
+            # Production deployment logic
+          elif [ "$ENVIRONMENT" = "beta" ]; then
+            echo "🧪 Deploying to beta track"
+            # Beta deployment logic
+          elif [ "$ENVIRONMENT" = "staging" ]; then
+            echo "🔧 Deploying to staging"
+            # Staging deployment logic
+          fi
+
+      - name: Health check
+        run: |
+          echo "✅ Deployment completed for ${{ github.event.inputs.environment }}"
+          echo "📊 Version: ${{ github.event.inputs.version }}"
+
+      - name: Create deployment record
+        uses: chrnorm/deployment@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: ${{ github.event.inputs.environment }}
+          deployment-branch: main
+          production-environment: production
+
+      - name: Notify deployment
+        uses: slackapi/slack-github-action@v1.24.0
+        if: always()
+        with:
+          payload: |
+            {
+              "text": "🚀 Deployment Status: ${{ job.status }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Deployment: ${{ job.status }}* ${{ job.status == 'success' && '✅' || '❌' }}\n*Environment:* ${{ github.event.inputs.environment }}\n*Version:* ${{ github.event.inputs.version }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

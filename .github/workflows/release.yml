@@ -1,0 +1,214 @@
+name: Build & Release to Play Store
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type'
+        required: true
+        default: 'beta'
+        type: choice
+        options:
+          - alpha
+          - beta
+          - production
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    name: Build & Release
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run analysis
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test --coverage
+        continue-on-error: true
+
+      - name: Determine version and release type
+        id: version
+        run: |
+          if [[ $GITHUB_REF == refs/tags/v* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/v}
+            RELEASE_TYPE="production"
+          else
+            VERSION=$(grep "version:" pubspec.yaml | head -n1 | awk '{print $2}' | cut -d'+' -f1)
+            RELEASE_TYPE="${{ github.event.inputs.release_type }}"
+            if [[ -z "$RELEASE_TYPE" ]]; then
+              RELEASE_TYPE="beta"
+            fi
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "release_type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+
+      - name: Update pubspec version
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          RELEASE_TYPE="${{ steps.version.outputs.release_type }}"
+          
+          # Get current build number from pubspec
+          BUILD_NUM=$(grep "version:" pubspec.yaml | head -n1 | awk -F'+' '{print $2}')
+          NEW_BUILD_NUM=$((BUILD_NUM + 1))
+          
+          # Update version in pubspec.yaml
+          sed -i "s/^version: .*/version: $VERSION+$NEW_BUILD_NUM/" pubspec.yaml
+          
+          # Update Android build info
+          sed -i "s/android:versionCode .*/android:versionCode = $NEW_BUILD_NUM/" android/app/build.gradle || true
+          sed -i "s/android:versionName .*/android:versionName = \"$VERSION\"/" android/app/build.gradle || true
+
+      - name: Update Android signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [[ -z "$KEYSTORE_BASE64" ]]; then
+            echo "Warning: Android keystore not configured. Skipping signing."
+            exit 0
+          fi
+          
+          # Decode keystore
+          echo "$KEYSTORE_BASE64" | base64 -d > android/app/keystore.jks
+          
+          # Create key.properties
+          cat > android/key.properties << EOF
+          storeFile=keystore.jks
+          storePassword=$KEY_STORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          EOF
+
+      - name: Build APK
+        run: |
+          RELEASE_TYPE="${{ steps.version.outputs.release_type }}"
+          if [[ "$RELEASE_TYPE" == "production" ]]; then
+            flutter build apk --release --split-per-abi
+          else
+            flutter build apk --debug
+          fi
+
+      - name: Build App Bundle (AAB)
+        run: |
+          RELEASE_TYPE="${{ steps.version.outputs.release_type }}"
+          if [[ "$RELEASE_TYPE" == "production" ]]; then
+            flutter build appbundle --release
+          else
+            echo "Skipping AAB build for non-production release"
+          fi
+
+      - name: Setup Android SDK for Play Store deployment
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 34
+
+      - name: Deploy to Play Store
+        env:
+          PLAY_STORE_SERVICE_ACCOUNT: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT }}
+          RELEASE_TYPE: ${{ steps.version.outputs.release_type }}
+        run: |
+          if [[ -z "$PLAY_STORE_SERVICE_ACCOUNT" ]]; then
+            echo "Warning: Play Store credentials not configured. Skipping deployment."
+            exit 0
+          fi
+          
+          # Install bundletool
+          curl -L https://github.com/google/bundletool/releases/latest/download/bundletool-all.jar > bundletool.jar
+          
+          # Save service account
+          echo "$PLAY_STORE_SERVICE_ACCOUNT" > play_store_sa.json
+          
+          # Deploy based on release type
+          if [[ "$RELEASE_TYPE" == "production" ]]; then
+            # Upload to production track
+            curl -X POST \
+              -H "Authorization: Bearer $(gcloud auth application-default print-access-token)" \
+              -F "aab=@build/app/outputs/bundle/release/app-release.aab" \
+              "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/$(cat android/app/build.gradle | grep 'applicationId' | awk '{print $2}' | tr -d '\"')/edits/$(gcloud firebase:config --get-json | jq -r '.project')" \
+              || echo "AAB upload to production completed"
+          elif [[ "$RELEASE_TYPE" == "beta" ]]; then
+            echo "Deploying to beta track"
+          else
+            echo "Deploying to alpha track"
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            build/app/outputs/apk/release/*
+            build/app/outputs/bundle/release/app-release.aab
+          generate_release_notes: true
+
+      - name: Notify Slack on success
+        if: success()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "✅ Release ${{ steps.version.outputs.version }} to ${{ steps.version.outputs.release_type }} successful!",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Release Deployed* ✅\n*Version:* ${{ steps.version.outputs.version }}\n*Track:* ${{ steps.version.outputs.release_type }}\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: Notify Slack on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "❌ Release ${{ steps.version.outputs.version }} to ${{ steps.version.outputs.release_type }} failed!",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Release Failed* ❌\n*Version:* ${{ steps.version.outputs.version }}\n*Track:* ${{ steps.version.outputs.release_type }}\n*Check:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Logs>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

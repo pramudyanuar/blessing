@@ -1,0 +1,106 @@
+name: "📋 Quick Start"
+description: "Repository documentation and quick links"
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # 📋 Blessing App - Quick Start Guide
+
+        Welcome to the Blessing Flutter project! This template provides a complete CI/CD pipeline with GitOps principles.
+
+        ## 🚀 Quick Links
+
+        ### 📚 Documentation
+        - [CI/CD Setup Guide](.github/CICD_SETUP.md) - Complete setup instructions
+        - [CI/CD User Guide](CICD_GUIDE.md) - How to use the pipeline
+        - [GitOps Configuration](.github/GITOPS_CONFIG.md) - Workflow and best practices
+        - [Release Checklist](RELEASE_CHECKLIST.md) - Pre-release validation
+        
+        ### 🔧 Configuration
+        - [GitHub Secrets](.github/CICD_SETUP.md#github-secrets) - Required secrets setup
+        - [Android Keystore](.github/CICD_SETUP.md#setup-android-keystore) - Generate and configure
+        - [Play Store Service Account](.github/CICD_SETUP.md#setup-play-store-service-account) - Setup credentials
+        
+        ### 🚩 Feature Flags
+        - [Feature Flags Guide](lib/core/feature_flags) - Using feature flags
+        - [Adding New Flags](CICD_GUIDE.md#adding-new-features) - How to add flags
+
+        ### 📈 Workflows
+        - [CI Workflow](.github/workflows/ci.yml) - Tests and analysis
+        - [Release Workflow](.github/workflows/release.yml) - Build and deploy
+        - [Rollback Workflow](.github/workflows/rollback.yml) - Emergency rollback
+        - [Quality Workflow](.github/workflows/quality.yml) - Security and performance
+
+        ## ⚡ Quick Commands
+
+        ### Development
+        ```bash
+        # Setup environment
+        ./setup-cicd.sh
+
+        # Run tests locally
+        flutter test --coverage
+
+        # Check formatting
+        dart format . --set-exit-if-changed
+
+        # Analyze code
+        flutter analyze
+        ```
+
+        ### Releasing
+
+        **Bump version:**
+        ```bash
+        ./bump-version.sh [major|minor|patch]
+        git push origin main
+        git push origin v1.2.0  # Replace with actual version
+        ```
+
+        **Manual release:**
+        1. Go to Actions → Build & Release to Play Store
+        2. Click "Run workflow"
+        3. Select release type
+        4. Done!
+
+        **Rollback:**
+        1. Go to Actions → Rollback Release
+        2. Enter version to rollback to
+        3. Approve the PR
+
+        ## ✅ Setup Checklist
+
+        - [ ] Clone repository
+        - [ ] Generate Android keystore
+        - [ ] Setup GitHub secrets (6 total)
+        - [ ] Configure branch protection rules
+        - [ ] Setup Slack webhook (optional)
+        - [ ] Run local tests: `flutter test`
+        - [ ] Create first release tag
+        - [ ] Verify Play Store deployment
+
+        ## 📞 Troubleshooting
+
+        ### Issues?
+        - Check [CICD_SETUP.md](.github/CICD_SETUP.md#troubleshooting)
+        - View [GitHub Actions](../../actions) logs
+        - Check [Discussions](../../discussions)
+
+        ### Common Issues
+        - **Build fails**: Run `flutter clean && flutter pub get`
+        - **Tests fail**: Run locally first `flutter test`
+        - **Upload error**: Check secrets and credentials
+        - **Version conflict**: Verify build number increment
+
+        ## 🎯 Next Steps
+
+        1. Read [CI/CD Setup Guide](.github/CICD_SETUP.md)
+        2. Configure GitHub secrets
+        3. Generate Android keystore
+        4. Create first release
+        5. Monitor deployment
+
+        ---
+
+        **Need help?** Check documentation files or create an issue.
