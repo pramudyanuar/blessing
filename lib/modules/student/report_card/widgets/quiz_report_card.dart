@@ -31,13 +31,13 @@ class QuizReportCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10.r,
             offset: Offset(0, 2.h),
           ),
         ],
         border: Border.all(
-          color: getStatusColor(quiz.status).withOpacity(0.3),
+          color: getStatusColor(quiz.status).withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -82,10 +82,10 @@ class QuizReportCard extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                   decoration: BoxDecoration(
-                    color: getStatusColor(quiz.status).withOpacity(0.1),
+                    color: getStatusColor(quiz.status).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6.r),
                     border: Border.all(
-                      color: getStatusColor(quiz.status).withOpacity(0.3),
+                      color: getStatusColor(quiz.status).withValues(alpha: 0.3),
                       width: 1,
                     ),
                   ),
@@ -137,10 +137,10 @@ class QuizReportCard extends StatelessWidget {
                 width: double.infinity,
                 padding: EdgeInsets.all(12.w),
                 decoration: BoxDecoration(
-                  color: getScoreColor(quiz.score).withOpacity(0.1),
+                  color: getScoreColor(quiz.score).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8.r),
                   border: Border.all(
-                    color: getScoreColor(quiz.score).withOpacity(0.3),
+                    color: getScoreColor(quiz.score).withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
@@ -172,7 +172,7 @@ class QuizReportCard extends StatelessWidget {
                         GlobalText.medium(
                           '/100',
                           fontSize: 14.sp,
-                          color: getScoreColor(quiz.score).withOpacity(0.7),
+                          color: getScoreColor(quiz.score).withValues(alpha: 0.7),
                         ),
                       ],
                     ),

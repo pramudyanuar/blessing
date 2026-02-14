@@ -37,7 +37,7 @@ class MainStudent extends StatelessWidget {
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withValues(alpha: 0.2),
                           offset: Offset(2, 2),
                           blurRadius: 0,
                           spreadRadius: 0.5,

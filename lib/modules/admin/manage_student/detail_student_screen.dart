@@ -71,7 +71,7 @@ class DetailStudentScreen extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 40.r,
-                backgroundColor: AppColors.c2.withOpacity(0.2),
+                backgroundColor: AppColors.c2.withValues(alpha: 0.2),
                 child: Icon(Icons.person, size: 40.sp, color: AppColors.c2),
               ),
               SizedBox(height: 16.h),
@@ -84,7 +84,7 @@ class DetailStudentScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12.r),
                     boxShadow: [
                       BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
+                          color: Colors.grey.withValues(alpha: 0.1),
                           spreadRadius: 1,
                           blurRadius: 5)
                     ]),

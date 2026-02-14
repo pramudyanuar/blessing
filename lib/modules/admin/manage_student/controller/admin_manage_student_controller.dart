@@ -66,7 +66,7 @@ class AdminManageStudentController extends GetxController {
 
       filterStudents();
     } catch (e) {
-      print('Error fetching students: $e');
+      // print('Error fetching students: $e');
       // Tetap reset loading state meski ada error
       allStudents.clear();
       filteredStudents.clear();

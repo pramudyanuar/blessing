@@ -28,14 +28,14 @@ class AdminQuizResultController extends GetxController {
     
     // Get quiz ID from arguments
     final dynamic args = Get.arguments;
-    print('AdminQuizResultController - Arguments received: $args');
+    // print('AdminQuizResultController - Arguments received: $args');
     
     if (args is Map && args.containsKey('quizId')) {
       final int quizId = args['quizId'];
-      print('AdminQuizResultController - Quiz ID found: $quizId');
+      // print('AdminQuizResultController - Quiz ID found: $quizId');
       fetchQuizReportCard(quizId);
     } else {
-      print('AdminQuizResultController - No quiz ID found in arguments!');
+      // print('AdminQuizResultController - No quiz ID found in arguments!');
       // Show error state or fetch sample data
       Get.snackbar(
         'Error', 
@@ -51,21 +51,21 @@ class AdminQuizResultController extends GetxController {
   Future<void> fetchQuizReportCard(int quizId) async {
     try {
       isLoading.value = true;
-      print('AdminQuizResultController - Fetching quiz report for ID: $quizId');
+      // print('AdminQuizResultController - Fetching quiz report for ID: $quizId');
       
       final response = await _reportRepository.getQuizReportCard(
         quizId: quizId.toString(),
         sortByScore: 'desc', // Sort by highest score first
       );
       
-      print('AdminQuizResultController - API Response: $response');
+      // print('AdminQuizResultController - API Response: $response');
       
       if (response != null) {
         quizReportData.value = response;
-        print('AdminQuizResultController - Users count: ${response.data.users.length}');
+        // print('AdminQuizResultController - Users count: ${response.data.users.length}');
         _filterUsers(); // Initialize filtered list
       } else {
-        print('AdminQuizResultController - Response is null');
+        // print('AdminQuizResultController - Response is null');
         Get.snackbar(
           'Error',
           'Data quiz report tidak ditemukan',
@@ -73,7 +73,7 @@ class AdminQuizResultController extends GetxController {
         );
       }
     } catch (e) {
-      print('AdminQuizResultController - Error: $e');
+      // print('AdminQuizResultController - Error: $e');
       Get.snackbar(
         'Error',
         'Gagal memuat data hasil kuis: $e',

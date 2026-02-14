@@ -76,8 +76,8 @@ class AdminManageStudentScreen extends StatelessWidget {
                                       },
                                     );
                                   },
-                                  onOptionsTap: () =>
-                                      print("Options for ${student['nama']}"),
+                                  // onOptionsTap: () =>
+                                      // print("Options for ${student['nama']}"),
                                 );
                               },
                             ),

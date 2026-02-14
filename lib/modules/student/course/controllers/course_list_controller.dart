@@ -99,7 +99,8 @@ class CourseListController extends GetxController {
         CacheUtil().setData(_cacheKey, processedItems);
       }
     } catch (e) {
-      print('Error fetching from network: $e');
+      // print('Error fetching from network: $e');
+      Get.snackbar('Error', 'Gagal memuat data dari server: $e');
     }
   }
 

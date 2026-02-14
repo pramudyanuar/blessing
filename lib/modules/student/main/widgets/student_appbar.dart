@@ -23,7 +23,7 @@ class StudentAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.white,
       elevation: 3,
-      shadowColor: Colors.black.withOpacity(0.4),
+      shadowColor: Colors.black.withValues(alpha: 0.4),
       toolbarHeight: 65.h,
       // 3. Bungkus Row dengan GestureDetector
       title: GestureDetector(

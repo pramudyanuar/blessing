@@ -17,7 +17,6 @@ abstract class AppRoutes {
   static const addStudent = '/add-student';
   static const adminHomepage = '/homepage';
   static const manageSubject = '/manage-subject';
-  static const adminSubjectList = '/admin-subject-list';
   static const adminSubjectDetail = '/admin-subject-detail';
   static const adminCreateSubject = '/admin-create-subject-screen';
   static const adminEditSubject = '/admin-edit-subject';

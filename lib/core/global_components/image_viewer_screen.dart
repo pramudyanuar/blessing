@@ -55,7 +55,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
       extendBodyBehindAppBar: true,
       appBar: _isAppBarVisible
           ? AppBar(
-              backgroundColor: Colors.black.withOpacity(0.7),
+              backgroundColor: Colors.black.withValues(alpha: 0.7),
               foregroundColor: Colors.white,
               elevation: 0,
               leading: IconButton(

@@ -86,7 +86,7 @@ class SubjectAppbar extends StatelessWidget implements PreferredSizeWidget {
                     padding:
                         EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: GlobalText.medium(

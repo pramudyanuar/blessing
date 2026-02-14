@@ -24,7 +24,7 @@ class QuizIntroScreen extends StatelessWidget {
         ),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
-        shadowColor: Colors.grey.withOpacity(0.2),
+        shadowColor: Colors.grey.withValues(alpha: 0.2),
         elevation: 0.5,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.c2),
@@ -84,14 +84,14 @@ class QuizIntroScreen extends StatelessWidget {
                                           begin: Alignment.topLeft,
                                           end: Alignment.bottomRight,
                                           colors: [
-                                            AppColors.c2.withOpacity(0.8),
+                                            AppColors.c2.withValues(alpha: 0.8),
                                             AppColors.c2,
                                           ],
                                         ),
                                         boxShadow: [
                                           BoxShadow(
                                             color: AppColors.c2
-                                                .withOpacity(0.3),
+                                                .withValues(alpha: 0.3),
                                             blurRadius: 8,
                                             offset: const Offset(0, 4),
                                           ),
@@ -188,7 +188,7 @@ class QuizIntroScreen extends StatelessWidget {
                             vertical: 6.h,
                           ),
                           decoration: BoxDecoration(
-                            color: statusColor.withOpacity(0.1),
+                            color: statusColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6.r),
                             border: Border.all(color: statusColor),
                           ),

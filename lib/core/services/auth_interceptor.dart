@@ -1,6 +1,8 @@
+import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/main.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
 
 class AuthInterceptor extends Interceptor {
   @override
@@ -39,12 +41,12 @@ class AuthInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) {
     // Example: Handle 401 Unauthorized errors globally
     if (err.response?.statusCode == 401) {
-      print(
-          'AuthInterceptor: Unauthorized request at ${err.requestOptions.path}');
-      print('AuthInterceptor: Request headers: ${err.requestOptions.headers}');
+      // print(
+      //     'AuthInterceptor: Unauthorized request at ${err.requestOptions.path}');
+      // print('AuthInterceptor: Request headers: ${err.requestOptions.headers}');
       // For example, you could log the user out:
-      // secureStorageUtil.deleteAccessToken();
-      // Get.offAllNamed(AppRoutes.login);
+      secureStorageUtil.deleteAccessToken();
+      Get.offAllNamed(AppRoutes.login);
     }
 
     // Continue with the error

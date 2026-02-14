@@ -160,7 +160,7 @@ class DetailStudentController extends GetxController {
         birthDate: birthDateString,
       );
 
-      print('Payload update user: ${request.toJson()}');
+      // print('Payload update user: ${request.toJson()}');
 
       final UserResponse? updatedUser =
           await _userRepository.updateUserAdmin(studentId.value, request);
@@ -210,7 +210,7 @@ class DetailStudentController extends GetxController {
             title: "Gagal", message: "Gagal menghapus user", isError: true);
       }
     } catch (e) {
-      print('Error saat hapus: $e');
+      // print('Error saat hapus: $e');
       CustomSnackbar.show(
           title: "Error",
           message: "Terjadi kesalahan saat menghapus user",

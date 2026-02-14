@@ -67,7 +67,7 @@ class CourseListScreen extends StatelessWidget {
                       fileName: item['fileName'],
                       previewImages: item['previewImages'],
                       onTapAction: () {
-                        print("Melihat detail materi: ${item['title']}");
+                        // print("Melihat detail materi: ${item['title']}");
                         Get.toNamed(AppRoutes.courseDetail, arguments: {'courseId': item['id']});
                       },
                     );
@@ -95,7 +95,7 @@ class CourseListScreen extends StatelessWidget {
                               });
                         } else {
                           // Buka quiz intro untuk mulai atau lanjutkan
-                          print("Membuka kuis: ${item['title']}");
+                          // print("Membuka kuis: ${item['title']}");
                           Get.toNamed(AppRoutes.quizIntro,
                               arguments: item['id']); 
                         }

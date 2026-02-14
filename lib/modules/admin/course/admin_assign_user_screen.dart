@@ -23,7 +23,7 @@ class AdminAssignUserScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.c2),
           onPressed: () => Get.back(),
         ),
-        shadowColor: Colors.black.withOpacity(0.4),
+        shadowColor: Colors.black.withValues(alpha: 0.4),
         surfaceTintColor: Colors.white,
         elevation: 0.5,
         actions: [

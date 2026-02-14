@@ -78,11 +78,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        // Reset system UI menggunakan utility
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) return;
         SystemUIUtil.resetSystemUI();
-        return true;
       },
       child: YoutubePlayerBuilder(
         onExitFullScreen: () {
@@ -93,9 +93,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           controller: _controller,
           showVideoProgressIndicator: true,
           progressIndicatorColor: Colors.red,
-          onReady: () {
-            print('Player is ready.');
-          },
+          // onReady: () {
+          //   print('Player is ready.');
+          // },
           onEnded: (data) {
             // Auto exit fullscreen when video ends
             if (_isFullScreen) {

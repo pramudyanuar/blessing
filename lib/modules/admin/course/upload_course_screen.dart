@@ -130,7 +130,7 @@ class UploadCourseScreen extends StatelessWidget {
                 icon: const Icon(Icons.add_photo_alternate_outlined),
                 label: const Text("Tambah Gambar"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.c2.withOpacity(0.1),
+                  backgroundColor: AppColors.c2.withValues(alpha: 0.1),
                   foregroundColor: AppColors.c2,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
@@ -187,9 +187,9 @@ class UploadCourseScreen extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 8.h),
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -254,9 +254,9 @@ class UploadCourseScreen extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 8.h),
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -264,7 +264,7 @@ class UploadCourseScreen extends StatelessWidget {
             width: 40.w,
             height: 40.w,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Icon(

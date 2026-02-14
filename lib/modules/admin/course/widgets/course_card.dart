@@ -46,8 +46,8 @@ class CourseCard extends StatelessWidget {
     final String headerText = isMaterial ? "Materi Pembelajaran" : "Kuis";
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-      padding: EdgeInsets.all(16.w),
+      margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
+      padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),

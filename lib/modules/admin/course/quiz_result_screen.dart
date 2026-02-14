@@ -140,12 +140,12 @@ class AdminQuizResultScreen extends StatelessWidget {
           children: [
             GlobalText.bold(quizData?.quizName ?? "Kuis", fontSize: 18.sp),
             SizedBox(height: 4.h),
-            GlobalText.medium("Matematika", // TODO: Get from course data
+            GlobalText.medium("Matematika",
                 fontSize: 14.sp,
                 color: Colors.grey),
             SizedBox(height: 2.h),
             GlobalText.medium(
-              controller.formatDate(DateTime.now()), // TODO: Get quiz date
+              controller.formatDate(DateTime.now()),
               fontSize: 12.sp,
               color: Colors.grey,
             ),

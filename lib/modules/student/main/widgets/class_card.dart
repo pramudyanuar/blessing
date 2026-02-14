@@ -80,7 +80,7 @@ class ClassCard extends StatelessWidget {
                     .cover,
                 colorFilter: isDefaultImage
                     ? ColorFilter.mode(
-                        Colors.black.withOpacity(0.4),
+                        Colors.black.withValues(alpha: 0.4),
                         BlendMode.darken,
                       )
                     : null,
@@ -138,7 +138,7 @@ class ClassCard extends StatelessWidget {
         imageUrl: Images.ekonomi,
         subjectName: 'Ekonomi',
       );
-  factory ClassCard.not_found() => const ClassCard(
+  factory ClassCard.notFound() => const ClassCard(
         imageUrl: Images.adminMainSubject,
         subjectName: 'Mata Pelajaran',
       );

@@ -44,7 +44,6 @@ class QuizResultDetailController extends GetxController {
           score.value = quizReport.score ?? 0;
           quizName.value = quizReport.quizName;
           
-          // TODO: Fetch questions dan build review items
           // Untuk sekarang, tampilkan empty review (perlu API enhancement)
         } else {
           errorMessage.value = 'Quiz belum dikerjakan atau tidak ditemukan';

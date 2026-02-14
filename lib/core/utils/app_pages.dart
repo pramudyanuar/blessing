@@ -10,6 +10,7 @@ import 'package:blessing/modules/admin/course/bindings/admin_detail_quiz_binding
 import 'package:blessing/modules/admin/course/bindings/admin_manage_access_course_bindings.dart'
     show AdminManageAccessCourseBindings;
 import 'package:blessing/modules/admin/course/bindings/admin_manage_course_list_binding.dart';
+import 'package:blessing/modules/admin/course/admin_manage_course_list_screen.dart';
 import 'package:blessing/modules/admin/course/bindings/admin_upload_course_bindings.dart';
 import 'package:blessing/modules/admin/course/bindings/create_quiz_bindings.dart';
 import 'package:blessing/modules/admin/course/create_quiz_screen.dart';
@@ -27,8 +28,6 @@ import 'package:blessing/modules/admin/manage_student/bindings/detail_student_bi
 import 'package:blessing/modules/admin/manage_student/detail_student_screen.dart';
 import 'package:blessing/modules/admin/report_card/admin_report_card_screen.dart';
 import 'package:blessing/modules/admin/report_card/bindings/admin_report_card_binding.dart';
-import 'package:blessing/modules/admin/subject/admin_manage_subject_main_screen.dart';
-import 'package:blessing/modules/admin/subject/admin_subject_list_screen.dart';
 import 'package:blessing/modules/admin/subject/admin_subject_detail_screen.dart';
 import 'package:blessing/modules/admin/subject/admin_create_subject_screen.dart';
 import 'package:blessing/modules/admin/subject/admin_edit_subject_screen.dart';
@@ -117,9 +116,8 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.manageSubject,
-      page: () => AdminManageSubjectMainScreen(),
+      page: () => AdminManageCourseListScreen(),
       bindings: [
-        AdminManageSubjectBinding(),
         AdminManageCourseListBinding(),
       ],
       middlewares: [RoleMiddleware(requiredRole: 'admin')],
@@ -152,12 +150,6 @@ class AppPages {
       name: AppRoutes.adminCreateSubject,
       page: () => AdminCreateSubjectScreen(),
       binding: AdminCreateSubjectBinding(),
-      middlewares: [RoleMiddleware(requiredRole: 'admin')],
-    ),
-    GetPage(
-      name: AppRoutes.adminSubjectList,
-      page: () => const AdminSubjectListScreen(),
-      binding: AdminSubjectListBinding(),
       middlewares: [RoleMiddleware(requiredRole: 'admin')],
     ),
     GetPage(

@@ -20,8 +20,16 @@ class QuizAttemptScreen extends StatelessWidget {
     final scaffoldKey = GlobalKey<ScaffoldState>();
 
     // 1. Tambahkan WillPopScope di sini untuk mencegah keluar dari halaman
-    return WillPopScope(
-      onWillPop: controller.onWillPop,
+    return PopScope(
+      canPop: false, // default jangan langsung pop
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+        final shouldPop = await controller.onWillPop();
+        if (shouldPop) {
+          Get.back();
+        }
+      },
       child: BaseWidgetContainer(
         scaffoldKey: scaffoldKey,
         appBar: AppBar(

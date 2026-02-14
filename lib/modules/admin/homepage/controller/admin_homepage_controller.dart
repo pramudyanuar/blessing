@@ -73,7 +73,7 @@ class AdminHomepageController extends GetxController {
           isLoading.value = false;
         }
       } catch (e) {
-        print('Error parsing cached subjects: $e');
+        // print('Error parsing cached subjects: $e');
         await _cacheUtil.removeData(_cacheKey);
       }
     }
@@ -97,7 +97,7 @@ class AdminHomepageController extends GetxController {
       if (_allSubjects.isEmpty) {
         Get.snackbar('Error', 'Gagal memuat data mata pelajaran: $e');
       }
-      print('Failed to fetch subjects from network: $e');
+      // print('Failed to fetch subjects from network: $e');
     } finally {
       isLoading.value = false;
     }

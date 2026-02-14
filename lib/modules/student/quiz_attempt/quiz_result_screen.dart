@@ -17,8 +17,8 @@ class QuizResultScreen extends StatelessWidget {
 
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) {
-        // Tidak bisa back dengan tombol back device
+      onPopInvokedWithResult: (didPop, result) {
+        // Kalau perlu logic ketika pop terjadi
       },
       child: BaseWidgetContainer(
         backgroundColor: AppColors.c5,
@@ -42,7 +42,7 @@ class QuizResultScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12.r),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: Colors.grey.withValues(alpha: 0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),

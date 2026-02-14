@@ -56,8 +56,8 @@ class AdminQuizDetailScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppColors.c2.withOpacity(0.8),
-                    AppColors.c2.withOpacity(0.4),
+                    AppColors.c2.withValues(alpha: 0.8),
+                    AppColors.c2.withValues(alpha: 0.4),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -76,7 +76,7 @@ class AdminQuizDetailScreen extends StatelessWidget {
                   GlobalText.regular(
                     quiz.subjectName,
                     fontSize: 14.sp,
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                   ),
                   SizedBox(height: 16.h),
                   // Score Display
@@ -86,7 +86,7 @@ class AdminQuizDetailScreen extends StatelessWidget {
                       vertical: 12.h,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                     child: Row(
@@ -98,7 +98,7 @@ class AdminQuizDetailScreen extends StatelessWidget {
                             GlobalText.regular(
                               'Nilai',
                               fontSize: 12.sp,
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha: 0.8),
                             ),
                             GlobalText.semiBold(
                               '${quiz.score ?? 0}',
@@ -113,7 +113,7 @@ class AdminQuizDetailScreen extends StatelessWidget {
                             GlobalText.regular(
                               'Nilai',
                               fontSize: 12.sp,
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha: 0.8),
                             ),
                             GlobalText.semiBold(
                               '${quiz.score ?? 0}',
@@ -235,7 +235,6 @@ class AdminQuizDetailScreen extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  // TODO: Navigate to answer review screen
                   Get.snackbar(
                     'Review Jawaban',
                     'Fitur review jawaban segera hadir',
@@ -264,7 +263,6 @@ class AdminQuizDetailScreen extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  // TODO: Export functionality
                   Get.snackbar(
                     'Export',
                     'Fitur export segera hadir',
@@ -302,7 +300,7 @@ class AdminQuizDetailScreen extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: AppColors.c2.withOpacity(0.1),
+              color: AppColors.c2.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8.r),
             ),
             padding: EdgeInsets.all(8.w),
@@ -341,9 +339,9 @@ class AdminQuizDetailScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,

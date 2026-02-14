@@ -1,5 +1,5 @@
 import 'package:blessing/modules/admin/course/widgets/course_card.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class CourseContentTypeAdapter extends TypeAdapter<CourseContentType> {
   @override

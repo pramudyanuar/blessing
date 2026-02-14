@@ -59,7 +59,7 @@ class ProfileController extends GetxController {
     if (birthDate == null) return false;
     if (birthDate is String) {
       final cleanDate = birthDate.trim();
-      return !cleanDate.isEmpty && 
+      return cleanDate.isNotEmpty && 
              !cleanDate.startsWith('0001-') &&
              cleanDate != '0001-01-01T00:00:00Z';
     }
@@ -85,11 +85,11 @@ class ProfileController extends GetxController {
       bool isBirthDateEmpty = false;
       if (birthDate == null) {
         isBirthDateEmpty = true;
-      } else if (birthDate is String && (birthDate as String).trim().isEmpty) {
+      } else if (birthDate is String && (birthDate).trim().isEmpty) {
         isBirthDateEmpty = true;
-      } else if (birthDate is String && (birthDate as String).contains('0001-01-01')) {
+      } else if (birthDate is String && (birthDate).contains('0001-01-01')) {
         isBirthDateEmpty = true;
-      } else if (birthDate is DateTime && (birthDate as DateTime).year <= 1) {
+      } else if (birthDate is DateTime && (birthDate).year <= 1) {
         isBirthDateEmpty = true;
       }
       

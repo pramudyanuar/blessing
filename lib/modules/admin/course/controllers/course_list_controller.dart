@@ -47,9 +47,9 @@ class AdminManageCourseListController extends GetxController {
       _loadFromCache();
       fetchCourses();
 
-      print('✅ Controller Initialized. Subject ID: $subjectId, Kelas: $kelas');
+      // print('✅ Controller Initialized. Subject ID: $subjectId, Kelas: $kelas');
     } else {
-      print('❌ Error: Tidak ada data arguments yang diterima. Kembali.');
+      // print('❌ Error: Tidak ada data arguments yang diterima. Kembali.');
       subjectId = '';
       kelas = 0;
       _cacheKey = 'courses_error';
@@ -122,7 +122,7 @@ class AdminManageCourseListController extends GetxController {
         courses.assignAll(mappedCourses);
       }
     } catch (e) {
-      print('❌ Error fetching data: $e');
+      // print('❌ Error fetching data: $e');
       CustomSnackbar.show(
           title: 'Error',
           message: 'Gagal memuat data dari server.',

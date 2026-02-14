@@ -37,7 +37,6 @@ class _AdminAnswerReviewScreenState extends State<AdminAnswerReviewScreen> {
   }
 
   void _initializeMockData() {
-    // TODO: Replace with actual API call to fetch answer details
     questions = [
       QuestionReview(
         questionNumber: 1,
@@ -187,8 +186,8 @@ class _AdminAnswerReviewScreenState extends State<AdminAnswerReviewScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: currentQuestion.isCorrect
-                                ? Colors.green.withOpacity(0.1)
-                                : Colors.red.withOpacity(0.1),
+                                ? Colors.green.withValues(alpha: 0.1)
+                                : Colors.red.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6.r),
                           ),
                           child: GlobalText.semiBold(
@@ -221,15 +220,15 @@ class _AdminAnswerReviewScreenState extends State<AdminAnswerReviewScreen> {
                           Color textColor;
 
                           if (isCorrect) {
-                            backgroundColor = Colors.green.withOpacity(0.1);
+                            backgroundColor = Colors.green.withValues(alpha: 0.1);
                             borderColor = Colors.green;
                             textColor = Colors.green;
                           } else if (isWrongAnswer) {
-                            backgroundColor = Colors.red.withOpacity(0.1);
+                            backgroundColor = Colors.red.withValues(alpha: 0.1);
                             borderColor = Colors.red;
                             textColor = Colors.red;
                           } else {
-                            backgroundColor = Colors.grey.withOpacity(0.05);
+                            backgroundColor = Colors.grey.withValues(alpha: 0.05);
                             borderColor = Colors.grey.shade300;
                             textColor = Colors.grey.shade700;
                           }
@@ -278,7 +277,7 @@ class _AdminAnswerReviewScreenState extends State<AdminAnswerReviewScreen> {
                               ),
                             ),
                           );
-                        }).toList(),
+                        }),
                       ],
                     ),
                   ),
@@ -290,7 +289,7 @@ class _AdminAnswerReviewScreenState extends State<AdminAnswerReviewScreen> {
                     Container(
                       padding: EdgeInsets.all(12.w),
                       decoration: BoxDecoration(
-                        color: AppColors.c2.withOpacity(0.05),
+                        color: AppColors.c2.withValues(alpha: 0.05),
                         border: Border(
                           left: BorderSide(
                             color: AppColors.c2,

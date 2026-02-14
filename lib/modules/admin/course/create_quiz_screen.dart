@@ -359,32 +359,39 @@ class CreateQuizScreen extends StatelessWidget {
     final textController = question.optionControllers[optionIndex];
 
     return Obx(
-      () => Row(
-        children: [
-          Radio<int>(
-            value: optionIndex,
-            groupValue: question.correctAnswerIndex.value,
-            onChanged: (value) {
-              if (value != null) {
-                question.correctAnswerIndex.value = value;
-              }
-            },
-            activeColor: AppColors.c2,
-          ),
-          Expanded(
+      () => RadioGroup<int>(
+        groupValue: question.correctAnswerIndex.value,
+        onChanged: (value) {
+          if (value != null) {
+            question.correctAnswerIndex.value = value;
+          }
+        },
+        child: Row(
+          children: [
+            Radio<int>(
+              value: optionIndex,
+              activeColor: AppColors.c2,
+            ),
+            Expanded(
               child: _buildTextFormField(
-                  hint: 'Tulis Jawaban', controller: textController)),
-          if (question.optionControllers.length > 2)
-            IconButton(
-              icon:
-                  Icon(Icons.remove_circle_outline, color: Colors.red.shade400),
-              onPressed: () =>
-                  controller.removeOption(questionIndex, optionIndex),
-              tooltip: 'Hapus Opsi',
-            )
-          else
-            SizedBox(width: 48.w) // Placeholder to keep alignment
-        ],
+                hint: 'Tulis Jawaban',
+                controller: textController,
+              ),
+            ),
+            if (question.optionControllers.length > 2)
+              IconButton(
+                icon: Icon(
+                  Icons.remove_circle_outline,
+                  color: Colors.red.shade400,
+                ),
+                onPressed: () =>
+                    controller.removeOption(questionIndex, optionIndex),
+                tooltip: 'Hapus Opsi',
+              )
+            else
+              SizedBox(width: 48.w),
+          ],
+        ),
       ),
     );
   }

@@ -22,8 +22,8 @@ class QuizReviewScreen extends StatelessWidget {
 
     return PopScope(
       canPop: canPop,
-      onPopInvoked: (didPop) {
-        // Jika tidak bisa back, jangan lakukan apa-apa
+      onPopInvokedWithResult: (didPop, result) {
+        // Kalau perlu logic ketika pop terjadi
       },
       child: BaseWidgetContainer(
         backgroundColor: AppColors.c5,
@@ -52,7 +52,7 @@ class QuizReviewScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12.r),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: Colors.grey.withValues(alpha: 0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -104,7 +104,7 @@ class QuizReviewScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: _getScoreColor(controller.score.value)
-                                .withOpacity(0.1),
+                                .withValues(alpha: 0.1),
                           ),
                           child: Center(
                             child: GlobalText.bold(
@@ -209,12 +209,12 @@ class QuizReviewScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(8.r),
         border: Border.all(
-          color: statusColor.withOpacity(0.3),
+          color: statusColor.withValues(alpha: 0.3),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
@@ -235,7 +235,7 @@ class QuizReviewScreen extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6.r),
                 ),
                 child: Row(
@@ -309,9 +309,9 @@ class QuizReviewScreen extends StatelessWidget {
           width: double.infinity,
           padding: EdgeInsets.all(8.w),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.05),
+            color: color.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(6.r),
-            border: Border.all(color: color.withOpacity(0.2)),
+            border: Border.all(color: color.withValues(alpha: 0.2)),
           ),
           child: GlobalText.regular(
             answer,

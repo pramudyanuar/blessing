@@ -195,10 +195,10 @@ class _AdminSubjectDetailScreenState extends State<AdminSubjectDetailScreen> {
                         width: double.infinity,
                         padding: EdgeInsets.all(20.w),
                         decoration: BoxDecoration(
-                          color: AppColors.c2.withOpacity(0.1),
+                          color: AppColors.c2.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16.r),
                           border: Border.all(
-                            color: AppColors.c2.withOpacity(0.3),
+                            color: AppColors.c2.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Column(
@@ -206,7 +206,7 @@ class _AdminSubjectDetailScreenState extends State<AdminSubjectDetailScreen> {
                           children: [
                             Container(
                               decoration: BoxDecoration(
-                                color: AppColors.c2.withOpacity(0.2),
+                                color: AppColors.c2.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(12.r),
                               ),
                               padding: EdgeInsets.all(12.w),
@@ -336,7 +336,7 @@ class _AdminSubjectDetailScreenState extends State<AdminSubjectDetailScreen> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: AppColors.c2.withOpacity(0.1),
+              color: AppColors.c2.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8.r),
             ),
             padding: EdgeInsets.all(8.w),

@@ -238,7 +238,6 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
   /// Load jawaban yang sudah disimpan sebelumnya
   Future<void> _loadExistingAnswers() async {
     try {
-      // TODO: Implement API call untuk fetch existing answers dari session
       // const String answersUrl = '/api/answers?session_id=$sessionId';
       // final response = await _httpManager.restRequest(url: answersUrl);
       // if (response['statusCode'] == 200) {
@@ -338,7 +337,7 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
       userAnswers[question.id] = previousAnswerId; // Rollback jika gagal
       Get.snackbar(
           "Gagal", "Gagal menyimpan jawaban. Periksa koneksi internet Anda.",
-          backgroundColor: Colors.red.withOpacity(0.8),
+          backgroundColor: Colors.red.withValues(alpha: 0.8),
           colorText: Colors.white);
       debugPrint("Error saat menyimpan jawaban: $e");
     }

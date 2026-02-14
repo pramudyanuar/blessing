@@ -29,7 +29,7 @@ class AdminQuizCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               spreadRadius: 1,
               blurRadius: 5,
             ),
@@ -54,7 +54,7 @@ class AdminQuizCard extends StatelessWidget {
                     vertical: 4.h,
                   ),
                   decoration: BoxDecoration(
-                    color: _getScoreColor(quiz.score ?? 0).withOpacity(0.1),
+                    color: _getScoreColor(quiz.score ?? 0).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6.r),
                   ),
                   child: GlobalText.semiBold(
@@ -147,7 +147,7 @@ class AdminQuizCard extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
                     decoration: BoxDecoration(
-                      color: _getStatusColor(quiz.status).withOpacity(0.1),
+                      color: _getStatusColor(quiz.status).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4.r),
                     ),
                     child: GlobalText.regular(

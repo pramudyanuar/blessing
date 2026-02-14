@@ -4,7 +4,6 @@ import 'package:blessing/data/session/repository/session_repository_impl.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter/foundation.dart';
 
 enum QuizAttemptStatus { notStarted, inProgress, submitted }
 
@@ -110,7 +109,7 @@ class QuizIntroController extends GetxController {
           // Quiz sudah selesai (submitted)
           quizStatus.value = QuizAttemptStatus.submitted;
           previousScore.value = completedQuiz.score ?? 0;
-          canRetake.value = false; // TODO: Check dari backend admin setting
+          canRetake.value = false;
           return;
         }
       }

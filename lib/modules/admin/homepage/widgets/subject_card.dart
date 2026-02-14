@@ -22,7 +22,7 @@ class SubjectCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
+            color: Colors.grey.withValues(alpha: 0.08),
             spreadRadius: 1,
             blurRadius: 10,
             offset: const Offset(0, 2),

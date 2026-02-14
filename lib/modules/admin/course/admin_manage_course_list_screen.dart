@@ -32,6 +32,16 @@ class AdminManageCourseListScreen extends StatelessWidget {
                   itemBuilder: (BuildContext context) =>
                       <PopupMenuEntry<String>>[
                     const PopupMenuItem<String>(
+                      value: 'manage_courses',
+                      child: Row(
+                        children: [
+                          Icon(Icons.list_alt, color: AppColors.c2),
+                          SizedBox(width: 8),
+                          Text('Kelola Materi'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
                       value: 'edit',
                       child: Row(
                         children: [
@@ -95,7 +105,7 @@ class AdminManageCourseListScreen extends StatelessWidget {
                     previewImages: item['previewImages'],
                     actionButtonText: "Lihat Materi",
                     onTapAction: () {
-                      print("Navigasi ke detail materi: ${item['title']}");
+                      // print("Navigasi ke detail materi: ${item['title']}");
                       Get.toNamed(AppRoutes.adminCourseDetail, arguments: {
                         'courseId': item['id'],
                         'onCourseDeleted': () => controller.refreshCourses(),
@@ -111,7 +121,7 @@ class AdminManageCourseListScreen extends StatelessWidget {
                     timeLimit: item['timeLimit'],
                     actionButtonText: "Lihat Kuis",
                     onTapAction: () {
-                      print("Navigasi ke detail kuis: ${item['title']}");
+                      // print("Navigasi ke detail kuis: ${item['title']}");
                       Get.toNamed(AppRoutes.adminCreateQuiz,
                           arguments: {'quizId': item['id']});
                     },

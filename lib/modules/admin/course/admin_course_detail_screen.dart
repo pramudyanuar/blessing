@@ -34,7 +34,7 @@ class AdminCourseDetailScreen extends StatelessWidget {
             }
           },
         ),
-        shadowColor: Colors.black.withOpacity(0.4),
+        shadowColor: Colors.black.withValues(alpha: 0.4),
         surfaceTintColor: Colors.white,
         elevation: 0.5,
         actions: [
@@ -266,7 +266,7 @@ class AdminCourseDetailScreen extends StatelessWidget {
               width: double.infinity,
               padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 16.w),
               decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r)),
               child: Center(
                 child: Column(
@@ -649,7 +649,7 @@ class AdminCourseDetailScreen extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.all(6.w),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
+                      color: Colors.black.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(16.r),
                     ),
                     child: Icon(
@@ -725,7 +725,7 @@ class AdminCourseDetailScreen extends StatelessWidget {
                 // Dark overlay with count
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Center(
@@ -825,7 +825,7 @@ class AdminCourseDetailScreen extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.all(8.w),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Icon(
@@ -924,7 +924,7 @@ class AdminCourseDetailScreen extends StatelessWidget {
                         width: 70.w,
                         height: 70.w,
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.9),
+                          color: Colors.red.withValues(alpha: 0.9),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -944,7 +944,7 @@ class AdminCourseDetailScreen extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.8),
+                    color: Colors.black.withValues(alpha: 0.8),
                     borderRadius: BorderRadius.circular(4.r),
                   ),
                   child: Text(

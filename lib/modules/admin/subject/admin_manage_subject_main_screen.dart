@@ -33,6 +33,34 @@ class AdminManageSubjectMainScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () => Get.back(),
         ),
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert, color: AppColors.c2),
+            onSelected: (String value) {
+              if (value == 'edit_subject') {
+                Get.toNamed(
+                  AppRoutes.adminEditSubject,
+                  arguments: {
+                    'subjectId': subjectId,
+                    'subjectName': subjectName,
+                  },
+                );
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'edit_subject',
+                child: Row(
+                  children: [
+                    Icon(Icons.edit, color: AppColors.c2),
+                    SizedBox(width: 8),
+                    Text('Edit Mata Pelajaran'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: Obx(
         () {
@@ -108,7 +136,19 @@ class AdminManageSubjectMainScreen extends StatelessWidget {
                 },
               );
             },
-          );
+          );  
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.c2,
+        foregroundColor: Colors.white,
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Get.toNamed(AppRoutes.adminCreateCourse, arguments: {
+            'subjectId': subjectId,
+            'kelas': kelas,
+            'onCourseCreated': () => controller.refreshCourses(),
+          });
         },
       ),
     );
