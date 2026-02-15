@@ -124,10 +124,18 @@ class QuizIntroController extends GetxController {
       if (sessionsResult != null && sessionsResult.sessions.isNotEmpty) {
         final activeSession = sessionsResult.sessions.firstOrNull;
         if (activeSession != null) {
-          // Ada session yang belum diselesaikan
-          quizStatus.value = QuizAttemptStatus.inProgress;
-          sessionId.value = activeSession.id;
-          return;
+          // Validasi session: cek apakah session masih berlaku
+          final remainingTime = await _sessionRepository.getSessionRemainingTime(activeSession.id);
+          
+          // Jika session masih valid (time remaining > 0), tandai sebagai in-progress
+          if (remainingTime != null && remainingTime > 0) {
+            quizStatus.value = QuizAttemptStatus.inProgress;
+            sessionId.value = activeSession.id;
+            return;
+          } else {
+            // Session tidak valid (sudah expired), anggap belum dimulai
+            debugPrint("Session $activeSession.id tidak valid (remaining time: $remainingTime)");
+          }
         }
       }
 

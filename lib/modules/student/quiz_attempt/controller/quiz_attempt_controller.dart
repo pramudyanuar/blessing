@@ -172,8 +172,9 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
       final errorString = e.toString().toLowerCase();
 
       if (errorString.contains('conflict') || errorString.contains('409')) {
-        // <<< BAGIAN INI DIUBAH >>>
-        Get.back(); // langsung kembali ke halaman sebelumnya
+        // Quiz sudah dikerjakan - set flag dan kembali ke halaman sebelumnya
+        isQuizAlreadyAttempted.value = true;
+        Get.back();
         Get.snackbar(
           "Info",
           "Anda sudah pernah mengerjakan kuis ini.",
@@ -190,6 +191,7 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
   }
 
   /// Lanjutkan kuis yang sudah ada (resume session)
+  /// Jika session tidak valid, fallback ke start quiz baru
   Future<void> resumeQuiz() async {
     try {
       isLoading.value = true;
@@ -204,7 +206,9 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
       final sessionResponse =
           await _sessionRepository.getSessionById(resumeSessionId!);
       if (sessionResponse == null) {
-        throw Exception("Gagal memuat data sesi yang disimpan.");
+        debugPrint("Resume failed: Session $resumeSessionId tidak ditemukan. Fallback ke start baru.");
+        await initiateQuiz();
+        return;
       }
 
       sessionId = sessionResponse.id;
@@ -213,7 +217,10 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
       final remainingTime =
           await _sessionRepository.getSessionRemainingTime(sessionId!);
       if (remainingTime == null || remainingTime <= 0) {
-        throw Exception("Waktu untuk kuis ini sudah habis.");
+        debugPrint("Resume failed: Session sudah expired (remaining: $remainingTime). Fallback ke start baru.");
+        // Session sudah expired, mulai quiz baru
+        await initiateQuiz();
+        return;
       }
       totalDuration.value = remainingTime;
 
@@ -228,8 +235,41 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
 
       debugPrint("Quiz resumed successfully. Session ID: $sessionId");
     } catch (e) {
-      errorMessage.value = "Gagal melanjutkan kuis: ${e.toString()}";
-      debugPrint("Error during quiz resume: $e");
+      final errorString = e.toString().toLowerCase();
+      
+      if (errorString.contains('conflict') || errorString.contains('409')) {
+        // Quiz sudah dikerjakan (conflict) - set flag dan kembali
+        isQuizAlreadyAttempted.value = true;
+        Get.back();
+        Get.snackbar(
+          "Info",
+          "Anda sudah pernah mengerjakan kuis ini.",
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+        );
+      } else {
+        debugPrint("Error during quiz resume: $e. Fallback ke start baru.");
+        // Jika ada error lain atau session tidak valid, coba start baru
+        try {
+          isLoading.value = true;
+          await initiateQuiz();
+        } catch (initError) {
+          final initErrorString = initError.toString().toLowerCase();
+          if (initErrorString.contains('conflict') || initErrorString.contains('409')) {
+            isQuizAlreadyAttempted.value = true;
+            Get.back();
+            Get.snackbar(
+              "Info",
+              "Anda sudah pernah mengerjakan kuis ini.",
+              backgroundColor: Colors.orange,
+              colorText: Colors.white,
+            );
+          } else {
+            errorMessage.value = "Gagal memulai kuis: ${initError.toString()}";
+          }
+          debugPrint("Error during fallback initiate: $initError");
+        }
+      }
     } finally {
       isLoading.value = false;
     }
