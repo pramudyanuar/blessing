@@ -1,6 +1,7 @@
 import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_text.dart';
+import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/modules/student/report_card/controllers/report_card_controller.dart';
 import 'package:blessing/modules/student/report_card/widgets/report_card_statistics.dart';
 import 'package:blessing/modules/student/report_card/widgets/report_card_filters.dart';
@@ -225,6 +226,19 @@ class ReportCardScreen extends StatelessWidget {
                         getStatusText: controller.getStatusText,
                         formatDate: controller.formatDate,
                         formatTime: controller.formatTime,
+                        // Navigate ke QuizReviewScreen saat diTap
+                        onTap: quiz.isAttempted && quiz.sessionId != null
+                            ? () {
+                                Get.toNamed(AppRoutes.quizReview, arguments: {
+                                  'sessionId': quiz.sessionId,
+                                  'quizId': quiz.quizId,
+                                  'quizName': quiz.quizName,
+                                  'score': quiz.score ?? 0,
+                                  'reviewItems': [],
+                                  'fetchFromServer': true,
+                                });
+                              }
+                            : null,
                       );
                     },
                     childCount: controller.filteredQuizzes.length,

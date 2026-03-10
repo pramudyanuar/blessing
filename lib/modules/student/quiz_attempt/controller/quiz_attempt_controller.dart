@@ -487,6 +487,11 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
   }
 
   /// Build review items dari user answers dan options
+  /// Membangun review items dari jawaban user dan soal-soal
+  /// 
+  /// Mencocokkan setiap pertanyaan dengan jawaban user yang dipilih.
+  /// Note: correctAnswer dan isCorrect akan diterima dari backend 
+  /// saat session di-submit atau di-fetch kembali.
   List<Map<String, dynamic>> _buildReviewItems() {
     final List<Map<String, dynamic>> items = [];
 
@@ -494,22 +499,19 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
       final userAnswerId = userAnswers[question.id];
       final options = optionsByQuestion[question.id] ?? [];
 
-      // Cari jawaban user
+      // Cari jawaban user dari ID yang tersimpan
       QuestionOptionResponse? userAnswer;
-      if (userAnswerId != null) {
+      if (userAnswerId != null && userAnswerId.isNotEmpty) {
         userAnswer = options.firstWhereOrNull((opt) => opt.id == userAnswerId);
       }
 
-      // Untuk sekarang, kita belum punya cara untuk tahu jawaban benar dari API
-      // Ini perlu di-extend kemudian dengan API yang mengembalikan correct answer
-      final isCorrect = false; // Placeholder
-      final correctAnswer = null; // Placeholder
-
+      // Note: correctAnswer dan isCorrect akan diisi oleh backend response
+      // Saat ini placeholder, perlu endpoint /api/sessions/{sessionId}/summary
       items.add({
         'question': question,
-        'userAnswer': userAnswer,
-        'correctAnswer': correctAnswer,
-        'isCorrect': isCorrect,
+        'userAnswer': userAnswer, // Nullable jika tidak menjawab
+        'correctAnswer': null, // Akan diisi dari backend
+        'isCorrect': false, // Akan diisi dari backend (placeholder)
       });
     }
 

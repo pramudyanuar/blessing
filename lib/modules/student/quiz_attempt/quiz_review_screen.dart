@@ -255,33 +255,49 @@ class QuizReviewScreen extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
 
-          // Pertanyaan
-          GlobalText.medium(
-            'Pertanyaan:',
-            fontSize: 11.sp,
-            color: Colors.grey.shade600,
-          ),
-          SizedBox(height: 4.h),
-          GlobalText.regular(
-            _extractQuestionText(question),
-            fontSize: 12.sp,
-            color: Colors.black87,
-          ),
-          SizedBox(height: 12.h),
+          // Pertanyaan Text
+          if (_extractQuestionText(question).isNotEmpty)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GlobalText.medium(
+                  'Pertanyaan:',
+                  fontSize: 11.sp,
+                  color: Colors.grey.shade600,
+                ),
+                SizedBox(height: 4.h),
+                GlobalText.regular(
+                  _extractQuestionText(question),
+                  fontSize: 12.sp,
+                  color: Colors.black87,
+                ),
+                SizedBox(height: 8.h),
+              ],
+            ),
+
+          // Question Images (jika ada)
+          if (_hasQuestionImages(question))
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ..._buildQuestionImages(question),
+                SizedBox(height: 8.h),
+              ],
+            ),
 
           // Jawaban User
           _buildAnswerRow(
             label: 'Jawaban Kamu:',
-            answer: userAnswer?.option ?? 'Tidak menjawab',
+            answer: _extractAnswerValue(userAnswer),
             isCorrect: isCorrect,
           ),
           SizedBox(height: 8.h),
 
-          // Jawaban Benar
+          // Jawaban Benar (hanya tampil jika salah)
           if (!isCorrect)
             _buildAnswerRow(
               label: 'Jawaban Benar:',
-              answer: correctAnswer?.option ?? 'Tidak tersedia',
+              answer: _extractAnswerValue(correctAnswer),
               isCorrect: true,
             ),
         ],
@@ -323,21 +339,116 @@ class QuizReviewScreen extends StatelessWidget {
     );
   }
 
+  /// Extract question text dari berbagai format
+  /// Format baru: Map dengan 'questionText' key (dari SessionSummaryResponse)
+  /// Format lama: QuestionResponse model dengan 'content' property
   String _extractQuestionText(dynamic question) {
-    if (question == null) return 'Pertanyaan tidak tersedia';
+    if (question == null) return '';
 
-    // Jika question memiliki content
-    if (question.content != null && question.content is List) {
-      final contents = question.content as List<dynamic>;
-      if (contents.isNotEmpty) {
-        final firstContent = contents.first;
-        if (firstContent is ContentBlock) {
-          return firstContent.data;
+    // Format baru: Map dari SessionSummaryResponse
+    if (question is Map<String, dynamic>) {
+      final text = question['questionText'];
+      // Return text jika ada dan tidak kosong, otherwise return empty (images only)
+      if (text != null && text is String && text.trim().isNotEmpty) {
+        return text.trim();
+      }
+      // Jika questionText kosong, return empty (soal pure image)
+      return '';
+    }
+
+    // Format lama: QuestionResponse model dengan content (list of ContentBlock)
+    try {
+      if (question.content != null && question.content is List) {
+        final contents = question.content as List<dynamic>;
+        if (contents.isNotEmpty) {
+          final firstContent = contents.first;
+          if (firstContent is ContentBlock && firstContent.data.isNotEmpty) {
+            return firstContent.data;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error extracting question text: $e');
+    }
+
+    return '';
+  }
+
+  /// Check apakah question memiliki images
+  bool _hasQuestionImages(dynamic question) {
+    if (question is Map<String, dynamic>) {
+      final images = question['questionImages'] as List?;
+      return images != null && images.isNotEmpty;
+    }
+    return false;
+  }
+
+  /// Build widgets untuk menampilkan question images
+  List<Widget> _buildQuestionImages(dynamic question) {
+    final widgets = <Widget>[];
+    if (question is Map<String, dynamic>) {
+      final images = question['questionImages'] as List?;
+      if (images != null && images.isNotEmpty) {
+        for (int i = 0; i < images.length; i++) {
+          final imageUrl = images[i] as String?;
+          if (imageUrl != null && imageUrl.isNotEmpty) {
+            widgets.add(
+              Padding(
+                padding: EdgeInsets.only(bottom: 8.h),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(6.r),
+                  child: Image.network(
+                    imageUrl,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: double.infinity,
+                      height: 150.h,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(6.r),
+                      ),
+                      child: Center(
+                        child: Icon(Icons.broken_image,
+                            color: Colors.grey.shade400),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
         }
       }
     }
+    return widgets;
+  }
 
-    return 'Pertanyaan tidak tersedia';
+  /// Extract answer value dari berbagai format
+  /// Bisa dari Map {'option': 'value'} atau dari object dengan .option property
+  String _extractAnswerValue(dynamic answer) {
+    if (answer == null) return 'Tidak menjawab';
+    
+    // Format Map (dari SessionSummaryResponse)
+    if (answer is Map<String, dynamic>) {
+      final value = answer['option'];
+      if (value != null && value is String && value.isNotEmpty) {
+        return value;
+      }
+      return 'Tidak menjawab';
+    }
+    
+    // Format object dengan .option property (backward compat)
+    try {
+      final value = answer.option;
+      if (value != null && value is String && value.isNotEmpty) {
+        return value;
+      }
+      return 'Tidak menjawab';
+    } catch (e) {
+      debugPrint('Error extracting answer value: $e');
+      return 'Tidak tersedia';
+    }
   }
 
   Color _getScoreColor(int score) {

@@ -51,41 +51,44 @@ class CourseCard extends StatelessWidget {
         isMaterial ? Icons.menu_book_outlined : Icons.quiz_outlined;
     final String headerText = isMaterial ? "Materi Pembelajaran" : "Kuis";
 
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 8.0,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Bagian Header Kartu
-          _buildHeader(headerIcon, headerText),
-          SizedBox(height: 12.h),
+    return GestureDetector(
+      onTap: onTapAction,
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 8.0,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Bagian Header Kartu
+            _buildHeader(headerIcon, headerText),
+            SizedBox(height: 12.h),
 
-          // Judul Utama
-          GlobalText.bold(title, fontSize: 16.sp, textAlign: TextAlign.start),
-          SizedBox(height: 8.h),
+            // Judul Utama
+            GlobalText.bold(title, fontSize: 16.sp, textAlign: TextAlign.start),
+            SizedBox(height: 8.h),
 
-          // Konten Inti (berbeda untuk materi dan kuis)
-          if (isMaterial)
-            _buildMaterialContent(context)
-          else
-            _buildQuizContent(context),
+            // Konten Inti (berbeda untuk materi dan kuis)
+            if (isMaterial)
+              _buildMaterialContent(context)
+            else
+              _buildQuizContent(context),
 
-          // Preview Gambar (hanya untuk materi)
-          if (isMaterial && previewImages != null && previewImages!.isNotEmpty)
-            _buildImagePreview(context),
-        ],
+            // Preview Gambar (hanya untuk materi)
+            if (isMaterial && previewImages != null && previewImages!.isNotEmpty)
+              _buildImagePreview(context),
+          ],
+        ),
       ),
     );
   }
@@ -143,15 +146,12 @@ class CourseCard extends StatelessWidget {
                   ],
                 ),
               ),
-            GestureDetector(
-              onTap: onTapAction,
-              child: Text(
-                "Lihat Detail",
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  color: Theme.of(context).primaryColor,
-                  fontWeight: FontWeight.w500,
-                ),
+            Text(
+              "Lihat Detail",
+              style: TextStyle(
+                fontSize: 13.sp,
+                color: Colors.blue,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -187,18 +187,14 @@ class CourseCard extends StatelessWidget {
         SizedBox(width: 16.w),
         // Sisi Kanan: Menampilkan Tombol "Mulai/Lanjutkan" atau Nilai
         if (isCompleted)
-          GestureDetector(
-            onTap: onTapAction,
-            child: _buildScoreDisplay(),
-          )
+          _buildScoreDisplay()
         else
-          ElevatedButton(
-            onPressed: onTapAction,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2E5B9F),
-              shape: const StadiumBorder(),
-              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF2E5B9F),
+              borderRadius: BorderRadius.circular(20.r),
             ),
+            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),
             child: GlobalText.bold(
               "Mulai",
               fontSize: 13.sp,

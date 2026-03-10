@@ -45,79 +45,79 @@ class CourseCard extends StatelessWidget {
         isMaterial ? Icons.menu_book_outlined : Icons.quiz_outlined;
     final String headerText = isMaterial ? "Materi Pembelajaran" : "Kuis";
 
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 8.r,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// Header (Dinamis)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Icon(headerIcon, size: 18.sp, color: Colors.black87),
-                  SizedBox(width: 8.w),
-                  Text(
-                    headerText,
-                    style:
-                        TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
-                  ),
-                ],
-              ),
-              Text(
-                dateText,
-                style: TextStyle(fontSize: 11.sp, color: Colors.grey),
-              ),
-            ],
-          ),
-          SizedBox(height: 12.h),
-
-          /// Title
-          Text(
-            title,
-            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 6.h),
-
-          /// Description (Opsional)
-          if (description != null && description!.isNotEmpty)
-            Padding(
-              padding: EdgeInsets.only(bottom: 10.h),
-              child: Text(
-                description!,
-                style: TextStyle(fontSize: 13.sp, color: Colors.black87),
-              ),
+    return GestureDetector(
+      onTap: onTapAction,
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
+        padding: EdgeInsets.all(12.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 8.r,
+              offset: Offset(0, 4),
             ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// Header (Dinamis)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(headerIcon, size: 18.sp, color: Colors.black87),
+                    SizedBox(width: 8.w),
+                    Text(
+                      headerText,
+                      style:
+                          TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+                Text(
+                  dateText,
+                  style: TextStyle(fontSize: 11.sp, color: Colors.grey),
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
 
-          /// Konten Spesifik (File untuk Materi, Waktu untuk Kuis) & Tombol Aksi
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // 4. Tampilkan widget info berdasarkan tipe
-              if (isMaterial && fileName != null) _buildFileInfo(fileName!),
-              if (!isMaterial && timeLimit != null) _buildQuizInfo(timeLimit!),
+            /// Title
+            Text(
+              title,
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 6.h),
 
-              // Jika tidak ada info spesifik, tampilkan widget kosong agar 'space-between' tetap bekerja
-              if ((isMaterial && fileName == null) ||
-                  (!isMaterial && timeLimit == null))
-                const SizedBox(),
-
-              GestureDetector(
-                onTap: onTapAction,
+            /// Description (Opsional)
+            if (description != null && description!.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.only(bottom: 10.h),
                 child: Text(
+                  description!,
+                  style: TextStyle(fontSize: 13.sp, color: Colors.black87),
+                ),
+              ),
+
+            /// Konten Spesifik (File untuk Materi, Waktu untuk Kuis) & Tombol Aksi
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // 4. Tampilkan widget info berdasarkan tipe
+                if (isMaterial && fileName != null) _buildFileInfo(fileName!),
+                if (!isMaterial && timeLimit != null) _buildQuizInfo(timeLimit!),
+
+                // Jika tidak ada info spesifik, tampilkan widget kosong agar 'space-between' tetap bekerja
+                if ((isMaterial && fileName == null) ||
+                    (!isMaterial && timeLimit == null))
+                  const SizedBox(),
+
+                Text(
                   actionButtonText, // <-- Gunakan teks tombol dinamis
                   style: TextStyle(
                     fontSize: 13.sp,
@@ -125,15 +125,15 @@ class CourseCard extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 10.h),
+              ],
+            ),
+            SizedBox(height: 10.h),
 
-          /// Preview Images (hanya untuk materi)
-          if (isMaterial && previewImages != null && previewImages!.isNotEmpty)
-            _buildImagePreview(),
-        ],
+            /// Preview Images (hanya untuk materi)
+            if (isMaterial && previewImages != null && previewImages!.isNotEmpty)
+              _buildImagePreview(),
+          ],
+        ),
       ),
     );
   }

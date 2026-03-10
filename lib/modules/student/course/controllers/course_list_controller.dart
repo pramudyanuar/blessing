@@ -140,6 +140,7 @@ class CourseListController extends GetxController {
           'questionCount': quiz.questionCount ?? 0,
           'isCompleted': isQuizCompleted,
           'score': attemptedQuiz?.score,
+          'sessionId': attemptedQuiz?.sessionId ?? '', // Add sessionId dari report card
         });
       }
     }

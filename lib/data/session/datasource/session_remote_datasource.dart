@@ -3,6 +3,7 @@ import 'package:blessing/core/services/http_manager.dart';
 import 'package:blessing/data/core/models/paging_response.dart';
 import 'package:blessing/data/session/models/request/create_user_quiz_session_request.dart';
 import 'package:blessing/data/session/models/response/user_quiz_session_response.dart';
+import 'package:blessing/data/session/models/response/session_summary_response.dart';
 import 'package:flutter/foundation.dart';
 
 class SessionDataSource {
@@ -162,6 +163,36 @@ class SessionDataSource {
       }
     } catch (e) {
       debugPrint('getSessionRemainingTime DataSource error: $e');
+      return null;
+    }
+  }
+
+  /// Fetch session summary dengan detail jawaban user dan jawaban benar
+  Future<SessionSummaryResponse?> getSessionSummary(String sessionId) async {
+    try {
+      final url =
+          Endpoints.getSessionSummary.replaceFirst('{sessionId}', sessionId);
+
+      final response = await _httpManager.restRequest(
+        url: url,
+        method: HttpMethods.get,
+      );
+
+      if (response['statusCode'] == 200) {
+        debugPrint(
+            'getSessionSummary DataSource response: ${response['data']}');
+        final data = response['data']['data'];
+        if (data != null) {
+          return SessionSummaryResponse.fromJson(data as Map<String, dynamic>);
+        }
+        return null;
+      } else {
+        debugPrint(
+            'getSessionSummary DataSource failed: ${response['statusMessage']}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('getSessionSummary DataSource error: $e');
       return null;
     }
   }

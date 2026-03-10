@@ -11,6 +11,7 @@ class QuizReportCard extends StatelessWidget {
   final String Function(QuizReport) getStatusText;
   final String Function(DateTime?) formatDate;
   final String Function(int) formatTime;
+  final VoidCallback? onTap; // Add onTap callback
 
   const QuizReportCard({
     super.key,
@@ -20,32 +21,37 @@ class QuizReportCard extends StatelessWidget {
     required this.getStatusText,
     required this.formatDate,
     required this.formatTime,
+    this.onTap, // Add to constructor
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10.r,
-            offset: Offset(0, 2.h),
+    // Wrap dengan InkWell untuk make it tappable (hanya jika sudah dikerjakan)
+    return InkWell(
+      onTap: quiz.isAttempted ? onTap : null,
+      borderRadius: BorderRadius.circular(12.r),
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10.r,
+              offset: Offset(0, 2.h),
+            ),
+          ],
+          border: Border.all(
+            color: getStatusColor(quiz.status).withValues(alpha: 0.3),
+            width: 1,
           ),
-        ],
-        border: Border.all(
-          color: getStatusColor(quiz.status).withValues(alpha: 0.3),
-          width: 1,
         ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        child: Padding(
+          padding: EdgeInsets.all(16.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             // Header
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,7 +217,8 @@ class QuizReportCard extends StatelessWidget {
                 ),
               ),
             ],
-          ],
+            ],
+          ),
         ),
       ),
     );

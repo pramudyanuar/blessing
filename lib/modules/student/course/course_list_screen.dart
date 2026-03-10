@@ -84,12 +84,13 @@ class CourseListScreen extends StatelessWidget {
                       onTapAction: () {
                         if (item['isCompleted'] as bool) {
                           // Navigasi langsung ke pembahasan quiz jika sudah selesai (submitted)
+                          // Pass sessionId dari report card untuk fetch detail jawaban
                           Get.toNamed(AppRoutes.quizReview,
                               arguments: {
                                 'quizId': item['id'],
                                 'quizName': item['title'],
                                 'score': item['score'] ?? 0,
-                                'sessionId': '',
+                                'sessionId': item['sessionId'] ?? '', // Use sessionId dari report card
                                 'reviewItems': [],
                                 'fetchFromServer': true,
                               });

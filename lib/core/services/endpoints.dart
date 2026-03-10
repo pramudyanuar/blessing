@@ -89,6 +89,8 @@ class Endpoints {
   static final String getSessionById = _url('/api/sessions/{id}');
   static final String getSessionTimeById =
       _url('/api/sessions/{sessionId}/time');
+  static final String getSessionSummary =
+      _url('/api/sessions/{sessionId}/summary');
   static final String submitSessionById =
       _url('/api/sessions/{sessionID}/submit');
   static final String updateSessionById = _url('/api/admin/sessions/{id}');

@@ -2,6 +2,7 @@ import 'package:blessing/data/core/models/paging_response.dart';
 import 'package:blessing/data/session/datasource/session_remote_datasource.dart';
 import 'package:blessing/data/session/models/request/create_user_quiz_session_request.dart';
 import 'package:blessing/data/session/models/response/user_quiz_session_response.dart';
+import 'package:blessing/data/session/models/response/session_summary_response.dart';
 import 'package:flutter/foundation.dart';
 
 class SessionRepository {
@@ -65,6 +66,19 @@ class SessionRepository {
       return await _dataSource.getSessionRemainingTime(sessionId);
     } catch (e) {
       debugPrint('Error in SessionRepository (getSessionRemainingTime): $e');
+      return null;
+    }
+  }
+
+  /// Fetch session summary dengan detail jawaban user dan jawaban benar
+  /// 
+  /// Endpoint: GET /api/sessions/{sessionId}/summary
+  /// Return: SessionSummaryResponse berisi score, jawaban user, jawaban benar
+  Future<SessionSummaryResponse?> getSessionSummary(String sessionId) async {
+    try {
+      return await _dataSource.getSessionSummary(sessionId);
+    } catch (e) {
+      debugPrint('Error in SessionRepository (getSessionSummary): $e');
       return null;
     }
   }
