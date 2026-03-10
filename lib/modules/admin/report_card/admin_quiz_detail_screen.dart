@@ -1,6 +1,7 @@
 import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_text.dart';
+import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/data/report/model/response/quiz_report.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,7 +13,10 @@ class AdminQuizDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final quiz = Get.arguments as QuizReport?;
+    final args = Get.arguments as Map<String, dynamic>?;
+    final quiz = args?['quiz'] as QuizReport?;
+    final userId = args?['userId'] as String?;
+    final userName = args?['userName'] as String?;
 
     if (quiz == null) {
       return BaseWidgetContainer(
@@ -224,31 +228,54 @@ class AdminQuizDetailScreen extends StatelessWidget {
             SizedBox(height: 24.h),
 
             // Action Button
-            SizedBox(
-              width: double.infinity,
-              height: 48.h,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.c2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
+            if (quiz.isAttempted && quiz.sessionId != null)
+              SizedBox(
+                width: double.infinity,
+                height: 48.h,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.c2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                  onPressed: () => Get.toNamed(
+                    AppRoutes.adminAnswerReview,
+                    arguments: {
+                      'sessionId': quiz.sessionId,
+                      'userId': userId ?? '',
+                      'quizName': quiz.quizName,
+                      'userName': userName ?? 'Siswa',
+                    },
+                  ),
+                  icon: Icon(Icons.preview, size: 20.sp),
+                  label: GlobalText.semiBold(
+                    'LIHAT REVIEW JAWABAN',
+                    fontSize: 14.sp,
+                    color: Colors.white,
                   ),
                 ),
-                onPressed: () {
-                  Get.snackbar(
-                    'Review Jawaban',
-                    'Fitur review jawaban segera hadir',
-                    duration: const Duration(seconds: 2),
-                  );
-                },
-                icon: Icon(Icons.preview, size: 20.sp),
-                label: GlobalText.semiBold(
-                  'LIHAT REVIEW JAWABAN',
-                  fontSize: 14.sp,
-                  color: Colors.white,
+              )
+            else
+              SizedBox(
+                width: double.infinity,
+                height: 48.h,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                  onPressed: null,
+                  icon: Icon(Icons.preview, size: 20.sp),
+                  label: GlobalText.semiBold(
+                    'LIHAT REVIEW JAWABAN',
+                    fontSize: 14.sp,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            ),
 
             SizedBox(height: 16.h),
 

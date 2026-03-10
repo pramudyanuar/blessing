@@ -5,6 +5,7 @@ class QuizReportUser {
   final bool isAttempted;
   final String status;
   final int? score;
+  final String? sessionId;
   final DateTime? attemptedAt;
   final DateTime? completedAt;
 
@@ -15,6 +16,7 @@ class QuizReportUser {
     required this.isAttempted,
     required this.status,
     this.score,
+    this.sessionId,
     this.attemptedAt,
     this.completedAt,
   });
@@ -27,6 +29,7 @@ class QuizReportUser {
       isAttempted: json['is_attempted'] ?? false,
       status: json['status'] ?? '',
       score: json['score'],
+      sessionId: json['session_id'],
       attemptedAt: json['attempted_at'] != null
           ? DateTime.parse(json['attempted_at'])
           : null,
@@ -44,6 +47,7 @@ class QuizReportUser {
       'is_attempted': isAttempted,
       'status': status,
       'score': score,
+      'session_id': sessionId,
       'attempted_at': attemptedAt?.toIso8601String(),
       'completed_at': completedAt?.toIso8601String(),
     };

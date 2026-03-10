@@ -9,10 +9,14 @@ import 'package:intl/intl.dart';
 
 class AdminQuizCard extends StatelessWidget {
   final QuizReport quiz;
+  final String? userId;
+  final String? userName;
 
   const AdminQuizCard({
     super.key,
     required this.quiz,
+    this.userId,
+    this.userName,
   });
 
   @override
@@ -20,7 +24,11 @@ class AdminQuizCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => Get.toNamed(
         AppRoutes.adminQuizDetail,
-        arguments: quiz,
+        arguments: {
+          'quiz': quiz,
+          'userId': userId,
+          'userName': userName,
+        },
       ),
       child: Container(
         padding: EdgeInsets.all(16.w),

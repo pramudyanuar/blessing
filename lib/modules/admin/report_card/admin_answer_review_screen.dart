@@ -1,366 +1,401 @@
 import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_text.dart';
+import 'package:blessing/modules/admin/report_card/controller/admin_answer_review_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-class AdminAnswerReviewScreen extends StatefulWidget {
+class AdminAnswerReviewScreen extends StatelessWidget {
   const AdminAnswerReviewScreen({super.key});
 
   @override
-  State<AdminAnswerReviewScreen> createState() =>
-      _AdminAnswerReviewScreenState();
-}
-
-class _AdminAnswerReviewScreenState extends State<AdminAnswerReviewScreen> {
-  int currentQuestionIndex = 0;
-  late final String quizId;
-  late final String userId;
-  late final String quizName;
-  late final String userName;
-
-  // Mock data structure - replace with actual API call
-  late final List<QuestionReview> questions;
-
-  @override
-  void initState() {
-    super.initState();
-    final args = Get.arguments as Map<String, dynamic>?;
-    quizId = args?['quizId'] ?? '';
-    userId = args?['userId'] ?? '';
-    quizName = args?['quizName'] ?? 'Quiz';
-    userName = args?['userName'] ?? 'Siswa';
-
-    // Initialize mock data
-    _initializeMockData();
-  }
-
-  void _initializeMockData() {
-    questions = [
-      QuestionReview(
-        questionNumber: 1,
-        questionText: 'Berapa hasil dari 2 + 2?',
-        userAnswer: 'A',
-        correctAnswer: 'A',
-        isCorrect: true,
-        options: [
-          {'label': 'A', 'text': '4'},
-          {'label': 'B', 'text': '5'},
-          {'label': 'C', 'text': '3'},
-          {'label': 'D', 'text': '6'},
-        ],
-        explanation:
-            '2 + 2 = 4 adalah penjumlahan dasar yang menghasilkan angka 4.',
-      ),
-      QuestionReview(
-        questionNumber: 2,
-        questionText: 'Ibu kota Indonesia adalah?',
-        userAnswer: 'B',
-        correctAnswer: 'A',
-        isCorrect: false,
-        options: [
-          {'label': 'A', 'text': 'Jakarta'},
-          {'label': 'B', 'text': 'Bandung'},
-          {'label': 'C', 'text': 'Surabaya'},
-          {'label': 'D', 'text': 'Medan'},
-        ],
-        explanation:
-            'Jakarta adalah ibu kota Indonesia yang berlokasi di Pulau Jawa.',
-      ),
-      QuestionReview(
-        questionNumber: 3,
-        questionText: 'Siapa penemu lampu pijar?',
-        userAnswer: null,
-        correctAnswer: 'A',
-        isCorrect: false,
-        options: [
-          {'label': 'A', 'text': 'Thomas Edison'},
-          {'label': 'B', 'text': 'Nikola Tesla'},
-          {'label': 'C', 'text': 'Alexander Graham Bell'},
-          {'label': 'D', 'text': 'Guglielmo Marconi'},
-        ],
-        explanation:
-            'Thomas Edison menemukan lampu pijar yang praktis untuk digunakan.',
-      ),
-    ];
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final currentQuestion = questions[currentQuestionIndex];
-    final correctCount =
-        questions.where((q) => q.isCorrect).length;
-    final accuracy =
-        ((correctCount / questions.length) * 100).toStringAsFixed(1);
-
-    return BaseWidgetContainer(
-      backgroundColor: AppColors.c5,
-      appBar: AppBar(
-        title: GlobalText.semiBold(
-          'Review Jawaban',
-          fontSize: 18.sp,
-          color: AppColors.c2,
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Get.back(),
-        ),
-      ),
-      body: Column(
-        children: [
-          // Progress Header
-          Container(
-            color: Colors.white,
-            padding: EdgeInsets.all(16.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GlobalText.semiBold(
-                  quizName,
-                  fontSize: 16.sp,
-                  color: Colors.black87,
-                ),
-                SizedBox(height: 8.h),
-                GlobalText.regular(
-                  userName,
-                  fontSize: 13.sp,
-                  color: Colors.grey.shade600,
-                ),
-                SizedBox(height: 12.h),
-                // Progress Bar
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.r),
-                  child: LinearProgressIndicator(
-                    value: (currentQuestionIndex + 1) / questions.length,
-                    minHeight: 8.h,
-                    backgroundColor: Colors.grey.shade200,
-                    valueColor: const AlwaysStoppedAnimation(AppColors.c2),
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GlobalText.medium(
-                      'Soal ${currentQuestionIndex + 1} dari ${questions.length}',
-                      fontSize: 12.sp,
-                      color: Colors.grey.shade600,
-                    ),
-                    GlobalText.semiBold(
-                      'Akurasi: $accuracy%',
-                      fontSize: 12.sp,
-                      color: AppColors.c2,
-                    ),
-                  ],
-                ),
-              ],
+    return GetBuilder<AdminAnswerReviewController>(
+      init: AdminAnswerReviewController(),
+      builder: (controller) {
+        return BaseWidgetContainer(
+          backgroundColor: AppColors.c5,
+          appBar: AppBar(
+            title: GlobalText.semiBold(
+              'Review Jawaban',
+              fontSize: 18.sp,
+              color: AppColors.c2,
+            ),
+            backgroundColor: Colors.white,
+            elevation: 0.5,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+              onPressed: () => Get.back(),
             ),
           ),
+          body: Obx(() {
+            if (controller.isLoading.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          // Question Content
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(16.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            if (controller.questions.isEmpty) {
+              return const Center(
+                child: Text('Data tidak tersedia'),
+              );
+            }
+
+            return _buildContent(controller);
+          }),
+        );
+      },
+    );
+  }
+
+  Widget _buildContent(AdminAnswerReviewController controller) {
+    return Column(
+      children: [
+        // Header dengan Quiz info dan Akurasi
+        Container(
+          padding: EdgeInsets.all(16.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(
+              bottom: BorderSide(color: Colors.grey.shade200),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GlobalText.semiBold(
+                controller.quizName.value,
+                fontSize: 16.sp,
+                color: Colors.black87,
+              ),
+              SizedBox(height: 8.h),
+              GlobalText.regular(
+                controller.userName.value,
+                fontSize: 13.sp,
+                color: Colors.grey.shade600,
+              ),
+              SizedBox(height: 12.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Question Card
-                  Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(color: Colors.grey.shade200),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  GlobalText.medium(
+                    'Total: ${controller.questions.length} soal',
+                    fontSize: 12.sp,
+                    color: Colors.grey.shade600,
+                  ),
+                  GlobalText.semiBold(
+                    'Akurasi: ${controller.accuracy}%',
+                    fontSize: 12.sp,
+                    color: AppColors.c2,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        // List of Questions
+        Expanded(
+          child: ListView.builder(
+            padding: EdgeInsets.all(16.w),
+            itemCount: controller.questions.length,
+            itemBuilder: (context, index) {
+              final question = controller.questions[index];
+              return Padding(
+                padding: EdgeInsets.only(bottom: 16.h),
+                child: Column(
+                  children: [
+                    // Question number badge
+                    Row(
                       children: [
-                        // Status Badge
                         Container(
                           padding: EdgeInsets.symmetric(
-                            horizontal: 8.w,
-                            vertical: 4.h,
+                            horizontal: 12.w,
+                            vertical: 6.h,
                           ),
                           decoration: BoxDecoration(
-                            color: currentQuestion.isCorrect
+                            color: question.isCorrect
+                                ? Colors.green.withValues(alpha: 0.1)
+                                : Colors.red.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20.r),
+                            border: Border.all(
+                              color: question.isCorrect
+                                  ? Colors.green
+                                  : Colors.red,
+                            ),
+                          ),
+                          child: GlobalText.semiBold(
+                            'Soal ${index + 1}',
+                            fontSize: 12.sp,
+                            color: question.isCorrect
+                                ? Colors.green
+                                : Colors.red,
+                          ),
+                        ),
+                        SizedBox(width: 8.w),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10.w,
+                            vertical: 6.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: question.isCorrect
                                 ? Colors.green.withValues(alpha: 0.1)
                                 : Colors.red.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6.r),
                           ),
                           child: GlobalText.semiBold(
-                            currentQuestion.isCorrect ? 'BENAR' : 'SALAH',
+                            question.isCorrect ? 'BENAR' : 'SALAH',
                             fontSize: 11.sp,
-                            color: currentQuestion.isCorrect
+                            color: question.isCorrect
                                 ? Colors.green
                                 : Colors.red,
                           ),
                         ),
-                        SizedBox(height: 12.h),
-                        // Question Text
-                        GlobalText.semiBold(
-                          currentQuestion.questionText,
-                          fontSize: 16.sp,
-                          color: Colors.black87,
-                        ),
-                        SizedBox(height: 16.h),
-                        // Options
-                        ...currentQuestion.options.map((option) {
-                          final isUserAnswer =
-                              option['label'] == currentQuestion.userAnswer;
-                          final isCorrect =
-                              option['label'] == currentQuestion.correctAnswer;
-                          final isWrongAnswer =
-                              isUserAnswer && !isCorrect;
+                      ],
+                    ),
+                    SizedBox(height: 12.h),
+                    // Question Card
+                    _buildQuestionCard(question),
+                    SizedBox(height: 12.h),
+                    // Explanation if available
+                    if (question.explanation != null)
+                      _buildExplanationCard(question),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
 
-                          Color backgroundColor;
-                          Color borderColor;
-                          Color textColor;
+  Widget _buildQuestionCard(QuestionReviewData currentQuestion) {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Question Text
+          GlobalText.semiBold(
+            currentQuestion.questionText,
+            fontSize: 15.sp,
+            color: Colors.black87,
+          ),
+          SizedBox(height: 16.h),
+          // Question Images
+          if (currentQuestion.questionImages.isNotEmpty) ...[
+            _buildQuestionImages(currentQuestion.questionImages),
+            SizedBox(height: 16.h),
+          ],
+          // User Answer
+          if (currentQuestion.userAnswer != null) ...[
+            _buildAnswerDisplay(
+              'Jawaban Siswa',
+              currentQuestion.userAnswer!,
+              Colors.orange,
+            ),
+            SizedBox(height: 12.h),
+          ],
+          // Correct Answer (only show if different from user answer)
+          if (currentQuestion.userAnswer != currentQuestion.correctAnswer) ...[
+            _buildAnswerDisplay(
+              'Jawaban Benar',
+              currentQuestion.correctAnswer,
+              Colors.green,
+            ),
+          ] else if (currentQuestion.userAnswer == null) ...[
+            _buildAnswerDisplay(
+              'Jawaban Benar',
+              currentQuestion.correctAnswer,
+              Colors.green,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 
-                          if (isCorrect) {
-                            backgroundColor = Colors.green.withValues(alpha: 0.1);
-                            borderColor = Colors.green;
-                            textColor = Colors.green;
-                          } else if (isWrongAnswer) {
-                            backgroundColor = Colors.red.withValues(alpha: 0.1);
-                            borderColor = Colors.red;
-                            textColor = Colors.red;
-                          } else {
-                            backgroundColor = Colors.grey.withValues(alpha: 0.05);
-                            borderColor = Colors.grey.shade300;
-                            textColor = Colors.grey.shade700;
-                          }
-
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: 8.h),
-                            child: Container(
-                              padding: EdgeInsets.all(12.w),
+  Widget _buildQuestionImages(List<String> images) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GlobalText.medium(
+          'Gambar Soal',
+          fontSize: 13.sp,
+          color: Colors.grey.shade600,
+        ),
+        SizedBox(height: 12.h),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: images.map((image) {
+              return Padding(
+                padding: EdgeInsets.only(right: 12.w),
+                child: GestureDetector(
+                  onTap: () => _showImageDetail(image),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12.r),
+                    child: Stack(
+                      children: [
+                        Image.network(
+                          image,
+                          height: 250.h,
+                          width: 250.w,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              height: 250.h,
+                              width: 250.w,
                               decoration: BoxDecoration(
-                                color: backgroundColor,
-                                border: Border.all(color: borderColor),
-                                borderRadius: BorderRadius.circular(8.r),
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(12.r),
                               ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 32.w,
-                                    height: 32.h,
-                                    decoration: BoxDecoration(
-                                      color: borderColor,
-                                      borderRadius: BorderRadius.circular(6.r),
-                                    ),
-                                    child: Center(
-                                      child: GlobalText.semiBold(
-                                        option['label'],
-                                        fontSize: 12.sp,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: 12.w),
-                                  Expanded(
-                                    child: GlobalText.regular(
-                                      option['text'],
-                                      fontSize: 14.sp,
-                                      color: textColor,
-                                    ),
-                                  ),
-                                  if (isCorrect)
-                                    Icon(Icons.check_circle,
-                                        color: Colors.green, size: 20.sp)
-                                  else if (isWrongAnswer)
-                                    Icon(Icons.close,
-                                        color: Colors.red, size: 20.sp),
-                                ],
+                              child: const Center(
+                                child: Icon(Icons.image_not_supported),
                               ),
+                            );
+                          },
+                        ),
+                        // Zoom indicator overlay
+                        Positioned(
+                          bottom: 8.w,
+                          right: 8.w,
+                          child: Container(
+                            padding: EdgeInsets.all(8.w),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.6),
+                              borderRadius: BorderRadius.circular(20.r),
                             ),
-                          );
-                        }),
+                            child: Icon(
+                              Icons.zoom_in,
+                              color: Colors.white,
+                              size: 18.sp,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ],
+    );
+  }
 
-                  SizedBox(height: 16.h),
-
-                  // Explanation Card
-                  if (currentQuestion.explanation != null)
-                    Container(
-                      padding: EdgeInsets.all(12.w),
-                      decoration: BoxDecoration(
-                        color: AppColors.c2.withValues(alpha: 0.05),
-                        border: Border(
-                          left: BorderSide(
-                            color: AppColors.c2,
-                            width: 4.w,
-                          ),
-                        ),
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          GlobalText.semiBold(
-                            'Penjelasan',
-                            fontSize: 13.sp,
-                            color: AppColors.c2,
-                          ),
-                          SizedBox(height: 8.h),
-                          GlobalText.regular(
-                            currentQuestion.explanation!,
-                            fontSize: 13.sp,
-                            color: Colors.grey.shade700,
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
+  void _showImageDetail(String imageUrl) {
+    Get.dialog(
+      Dialog(
+        backgroundColor: Colors.transparent,
+        child: GestureDetector(
+          onTap: () => Get.back(),
+          child: Stack(
+            children: [
+              // Backdrop
+              Positioned.fill(
+                child: GestureDetector(
+                  onTap: () => Get.back(),
+                  child: Container(
+                    color: Colors.black.withValues(alpha: 0.7),
+                  ),
+                ),
               ),
+              // Image
+              Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.w),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16.r),
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(32.w),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16.r),
+                              ),
+                              child: const Icon(Icons.image_not_supported),
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+                      // Close button
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                        ),
+                        onPressed: () => Get.back(),
+                        icon: const Icon(Icons.close, color: Colors.black),
+                        label: GlobalText.medium(
+                          'Tutup',
+                          fontSize: 12.sp,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAnswerDisplay(
+    String label,
+    String answer,
+    Color color,
+  ) {
+    return Container(
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        border: Border.all(color: color),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 4.w,
+            height: 40.h,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(2.r),
             ),
           ),
-
-          // Navigation Buttons
-          Container(
-            color: Colors.white,
-            padding: EdgeInsets.all(16.w),
-            child: Row(
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (currentQuestionIndex > 0)
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        setState(() => currentQuestionIndex--);
-                      },
-                      icon: const Icon(Icons.arrow_back),
-                      label: const Text('Sebelumnya'),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.c2),
-                      ),
-                    ),
-                  ),
-                if (currentQuestionIndex > 0) SizedBox(width: 12.w),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: currentQuestionIndex < questions.length - 1
-                        ? () {
-                            setState(() => currentQuestionIndex++);
-                          }
-                        : () => Get.back(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.c2,
-                    ),
-                    icon: Icon(
-                      currentQuestionIndex < questions.length - 1
-                          ? Icons.arrow_forward
-                          : Icons.check,
-                    ),
-                    label: Text(
-                      currentQuestionIndex < questions.length - 1
-                          ? 'Selanjutnya'
-                          : 'Selesai',
-                    ),
-                  ),
+                GlobalText.medium(
+                  label,
+                  fontSize: 12.sp,
+                  color: color,
+                ),
+                SizedBox(height: 4.h),
+                GlobalText.regular(
+                  answer,
+                  fontSize: 14.sp,
+                  color: Colors.black87,
                 ),
               ],
             ),
@@ -369,24 +404,38 @@ class _AdminAnswerReviewScreenState extends State<AdminAnswerReviewScreen> {
       ),
     );
   }
+
+  Widget _buildExplanationCard(QuestionReviewData currentQuestion) {
+    return Container(
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: AppColors.c2.withValues(alpha: 0.05),
+        border: Border(
+          left: BorderSide(
+            color: AppColors.c2,
+            width: 4.w,
+          ),
+        ),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GlobalText.semiBold(
+            'Penjelasan',
+            fontSize: 13.sp,
+            color: AppColors.c2,
+          ),
+          SizedBox(height: 8.h),
+          GlobalText.regular(
+            currentQuestion.explanation ?? '',
+            fontSize: 13.sp,
+            color: Colors.grey.shade700,
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-class QuestionReview {
-  final int questionNumber;
-  final String questionText;
-  final String? userAnswer;
-  final String correctAnswer;
-  final bool isCorrect;
-  final List<dynamic> options;
-  final String? explanation;
 
-  QuestionReview({
-    required this.questionNumber,
-    required this.questionText,
-    required this.userAnswer,
-    required this.correctAnswer,
-    required this.isCorrect,
-    required this.options,
-    this.explanation,
-  });
-}

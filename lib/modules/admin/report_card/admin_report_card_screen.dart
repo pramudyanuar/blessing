@@ -157,7 +157,11 @@ class AdminReportCardScreen extends StatelessWidget {
                         SizedBox(height: 12.h),
                     itemBuilder: (context, index) {
                       final quiz = controller.filteredQuizzes[index];
-                      return AdminQuizCard(quiz: quiz);
+                      return AdminQuizCard(
+                        quiz: quiz,
+                        userId: controller.selectedUserId.value,
+                        userName: controller.userName.value,
+                      );
                     },
                   );
                 }),

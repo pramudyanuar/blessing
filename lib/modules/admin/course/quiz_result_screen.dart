@@ -1,6 +1,7 @@
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/core/global_components/search_bar.dart';
+import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/data/report/repository/report_repository_impl.dart';
 import 'package:blessing/modules/admin/course/quiz_result_controller.dart';
 import 'package:flutter/material.dart';
@@ -99,11 +100,25 @@ class AdminQuizResultScreen extends StatelessWidget {
                       final rank = controller.getUserRanking(user);
                       return Padding(
                         padding: EdgeInsets.only(bottom: 8.h),
-                        child: _buildStudentCard(
-                          user.username,
-                          controller.getAchievementText(rank),
-                          user.score ?? 0,
-                          controller.getCardColor(rank),
+                        child: InkWell(
+                          onTap: user.isAttempted && user.sessionId != null
+                              ? () => Get.toNamed(
+                                    AppRoutes.adminAnswerReview,
+                                    arguments: {
+                                      'sessionId': user.sessionId,
+                                      'userId': user.userId,
+                                      'quizName': controller.quizData?.quizName ?? 'Quiz',
+                                      'userName': user.username,
+                                    },
+                                  )
+                              : null,
+                          child: _buildStudentCard(
+                            user.username,
+                            controller.getAchievementText(rank),
+                            user.score ?? 0,
+                            controller.getCardColor(rank),
+                            isAttempted: user.isAttempted,
+                          ),
                         ),
                       );
                     },
@@ -197,46 +212,54 @@ class AdminQuizResultScreen extends StatelessWidget {
   }
 
   Widget _buildStudentCard(
-      String name, String achievement, int score, Color cardColor) {
+    String name,
+    String achievement,
+    int score,
+    Color cardColor, {
+    bool isAttempted = false,
+  }) {
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(12.r),
       ),
-      child: Row(
-        children: [
-          // Avatar
-          CircleAvatar(
-            radius: 20.r,
-            backgroundColor: Colors.grey.shade300,
-            child: Icon(Icons.person, color: Colors.grey.shade600, size: 20.sp),
-          ),
-          SizedBox(width: 12.w),
+      child: Opacity(
+        opacity: isAttempted ? 1.0 : 0.6,
+        child: Row(
+          children: [
+            // Avatar
+            CircleAvatar(
+              radius: 20.r,
+              backgroundColor: Colors.grey.shade300,
+              child: Icon(Icons.person, color: Colors.grey.shade600, size: 20.sp),
+            ),
+            SizedBox(width: 12.w),
 
-          // Student Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            // Student Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GlobalText.semiBold(name, fontSize: 14.sp, color: Colors.white),
+                  if (achievement.isNotEmpty)
+                    GlobalText.medium(achievement,
+                        fontSize: 12.sp, color: Colors.white70),
+                ],
+              ),
+            ),
+
+            // Score
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                GlobalText.semiBold(name, fontSize: 14.sp, color: Colors.white),
-                if (achievement.isNotEmpty)
-                  GlobalText.medium(achievement,
-                      fontSize: 12.sp, color: Colors.white70),
+                GlobalText.bold(score.toString(),
+                    fontSize: 16.sp, color: Colors.white),
+                GlobalText.medium("/100", fontSize: 12.sp, color: Colors.white70),
               ],
             ),
-          ),
-
-          // Score
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              GlobalText.bold(score.toString(),
-                  fontSize: 16.sp, color: Colors.white),
-              GlobalText.medium("/100", fontSize: 12.sp, color: Colors.white70),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
