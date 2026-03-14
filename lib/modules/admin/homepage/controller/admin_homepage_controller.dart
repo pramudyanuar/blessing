@@ -17,8 +17,8 @@ class AdminHomepageController extends GetxController {
 
   // --- STATE ---
   var isLoading = true.obs;
-  var selectedKelas = 7.obs;
-  final List<int> kelasList = [7, 8, 9, 10, 11, 12];
+  var selectedKelas = 1.obs;
+  final List<int> kelasList = [1 ,2 ,3 ,4 ,5 ,6 ,7, 8, 9, 10, 11, 12];
 
   final _allSubjects = <SubjectResponse>[].obs; // Menyimpan semua data asli
   var displayedSubjects =

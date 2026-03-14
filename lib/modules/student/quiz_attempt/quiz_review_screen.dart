@@ -1,5 +1,6 @@
 import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
+import 'package:blessing/core/global_components/global_button.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/data/core/models/content_block.dart';
@@ -158,31 +159,39 @@ class QuizReviewScreen extends StatelessWidget {
                     );
                   },
                 ),
-              SizedBox(height: 24.h),
+                // Tombol Reattempt (Coba Lagi)
+                GlobalButton(
+                  text: "Coba Lagi (Reattempt)",
+                  width: double.infinity,
+                  height: 50,
+                  fontSize: 15.sp,
+                  color: Colors.orange.shade700,
+                  onPressed: () {
+                    Get.offNamed(
+                      AppRoutes.quizAttempt,
+                      arguments: {
+                        'quizId': controller.quizId,
+                        'quizName': controller.quizName,
+                      },
+                    );
+                  },
+                ),
 
-              // Tombol Kembali
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
+                SizedBox(height: 12.h),
+
+                // Tombol Kembali ke Menu Utama
+                GlobalButton(
+                  text: "Kembali ke Menu Utama",
+                  width: double.infinity,
+                  height: 50,
+                  fontSize: 15.sp,
                   onPressed: () {
                     // Baik dari list maupun dari quiz attempt -> kembali ke menu utama
                     Get.offAllNamed(AppRoutes.studentMenu);
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.c2,
-                    padding: EdgeInsets.symmetric(vertical: 12.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                  ),
-                  child: GlobalText.semiBold(
-                    'Kembali ke Menu Utama',
-                    fontSize: 16.sp,
-                    color: Colors.white,
-                  ),
                 ),
-              ),
-              SizedBox(height: 16.h),
+                
+                SizedBox(height: 32.h),
             ],
           ),
         );
