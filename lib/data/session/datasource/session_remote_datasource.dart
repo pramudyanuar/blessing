@@ -4,6 +4,7 @@ import 'package:blessing/data/core/models/paging_response.dart';
 import 'package:blessing/data/session/models/request/create_user_quiz_session_request.dart';
 import 'package:blessing/data/session/models/response/user_quiz_session_response.dart';
 import 'package:blessing/data/session/models/response/session_summary_response.dart';
+import 'package:blessing/data/session/models/response/quiz_attempt_summary.dart';
 import 'package:flutter/foundation.dart';
 
 class SessionDataSource {
@@ -193,6 +194,53 @@ class SessionDataSource {
       }
     } catch (e) {
       debugPrint('getSessionSummary DataSource error: $e');
+      return null;
+    }
+  }
+
+  /// Fetch quiz attempt summaries - list of all attempts untuk satu quiz
+  /// Endpoint: GET /api/quiz/{quizId}/quiz-summary
+  /// Returns: Paginated list of QuizAttemptSummary ordered by most recent first
+  Future<({List<QuizAttemptSummary> attempts, PagingResponse paging})?>
+      getQuizAttemptSummaries({
+    required String quizId,
+    int page = 1,
+    int size = 10,
+  }) async {
+    try {
+      String url = Endpoints.getQuizAttemptSummaries
+          .replaceFirst('{quizId}', quizId);
+      url += '?page=$page&size=$size';
+
+      final response = await _httpManager.restRequest(
+        url: url,
+        method: HttpMethods.get,
+      );
+
+      if (response['statusCode'] == 200) {
+        debugPrint('getQuizAttemptSummaries DataSource response: ${response['data']}');
+
+        final responseData = response['data'] as Map<String, dynamic>?;
+        final dataPart = responseData?['data'] as Map<String, dynamic>?;
+        
+        // The API returns: data: {quiz_id, quiz_name, summaries: [...]}
+        // So we need to extract summaries array from dataPart
+        final summariesList = (dataPart?['summaries'] as List?)
+                ?.map((e) => QuizAttemptSummary.fromJson(e as Map<String, dynamic>))
+                .toList() ??
+            [];
+
+        final paging = PagingResponse.fromJson(
+            responseData?['paging'] as Map<String, dynamic>? ?? {});
+
+        return (attempts: summariesList, paging: paging);
+      } else {
+        debugPrint(
+            'getQuizAttemptSummaries DataSource failed: ${response['statusMessage']}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('getQuizAttemptSummaries DataSource error: $e');
       return null;
     }
   }

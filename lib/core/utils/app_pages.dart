@@ -16,6 +16,8 @@ import 'package:blessing/modules/admin/course/bindings/create_quiz_bindings.dart
 import 'package:blessing/modules/admin/course/create_quiz_screen.dart';
 import 'package:blessing/modules/admin/course/quiz_result_screen.dart';
 import 'package:blessing/modules/admin/course/upload_course_screen.dart';
+import 'package:blessing/modules/admin/course/admin_quiz_attempts_list_screen.dart';
+import 'package:blessing/modules/admin/course/admin_quiz_attempts_list_binding.dart';
 import 'package:blessing/modules/admin/homepage/bindings/admin_homepage_binding.dart';
 import 'package:blessing/modules/admin/homepage/admin_homepage_screen.dart';
 import 'package:blessing/modules/admin/main/bindings/main_admin_binding.dart';
@@ -50,8 +52,10 @@ import 'package:blessing/modules/student/profile/bindings/profile_binding.dart';
 import 'package:blessing/modules/student/report_card/bindings/report_card_binding.dart';
 import 'package:blessing/modules/student/report_card/report_card_screen.dart';
 import 'package:blessing/modules/student/quiz_attempt/bindings/quiz_attempt_binding.dart';
+import 'package:blessing/modules/student/quiz_attempt/bindings/quiz_attempts_list_binding.dart';
 import 'package:blessing/modules/student/quiz_attempt/bindings/quiz_intro_binding.dart';
 import 'package:blessing/modules/student/quiz_attempt/quiz_attempt_screen.dart';
+import 'package:blessing/modules/student/quiz_attempt/quiz_attempts_list_screen.dart';
 import 'package:blessing/modules/student/quiz_attempt/quiz_intro_screen.dart';
 import 'package:blessing/modules/student/quiz_attempt/quiz_result_screen.dart';
 import 'package:blessing/modules/student/quiz_attempt/quiz_review_screen.dart';
@@ -207,6 +211,12 @@ class AppPages {
       page: () => const AdminAnswerReviewScreen(),
       middlewares: [RoleMiddleware(requiredRole: 'admin')],
     ),
+    GetPage(
+      name: AppRoutes.adminQuizAttemptsList,
+      page: () => const AdminQuizAttemptsListScreen(),
+      binding: AdminQuizAttemptsListBinding(),
+      middlewares: [RoleMiddleware(requiredRole: 'admin')],
+    ),
 
     /// Student-only
     GetPage(
@@ -237,6 +247,12 @@ class AppPages {
       middlewares: [
         RoleMiddleware(requiredRole: 'user'),
       ],
+    ),
+    GetPage(
+      name: AppRoutes.quizAttemptsList,
+      page: () => const QuizAttemptsListScreen(),
+      binding: QuizAttemptsListBinding(),
+      middlewares: [RoleMiddleware(requiredRole: 'user')],
     ),
     GetPage(
       name: AppRoutes.quizAttempt,

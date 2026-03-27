@@ -1,3 +1,4 @@
+import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/data/session/repository/session_repository_impl.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
@@ -111,6 +112,19 @@ class AdminAnswerReviewController extends GetxController {
     final correctCount = questions.where((q) => q.isCorrect).length;
     final acc = ((correctCount / questions.length) * 100).toStringAsFixed(1);
     return acc;
+  }
+
+  /// Navigate ke attempts list untuk student ini
+  void goToAttemptsList() {
+    Get.toNamed(
+      AppRoutes.adminQuizAttemptsList,
+      arguments: {
+        'quizId': quizId,
+        'quizName': quizName.value,
+        'userId': userId,
+        'studentName': userName.value,
+      },
+    );
   }
 }
 

@@ -28,6 +28,15 @@ class AdminAnswerReviewScreen extends StatelessWidget {
               icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
               onPressed: () => Get.back(),
             ),
+            actions: [
+              Tooltip(
+                message: 'Lihat semua attempt',
+                child: IconButton(
+                  icon: const Icon(Icons.list, color: Colors.black),
+                  onPressed: () => controller.goToAttemptsList(),
+                ),
+              ),
+            ],
           ),
           body: Obx(() {
             if (controller.isLoading.value) {

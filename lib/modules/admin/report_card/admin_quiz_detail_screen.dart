@@ -279,6 +279,37 @@ class AdminQuizDetailScreen extends StatelessWidget {
 
             SizedBox(height: 16.h),
 
+            // View All Attempts Button
+            SizedBox(
+              width: double.infinity,
+              height: 48.h,
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: AppColors.c2, width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                ),
+                onPressed: () => Get.toNamed(
+                  AppRoutes.adminQuizAttemptsList,
+                  arguments: {
+                    'quizId': quiz.quizId,
+                    'quizName': quiz.quizName,
+                    'userId': userId ?? '',
+                    'studentName': userName ?? 'Siswa',
+                  },
+                ),
+                icon: Icon(Icons.list, size: 20.sp, color: AppColors.c2),
+                label: GlobalText.semiBold(
+                  'LIHAT SEMUA ATTEMPT',
+                  fontSize: 14.sp,
+                  color: AppColors.c2,
+                ),
+              ),
+            ),
+
+            SizedBox(height: 24.h),
+
             SizedBox(
               width: double.infinity,
               height: 48.h,

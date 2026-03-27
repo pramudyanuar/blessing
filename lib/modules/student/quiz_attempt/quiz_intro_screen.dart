@@ -258,6 +258,14 @@ class QuizIntroScreen extends StatelessWidget {
                           text: "Lihat Detail Jawaban",
                           onPressed: controller.viewResult,
                         ),
+                        SizedBox(height: 8.h),
+                        OutlinedButton(
+                          onPressed: controller.viewAttemptsList,
+                          child: const Text(
+                            'Lihat Semua Attempt',
+                            style: TextStyle(color: AppColors.c2),
+                          ),
+                        ),
                         if (controller.canRetake.value) ...[
                           SizedBox(height: 8.h),
                           OutlinedButton(

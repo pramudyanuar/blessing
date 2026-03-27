@@ -3,6 +3,7 @@ import 'package:blessing/data/session/datasource/session_remote_datasource.dart'
 import 'package:blessing/data/session/models/request/create_user_quiz_session_request.dart';
 import 'package:blessing/data/session/models/response/user_quiz_session_response.dart';
 import 'package:blessing/data/session/models/response/session_summary_response.dart';
+import 'package:blessing/data/session/models/response/quiz_attempt_summary.dart';
 import 'package:flutter/foundation.dart';
 
 class SessionRepository {
@@ -79,6 +80,29 @@ class SessionRepository {
       return await _dataSource.getSessionSummary(sessionId);
     } catch (e) {
       debugPrint('Error in SessionRepository (getSessionSummary): $e');
+      return null;
+    }
+  }
+
+  /// Fetch quiz attempt summaries - list of all attempts untuk satu quiz
+  /// 
+  /// Endpoint: GET /api/quiz/{quizId}/quiz-summary
+  /// Return: Paginated list of QuizAttemptSummary ordered by most recent first
+  Future<({List<QuizAttemptSummary> attempts, PagingResponse paging})?>
+      getQuizAttemptSummaries({
+    required String quizId,
+    int page = 1,
+    int size = 10,
+  }) async {
+    try {
+      final result = await _dataSource.getQuizAttemptSummaries(
+        quizId: quizId,
+        page: page,
+        size: size,
+      );
+      return result;
+    } catch (e) {
+      debugPrint('Error in SessionRepository (getQuizAttemptSummaries): $e');
       return null;
     }
   }

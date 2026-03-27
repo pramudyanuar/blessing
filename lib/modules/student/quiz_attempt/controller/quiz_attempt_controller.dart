@@ -469,15 +469,12 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
     Get.back(); // Tutup dialog loading
 
     if (result != null) {
-      // Kumpulkan data untuk review
-      final reviewItems = _buildReviewItems();
-
-      // Navigate ke review screen dengan data lengkap
-      Get.toNamed(AppRoutes.quizReview, arguments: {
+      // Navigate ke quiz result screen untuk menampilkan skor dan pilihan see discussion/all attempts
+      Get.toNamed(AppRoutes.quizResult, arguments: {
+        'quizname': result.quiz?.quizName ?? 'Kuis',
+        'result': result.score ?? 0,
+        'quizId': quizId,
         'sessionId': sessionId,
-        'quizName': result.quiz?.quizName ?? 'Kuis',
-        'score': result.score ?? 0,
-        'reviewItems': reviewItems,
       });
       Get.snackbar("Sukses", "Kuis berhasil diselesaikan!");
     } else {
@@ -492,29 +489,4 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
   /// Mencocokkan setiap pertanyaan dengan jawaban user yang dipilih.
   /// Note: correctAnswer dan isCorrect akan diterima dari backend 
   /// saat session di-submit atau di-fetch kembali.
-  List<Map<String, dynamic>> _buildReviewItems() {
-    final List<Map<String, dynamic>> items = [];
-
-    for (final question in questions) {
-      final userAnswerId = userAnswers[question.id];
-      final options = optionsByQuestion[question.id] ?? [];
-
-      // Cari jawaban user dari ID yang tersimpan
-      QuestionOptionResponse? userAnswer;
-      if (userAnswerId != null && userAnswerId.isNotEmpty) {
-        userAnswer = options.firstWhereOrNull((opt) => opt.id == userAnswerId);
-      }
-
-      // Note: correctAnswer dan isCorrect akan diisi oleh backend response
-      // Saat ini placeholder, perlu endpoint /api/sessions/{sessionId}/summary
-      items.add({
-        'question': question,
-        'userAnswer': userAnswer, // Nullable jika tidak menjawab
-        'correctAnswer': null, // Akan diisi dari backend
-        'isCorrect': false, // Akan diisi dari backend (placeholder)
-      });
-    }
-
-    return items;
-  }
 }

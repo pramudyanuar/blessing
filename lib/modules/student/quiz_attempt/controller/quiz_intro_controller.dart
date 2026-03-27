@@ -109,6 +109,8 @@ class QuizIntroController extends GetxController {
           // Quiz sudah selesai (submitted)
           quizStatus.value = QuizAttemptStatus.submitted;
           previousScore.value = completedQuiz.score ?? 0;
+          // ✅ SIMPAN sessionId dari report card
+          sessionId.value = completedQuiz.sessionId ?? '';
           canRetake.value = false;
           return;
         }
@@ -180,9 +182,17 @@ class QuizIntroController extends GetxController {
       'quizId': quizId,
       'score': previousScore.value,
       'quizName': quizDetails.value['title'] ?? 'Kuis',
-      'sessionId': '', // Tidak ada session ID saat view dari list
-      'reviewItems': [], // Empty, akan di-fetch dari API
-      'fetchFromServer': true, // Flag untuk fetch dari server
+      'sessionId': sessionId.value, // ✅ Sekarang menggunakan sessionId yang disimpan
+      'reviewItems': [],
+      'fetchFromServer': true,
+    });
+  }
+
+  /// Lihat daftar semua attempt untuk quiz ini
+  void viewAttemptsList() {
+    Get.toNamed(AppRoutes.quizAttemptsList, arguments: {
+      'quizId': quizId,
+      'quizName': quizDetails.value['title'] ?? 'Kuis',
     });
   }
 

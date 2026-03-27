@@ -82,24 +82,10 @@ class CourseListScreen extends StatelessWidget {
                       isCompleted: item['isCompleted'],
                       score: item['score'],
                       onTapAction: () {
-                        if (item['isCompleted'] as bool) {
-                          // Navigasi langsung ke pembahasan quiz jika sudah selesai (submitted)
-                          // Pass sessionId dari report card untuk fetch detail jawaban
-                          Get.toNamed(AppRoutes.quizReview,
-                              arguments: {
-                                'quizId': item['id'],
-                                'quizName': item['title'],
-                                'score': item['score'] ?? 0,
-                                'sessionId': item['sessionId'] ?? '', // Use sessionId dari report card
-                                'reviewItems': [],
-                                'fetchFromServer': true,
-                              });
-                        } else {
-                          // Buka quiz intro untuk mulai atau lanjutkan
-                          // print("Membuka kuis: ${item['title']}");
-                          Get.toNamed(AppRoutes.quizIntro,
-                              arguments: item['id']); 
-                        }
+                        // Selalu buka quiz intro, biarkan controller handle logic
+                        // Quiz intro akan menampilkan opsi yang sesuai berdasarkan status
+                        Get.toNamed(AppRoutes.quizIntro,
+                            arguments: item['id']); 
                       },
                     );
                   }

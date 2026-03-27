@@ -25,6 +25,7 @@ abstract class AppRoutes {
   static const adminQuizResult = '/admin-quiz-result';
   static const adminQuizDetail = '/admin-quiz-detail';
   static const adminAnswerReview = '/admin-answer-review';
+  static const adminQuizAttemptsList = '/admin-quiz-attempts-list';
   static const adminCourseDetail = '/admin-course-detail';
   static const adminManageCourseAccess = '/admin-manage-course-access';
   static const adminAssignUser = '/admin-assign-user';
@@ -39,6 +40,7 @@ abstract class AppRoutes {
   static const courseMain = '/course-main';
   static const courseDetail = '/course-detail';
   static const quizList = '/quiz-list';
+  static const quizAttemptsList = '/quiz-attempts-list';
   static const quizAttempt = '/quiz-attempt';
   static const quizResult = '/quiz-result';
   static const quizReview = '/quiz-review';

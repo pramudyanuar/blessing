@@ -13,6 +13,8 @@ class QuizResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final args = Get.arguments ?? {};
     final String quizName = args['quizname'] ?? 'Kuis';
+    final String quizId = args['quizId'] ?? '';
+    final String sessionId = args['sessionId'] ?? '';
     final int score = args['result'] ?? 0;
 
     return PopScope(
@@ -83,12 +85,77 @@ class QuizResultScreen extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 30.h),
-                  // Tombol Kembali ke Daftar Materi
+                  // Tombol View Details & View All Attempts
+                  if (sessionId.isNotEmpty)
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => Get.toNamed(
+                          AppRoutes.quizReview,
+                          arguments: {
+                            'sessionId': sessionId,
+                            'quizId': quizId,
+                            'quizName': quizName,
+                            'score': score,
+                            'fetchFromServer': true,
+                          },
+                        ),
+                        icon: const Icon(Icons.description),
+                        label: GlobalText.semiBold(
+                          "Lihat Pembahasan",
+                          fontSize: 14.sp,
+                          color: const Color(0xFF1976D2),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF1976D2),
+                          side: const BorderSide(
+                            color: Color(0xFF1976D2),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                        ),
+                      ),
+                    ),
+                  SizedBox(height: 12.h),
+                  // Tombol View All Attempts
+                  if (quizId.isNotEmpty)
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => Get.toNamed(
+                          AppRoutes.quizAttemptsList,
+                          arguments: {
+                            'quizId': quizId,
+                            'quizName': quizName,
+                          },
+                        ),
+                        icon: const Icon(Icons.history),
+                        label: GlobalText.semiBold(
+                          "Lihat Semua Attempt",
+                          fontSize: 14.sp,
+                          color: const Color(0xFF1976D2),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF1976D2),
+                          side: const BorderSide(
+                            color: Color(0xFF1976D2),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                        ),
+                      ),
+                    ),
+                  SizedBox(height: 12.h),
+                  // Tombol Kembali ke Halaman Depan
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () => Get.offNamedUntil(
-                        AppRoutes.courseMain,
+                        AppRoutes.studentMenu,
                         (route) => route.isFirst,
                       ),
                       style: ElevatedButton.styleFrom(
@@ -100,7 +167,7 @@ class QuizResultScreen extends StatelessWidget {
                         ),
                       ),
                       child: GlobalText.semiBold(
-                        "Kembali ke Daftar Materi",
+                        "Kembali ke Halaman Depan",
                         fontSize: 16.sp,
                         color: Colors.white,
                       ),

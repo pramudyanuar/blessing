@@ -47,6 +47,8 @@ class Endpoints {
   // Quiz API
   static final String getAllQuizzes = _url('/api/quizzes');
   static final String getQuizById = _url('/api/quizzes/{quizId}');
+  static final String getQuizAttemptSummaries =
+      _url('/api/quiz/{quizId}/quiz-summary');
   static final String createQuiz = _url('/api/admin/quizzes');
   static final String updateQuiz = _url('/api/admin/quizzes/{quizId}');
   static final String deleteQuiz = _url('/api/admin/quizzes/{quizId}');
