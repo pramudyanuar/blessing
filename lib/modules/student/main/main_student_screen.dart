@@ -24,46 +24,49 @@ class MainStudent extends StatelessWidget {
             classInfo: controller.classInfo.value,
             profileImageUrl: 'assets/images/image.png')),
       ),
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.all(12.h),
-            child: Column(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          offset: Offset(2, 2),
-                          blurRadius: 0,
-                          spreadRadius: 0.5,
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverPadding(
+              padding: EdgeInsets.all(12.h),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              offset: Offset(2, 2),
+                              blurRadius: 0,
+                              spreadRadius: 0.5,
+                            ),
+                          ],
                         ),
-                      ],
+                        child: Image.asset(
+                          Images.studentMain,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
-                    child: Image.asset(
-                      Images.studentMain,
-                      fit: BoxFit.cover,
+                    SizedBox(height: 16.h),
+                    // Connect the search bar to the controller's search method
+                    CustomSearchBar(
+                      // Assuming your CustomSearchBar has an `onChanged` property.
+                      // If not, you will need to add it.
+                      onChanged: (query) => controller.onSearchChanged(query),
+                      hintText: 'Cari mata pelajaran...',
                     ),
-                  ),
+                    SizedBox(height: 16.h),
+                  ],
                 ),
-                SizedBox(height: 16.h),
-                // Connect the search bar to the controller's search method
-                CustomSearchBar(
-                  // Assuming your CustomSearchBar has an `onChanged` property.
-                  // If not, you will need to add it.
-                  onChanged: (query) => controller.onSearchChanged(query),
-                  hintText: 'Cari mata pelajaran...',
-                ),
-                SizedBox(height: 16.h),
-                // NewActivity(),
-                ClassList(),
-              ],
+              ),
             ),
-          ),
+            ClassList(),
+          ],
         ),
       ),
     );

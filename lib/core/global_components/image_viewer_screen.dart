@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -79,7 +80,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
 
   Widget _buildSingleImageView() {
     return PhotoView(
-      imageProvider: NetworkImage(widget.imageUrl),
+      imageProvider: CachedNetworkImageProvider(widget.imageUrl),
       backgroundDecoration: const BoxDecoration(color: Colors.black),
       minScale: PhotoViewComputedScale.contained * 0.5,
       maxScale: PhotoViewComputedScale.covered * 3.0,
@@ -134,7 +135,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
       builder: (BuildContext context, int index) {
         final imageUrl = widget.imageUrls![index];
         return PhotoViewGalleryPageOptions(
-          imageProvider: NetworkImage(imageUrl),
+          imageProvider: CachedNetworkImageProvider(imageUrl),
           initialScale: PhotoViewComputedScale.contained,
           minScale: PhotoViewComputedScale.contained * 0.5,
           maxScale: PhotoViewComputedScale.covered * 3.0,

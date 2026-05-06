@@ -1,10 +1,14 @@
 import 'package:blessing/core/utils/app_routes.dart';
+import 'package:blessing/data/quiz/models/response/question_option_response.dart';
+import 'package:blessing/data/quiz/repository/question_option_repository.dart';
+import 'package:blessing/data/session/models/response/session_question_detail_response.dart';
 import 'package:blessing/data/session/repository/session_repository_impl.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 class AdminAnswerReviewController extends GetxController {
   late final SessionRepository _sessionRepository;
+  final QuestionOptionRepository _optionRepository = QuestionOptionRepository();
 
   late String sessionId;
   late String userId;
@@ -56,25 +60,41 @@ class AdminAnswerReviewController extends GetxController {
 
         quizName.value = summary.quizName;
 
+        final optionsByQuestionId =
+            await _loadOptionsByQuestion(summary.questions);
+
         // Map response ke QuestionReviewData format
         final items = <QuestionReviewData>[];
         for (final q in summary.questions) {
+          final options = optionsByQuestionId[q.questionId] ?? [];
+          final userAnswerDisplay = _formatAnswerWithOption(
+            options,
+            q.userAnswerId,
+            q.userAnswer,
+          );
+          final correctAnswerDisplay = _formatAnswerWithOption(
+            options,
+            q.correctAnswerId,
+            q.correctAnswer,
+          );
+
           // Prepare options from answer data
-          final options = <Map<String, dynamic>>[];
+          final mappedOptions = <Map<String, dynamic>>[];
 
           // Option user answer
-          if (q.userAnswer != null) {
-            options.add({
-              'label': q.userAnswer,
+          if (userAnswerDisplay != null) {
+            mappedOptions.add({
+              'label': userAnswerDisplay,
               'isUserAnswer': true,
               'isCorrect': q.isCorrect,
             });
           }
 
           // Option correct answer
-          if (q.correctAnswer != q.userAnswer) {
-            options.add({
-              'label': q.correctAnswer,
+          if (correctAnswerDisplay != null &&
+              correctAnswerDisplay != userAnswerDisplay) {
+            mappedOptions.add({
+              'label': correctAnswerDisplay,
               'isUserAnswer': false,
               'isCorrect': true,
             });
@@ -85,10 +105,10 @@ class AdminAnswerReviewController extends GetxController {
               questionNumber: q.questionNumber,
               questionText: q.questionText,
               questionImages: q.questionImages,
-              userAnswer: q.userAnswer,
-              correctAnswer: q.correctAnswer,
+              userAnswer: userAnswerDisplay,
+              correctAnswer: correctAnswerDisplay ?? q.correctAnswer,
               isCorrect: q.isCorrect,
-              options: options,
+              options: mappedOptions,
               explanation: null, // Backend belum provide explanation
             ),
           );
@@ -125,6 +145,54 @@ class AdminAnswerReviewController extends GetxController {
         'studentName': userName.value,
       },
     );
+  }
+
+  Future<Map<String, List<QuestionOptionResponse>>> _loadOptionsByQuestion(
+      List<SessionQuestionDetailResponse> questions) async {
+    final results =
+        await Future.wait<MapEntry<String, List<QuestionOptionResponse>>>(
+      questions.map((q) async {
+      try {
+        final result = await _optionRepository.getAllOptionsByQuestionId(
+          q.questionId,
+          size: 20,
+        );
+        return MapEntry<String, List<QuestionOptionResponse>>(
+          q.questionId,
+          result?.options ?? <QuestionOptionResponse>[],
+        );
+      } catch (e) {
+        debugPrint('Option load failed for question ${q.questionId}: $e');
+        return MapEntry<String, List<QuestionOptionResponse>>(
+          q.questionId,
+          <QuestionOptionResponse>[],
+        );
+      }
+      },
+    ));
+
+    return Map<String, List<QuestionOptionResponse>>.fromEntries(results);
+  }
+
+  String? _formatAnswerWithOption(
+    List<QuestionOptionResponse> options,
+    String? optionId,
+    String? fallback,
+  ) {
+    if (optionId != null && options.isNotEmpty) {
+      final index = options.indexWhere((opt) => opt.id == optionId);
+      if (index >= 0 && index < options.length) {
+        final letter = String.fromCharCode('A'.codeUnitAt(0) + index);
+        final optionText = options[index].option;
+        return '$letter. $optionText';
+      }
+    }
+
+    if (fallback != null && fallback.trim().isNotEmpty) {
+      return fallback.trim();
+    }
+
+    return null;
   }
 }
 

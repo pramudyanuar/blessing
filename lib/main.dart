@@ -24,14 +24,24 @@ void main() async {
   
   // Initialize crash reporting first
   await crashReporting.initialize();
-  
-  await secureStorageUtil.init();
-  await cacheUtil.init();
-  await disableScreenshot();
-  await initializeDateFormatting('id_ID', null);
+
+  await Future.wait([
+    secureStorageUtil.init(),
+    cacheUtil.init(),
+  ]);
 
   // Gunakan SystemUIUtil untuk mengatur system UI
   SystemUIUtil.initializeAppSystemUI();
 
   runApp(const MainApp());
+
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    // Defer non-critical startup work to improve time-to-first-frame.
+    Future(() async {
+      await Future.wait([
+        disableScreenshot(),
+        initializeDateFormatting('id_ID', null),
+      ]);
+    });
+  });
 }

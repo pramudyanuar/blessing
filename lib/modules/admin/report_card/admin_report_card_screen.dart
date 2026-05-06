@@ -76,97 +76,111 @@ class AdminReportCardScreen extends StatelessWidget {
 
         return RefreshIndicator(
           onRefresh: () => controller.refreshData(),
-          child: SingleChildScrollView(
+          child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.all(16.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Analytics Summary
-                AdminAnalyticsSummary(),
-                SizedBox(height: 20.h),
+            slivers: [
+              SliverPadding(
+                padding: EdgeInsets.all(16.w),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Analytics Summary
+                      AdminAnalyticsSummary(),
+                      SizedBox(height: 20.h),
 
-                // Filter Section
-                AdminFilterSection(),
-                SizedBox(height: 20.h),
+                      // Filter Section
+                      AdminFilterSection(),
+                      SizedBox(height: 20.h),
 
-                // Quiz List Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GlobalText.semiBold(
-                      "Riwayat Quiz",
-                      fontSize: 18.sp,
-                    ),
-                    Obx(() => GlobalText.regular(
-                          "${controller.filteredQuizzes.length} quiz",
-                          fontSize: 14.sp,
-                          color: Colors.grey.shade600,
-                        )),
-                  ],
-                ),
-                SizedBox(height: 12.h),
-
-                // Quiz List
-                Obx(() {
-                  if (controller.filteredQuizzes.isEmpty) {
-                    return Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.all(32.w),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.r),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withValues(alpha: 0.1),
-                            spreadRadius: 1,
-                            blurRadius: 5,
+                      // Quiz List Header
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GlobalText.semiBold(
+                            "Riwayat Quiz",
+                            fontSize: 18.sp,
                           ),
+                          Obx(() => GlobalText.regular(
+                                "${controller.filteredQuizzes.length} quiz",
+                                fontSize: 14.sp,
+                                color: Colors.grey.shade600,
+                              )),
                         ],
                       ),
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.quiz_outlined,
-                            size: 48.w,
-                            color: Colors.grey.shade400,
-                          ),
-                          SizedBox(height: 12.h),
-                          GlobalText.medium(
-                            "Tidak ada quiz ditemukan",
-                            fontSize: 16.sp,
-                            color: Colors.grey.shade600,
-                          ),
-                          SizedBox(height: 8.h),
-                          GlobalText.regular(
-                            "Coba ubah filter untuk melihat data lainnya",
-                            fontSize: 14.sp,
-                            color: Colors.grey.shade500,
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                      SizedBox(height: 12.h),
+                    ],
+                  ),
+                ),
+              ),
+              SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                sliver: Obx(() {
+                  if (controller.filteredQuizzes.isEmpty) {
+                    return SliverToBoxAdapter(
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(32.w),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12.r),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withValues(alpha: 0.1),
+                              spreadRadius: 1,
+                              blurRadius: 5,
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.quiz_outlined,
+                              size: 48.w,
+                              color: Colors.grey.shade400,
+                            ),
+                            SizedBox(height: 12.h),
+                            GlobalText.medium(
+                              "Tidak ada quiz ditemukan",
+                              fontSize: 16.sp,
+                              color: Colors.grey.shade600,
+                            ),
+                            SizedBox(height: 8.h),
+                            GlobalText.regular(
+                              "Coba ubah filter untuk melihat data lainnya",
+                              fontSize: 14.sp,
+                              color: Colors.grey.shade500,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   }
 
-                  return ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: controller.filteredQuizzes.length,
-                    separatorBuilder: (context, index) =>
-                        SizedBox(height: 12.h),
-                    itemBuilder: (context, index) {
-                      final quiz = controller.filteredQuizzes[index];
-                      return AdminQuizCard(
-                        quiz: quiz,
-                        userId: controller.selectedUserId.value,
-                        userName: controller.userName.value,
-                      );
-                    },
+                  final itemCount = controller.filteredQuizzes.length;
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        if (index.isOdd) {
+                          return SizedBox(height: 12.h);
+                        }
+
+                        final quizIndex = index ~/ 2;
+                        final quiz = controller.filteredQuizzes[quizIndex];
+                        return AdminQuizCard(
+                          quiz: quiz,
+                          userId: controller.selectedUserId.value,
+                          userName: controller.userName.value,
+                        );
+                      },
+                      childCount: itemCount == 0 ? 0 : itemCount * 2 - 1,
+                    ),
                   );
                 }),
-              ],
-            ),
+              ),
+              SliverToBoxAdapter(child: SizedBox(height: 16.h)),
+            ],
           ),
         );
       }),

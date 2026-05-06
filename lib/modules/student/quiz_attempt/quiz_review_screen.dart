@@ -5,6 +5,7 @@ import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/data/core/models/content_block.dart';
 import 'package:blessing/modules/student/quiz_attempt/controller/quiz_review_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -15,7 +16,7 @@ class QuizReviewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(QuizReviewController());
-    
+
     // Cek apakah diakses dari list (bisa back) atau dari quiz attempt (tidak bisa back)
     final arguments = Get.arguments as Map<String, dynamic>? ?? {};
     final fetchFromServer = arguments['fetchFromServer'] as bool? ?? false;
@@ -33,169 +34,195 @@ class QuizReviewScreen extends StatelessWidget {
           title: GlobalText.semiBold("Pembahasan Kuis", fontSize: 16.sp),
           backgroundColor: Colors.white,
           elevation: 0.5,
-          automaticallyImplyLeading: canPop, // Sembunyikan back button jika tidak bisa back
+          automaticallyImplyLeading:
+              canPop, // Sembunyikan back button jika tidak bisa back
         ),
         body: Obx(() {
           if (controller.isLoading.value) {
             return const Center(child: CircularProgressIndicator());
           }
 
-        return SingleChildScrollView(
-          padding: EdgeInsets.all(16.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Score Card
-              Container(
+          return CustomScrollView(
+            slivers: [
+              SliverPadding(
                 padding: EdgeInsets.all(16.w),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withValues(alpha: 0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    GlobalText.bold(
-                      controller.quizName.value,
-                      fontSize: 20.sp,
-                      color: AppColors.c2,
-                    ),
-                    SizedBox(height: 16.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Score Card
+                      Container(
+                        padding: EdgeInsets.all(16.w),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12.r),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withValues(alpha: 0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            GlobalText.medium(
-                              'Skor Anda',
-                              fontSize: 12.sp,
-                              color: Colors.grey,
+                            GlobalText.bold(
+                              controller.quizName.value,
+                              fontSize: 20.sp,
+                              color: AppColors.c2,
                             ),
-                            SizedBox(height: 4.h),
+                            SizedBox(height: 16.h),
                             Row(
-                              crossAxisAlignment: CrossAxisAlignment.baseline,
-                              textBaseline: TextBaseline.alphabetic,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                GlobalText.bold(
-                                  '${controller.score.value}',
-                                  fontSize: 32.sp,
-                                  color: AppColors.c2,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    GlobalText.medium(
+                                      'Skor Anda',
+                                      fontSize: 12.sp,
+                                      color: Colors.grey,
+                                    ),
+                                    SizedBox(height: 4.h),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.baseline,
+                                      textBaseline: TextBaseline.alphabetic,
+                                      children: [
+                                        GlobalText.bold(
+                                          '${controller.score.value}',
+                                          fontSize: 32.sp,
+                                          color: AppColors.c2,
+                                        ),
+                                        SizedBox(width: 4.w),
+                                        GlobalText.medium(
+                                          '/100',
+                                          fontSize: 16.sp,
+                                          color: Colors.grey,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                SizedBox(width: 4.w),
-                                GlobalText.medium(
-                                  '/100',
-                                  fontSize: 16.sp,
-                                  color: Colors.grey,
+                                Container(
+                                  width: 80.w,
+                                  height: 80.w,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: _getScoreColor(
+                                            controller.score.value)
+                                        .withValues(alpha: 0.1),
+                                  ),
+                                  child: Center(
+                                    child: GlobalText.bold(
+                                      _getScoreGrade(controller.score.value),
+                                      fontSize: 24.sp,
+                                      color: _getScoreColor(
+                                          controller.score.value),
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
                           ],
                         ),
-                        Container(
-                          width: 80.w,
-                          height: 80.w,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: _getScoreColor(controller.score.value)
-                                .withValues(alpha: 0.1),
-                          ),
-                          child: Center(
-                            child: GlobalText.bold(
-                              _getScoreGrade(controller.score.value),
-                              fontSize: 24.sp,
-                              color: _getScoreColor(controller.score.value),
-                            ),
+                      ),
+                      SizedBox(height: 16.h),
+
+                      // Detail Per Soal
+                      GlobalText.semiBold(
+                        'Detail Jawaban',
+                        fontSize: 14.sp,
+                        color: AppColors.c2,
+                      ),
+                      SizedBox(height: 12.h),
+                    ],
+                  ),
+                ),
+              ),
+              SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                sliver: controller.reviewItems.isEmpty
+                    ? SliverToBoxAdapter(
+                        child: Center(
+                          child: GlobalText.regular(
+                            'Tidak ada data pembahasan',
+                            fontSize: 14.sp,
+                            color: Colors.grey,
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 16.h),
+                      )
+                    : SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            if (index.isOdd) {
+                              return SizedBox(height: 12.h);
+                            }
 
-              // Detail Per Soal
-              GlobalText.semiBold(
-                'Detail Jawaban',
-                fontSize: 14.sp,
-                color: AppColors.c2,
-              ),
-              SizedBox(height: 12.h),
+                            final itemIndex = index ~/ 2;
+                            final item = controller.reviewItems[itemIndex];
+                            final question = item['question'];
+                            final userAnswer = item['userAnswer'];
+                            final correctAnswer = item['correctAnswer'];
+                            final isCorrect = item['isCorrect'] as bool;
 
-              if (controller.reviewItems.isEmpty)
-                Center(
-                  child: GlobalText.regular(
-                    'Tidak ada data pembahasan',
-                    fontSize: 14.sp,
-                    color: Colors.grey,
+                            return _buildQuestionCard(
+                              questionNumber: itemIndex + 1,
+                              question: question,
+                              userAnswer: userAnswer,
+                              correctAnswer: correctAnswer,
+                              isCorrect: isCorrect,
+                            );
+                          },
+                          childCount: controller.reviewItems.isEmpty
+                              ? 0
+                              : controller.reviewItems.length * 2 - 1,
+                        ),
+                      ),
+              ),
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 32.h),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    children: [
+                      // Tombol Reattempt (Coba Lagi)
+                      GlobalButton(
+                        text: "Coba Lagi (Reattempt)",
+                        width: double.infinity,
+                        height: 50,
+                        fontSize: 15.sp,
+                        color: Colors.orange.shade700,
+                        onPressed: () {
+                          Get.offNamed(
+                            AppRoutes.quizAttempt,
+                            arguments: {
+                              'quizId': controller.quizId,
+                              'quizName': controller.quizName,
+                            },
+                          );
+                        },
+                      ),
+                      SizedBox(height: 12.h),
+
+                      // Tombol Kembali ke Menu Utama
+                      GlobalButton(
+                        text: "Kembali ke Menu Utama",
+                        width: double.infinity,
+                        height: 50,
+                        fontSize: 15.sp,
+                        onPressed: () {
+                          // Baik dari list maupun dari quiz attempt -> kembali ke menu utama
+                          Get.offAllNamed(AppRoutes.studentMenu);
+                        },
+                      ),
+                    ],
                   ),
-                )
-              else
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: controller.reviewItems.length,
-                  itemBuilder: (context, index) {
-                    final item = controller.reviewItems[index];
-                    final question = item['question'];
-                    final userAnswer = item['userAnswer'];
-                    final correctAnswer = item['correctAnswer'];
-                    final isCorrect = item['isCorrect'] as bool;
-
-                    return _buildQuestionCard(
-                      questionNumber: index + 1,
-                      question: question,
-                      userAnswer: userAnswer,
-                      correctAnswer: correctAnswer,
-                      isCorrect: isCorrect,
-                    );
-                  },
                 ),
-                // Tombol Reattempt (Coba Lagi)
-                GlobalButton(
-                  text: "Coba Lagi (Reattempt)",
-                  width: double.infinity,
-                  height: 50,
-                  fontSize: 15.sp,
-                  color: Colors.orange.shade700,
-                  onPressed: () {
-                    Get.offNamed(
-                      AppRoutes.quizAttempt,
-                      arguments: {
-                        'quizId': controller.quizId,
-                        'quizName': controller.quizName,
-                      },
-                    );
-                  },
-                ),
-
-                SizedBox(height: 12.h),
-
-                // Tombol Kembali ke Menu Utama
-                GlobalButton(
-                  text: "Kembali ke Menu Utama",
-                  width: double.infinity,
-                  height: 50,
-                  fontSize: 15.sp,
-                  onPressed: () {
-                    // Baik dari list maupun dari quiz attempt -> kembali ke menu utama
-                    Get.offAllNamed(AppRoutes.studentMenu);
-                  },
-                ),
-                
-                SizedBox(height: 32.h),
+              ),
             ],
-          ),
-        );
-      }),
+          );
+        }),
       ),
     );
   }
@@ -406,11 +433,20 @@ class QuizReviewScreen extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: 8.h),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(6.r),
-                  child: Image.network(
-                    imageUrl,
+                  child: CachedNetworkImage(
+                    imageUrl: imageUrl,
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
+                    placeholder: (context, url) => Container(
+                      width: double.infinity,
+                      height: 150.h,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(6.r),
+                      ),
+                      child: const Center(child: CircularProgressIndicator()),
+                    ),
+                    errorWidget: (context, url, error) => Container(
                       width: double.infinity,
                       height: 150.h,
                       decoration: BoxDecoration(
@@ -437,7 +473,7 @@ class QuizReviewScreen extends StatelessWidget {
   /// Bisa dari Map {'option': 'value'} atau dari object dengan .option property
   String _extractAnswerValue(dynamic answer) {
     if (answer == null) return 'Tidak menjawab';
-    
+
     // Format Map (dari SessionSummaryResponse)
     if (answer is Map<String, dynamic>) {
       final value = answer['option'];
@@ -446,7 +482,7 @@ class QuizReviewScreen extends StatelessWidget {
       }
       return 'Tidak menjawab';
     }
-    
+
     // Format object dengan .option property (backward compat)
     try {
       final value = answer.option;

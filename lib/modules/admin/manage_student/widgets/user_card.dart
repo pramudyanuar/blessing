@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:blessing/core/global_components/global_text.dart';
@@ -52,7 +53,7 @@ class UserCard extends StatelessWidget {
                     shape: BoxShape.circle,
                     image: avatarUrl.isNotEmpty
                         ? DecorationImage(
-                            image: NetworkImage(avatarUrl),
+                            image: CachedNetworkImageProvider(avatarUrl),
                             fit: BoxFit.cover,
                           )
                         : null,

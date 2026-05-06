@@ -6,6 +6,7 @@ import 'package:blessing/core/global_components/image_viewer_screen.dart';
 import 'package:blessing/core/global_components/video_player_screen.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/modules/admin/course/controllers/admin_course_detail_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -193,153 +194,189 @@ class AdminCourseDetailScreen extends StatelessWidget {
 
   Widget _buildViewMode(AdminCourseDetailController controller) {
     final course = controller.course.value!;
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Card(
-            color: AppColors.c1,
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.r),
-              side: BorderSide(color: AppColors.c2, width: 0.5.w),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(16.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GlobalText.bold(course.courseName ?? 'Tanpa Judul',
-                      fontSize: 22.sp, color: AppColors.c2),
-                  SizedBox(height: 12.h),
-                  _buildInfoRow(
-                      icon: Icons.class_outlined,
-                      text: 'Kelas: ${course.gradeLevel}'),
-                  SizedBox(height: 8.h),
-                  _buildInfoRow(
-                      icon: Icons.book_outlined,
-                      text:
-                          'Mata Pelajaran: ${course.subject?.subjectName ?? 'N/A'}'),
-                ],
-              ),
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.all(16.w),
+          sliver: SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Card(
+                  color: AppColors.c1,
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.r),
+                    side: BorderSide(color: AppColors.c2, width: 0.5.w),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(16.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        GlobalText.bold(course.courseName ?? 'Tanpa Judul',
+                            fontSize: 22.sp, color: AppColors.c2),
+                        SizedBox(height: 12.h),
+                        _buildInfoRow(
+                            icon: Icons.class_outlined,
+                            text: 'Kelas: ${course.gradeLevel}'),
+                        SizedBox(height: 8.h),
+                        _buildInfoRow(
+                            icon: Icons.book_outlined,
+                            text:
+                                'Mata Pelajaran: ${course.subject?.subjectName ?? 'N/A'}'),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.h),
+                GlobalText.semiBold("Isi Materi",
+                    fontSize: 18.sp, color: AppColors.c2),
+                SizedBox(height: 12.h),
+              ],
             ),
           ),
-          SizedBox(height: 20.h),
-          GlobalText.semiBold("Isi Materi",
-              fontSize: 18.sp, color: AppColors.c2),
-          SizedBox(height: 12.h),
-          _buildContentView(course.content!, controller),
-        ],
-      ),
+        ),
+        SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          sliver: _buildContentView(course.content!, controller),
+        ),
+        SliverToBoxAdapter(child: SizedBox(height: 16.h)),
+      ],
     );
   }
 
   Widget _buildQuizSection(AdminCourseDetailController controller) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          InkWell(
-            onTap: () {
-              Get.toNamed(AppRoutes.adminCreateQuiz, arguments: {
-                'courseId': controller.courseId,
-                'onQuizCreated': () => controller.fetchQuizzesForCourse()
-              });
-            },
-            borderRadius: BorderRadius.circular(20),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Icon(Icons.add, size: 20.sp, color: AppColors.c2),
-                  SizedBox(width: 4.w),
-                  GlobalText.medium("Tambah Kuis", color: AppColors.c2),
-                ],
-              ),
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.all(16.w),
+          sliver: SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InkWell(
+                  onTap: () {
+                    Get.toNamed(AppRoutes.adminCreateQuiz, arguments: {
+                      'courseId': controller.courseId,
+                      'onQuizCreated': () => controller.fetchQuizzesForCourse()
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(20),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Icon(Icons.add, size: 20.sp, color: AppColors.c2),
+                        SizedBox(width: 4.w),
+                        GlobalText.medium("Tambah Kuis", color: AppColors.c2),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16.h),
+              ],
             ),
           ),
-          SizedBox(height: 16.h),
-          if (controller.quizzes.isEmpty)
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 16.w),
-              decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12.r)),
-              child: Center(
-                child: Column(
-                  children: [
-                    Icon(Icons.quiz_outlined, size: 40.sp, color: Colors.grey),
-                    SizedBox(height: 8.h),
-                    GlobalText.regular("Belum ada kuis untuk materi ini.",
-                        color: Colors.grey),
-                  ],
-                ),
-              ),
-            )
-          else
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: controller.quizzes.length,
-              itemBuilder: (context, index) {
-                final quiz = controller.quizzes[index];
-                return Card(
-                  elevation: 2,
-                  margin: EdgeInsets.only(bottom: 12.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: ListTile(
-                    leading: const Icon(Icons.quiz, color: AppColors.c2),
-                    title: GlobalText.medium(
-                      quiz.quizName ?? 'Kuis Tanpa Judul',
-                      textAlign: TextAlign.start,
+        ),
+        SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          sliver: controller.quizzes.isEmpty
+              ? SliverToBoxAdapter(
+                  child: Container(
+                    width: double.infinity,
+                    padding:
+                        EdgeInsets.symmetric(vertical: 24.h, horizontal: 16.w),
+                    decoration: BoxDecoration(
+                        color: Colors.grey.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12.r)),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Icon(Icons.quiz_outlined,
+                              size: 40.sp, color: Colors.grey),
+                          SizedBox(height: 8.h),
+                          GlobalText.regular(
+                              "Belum ada kuis untuk materi ini.",
+                              color: Colors.grey),
+                        ],
+                      ),
                     ),
-                    subtitle: quiz.timeLimit != null
-                        ? GlobalText.regular(
-                            'Durasi: ${quiz.timeLimit} menit',
-                            color: Colors.grey,
-                            fontSize: 12.sp,
+                  ),
+                )
+              : SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      if (index.isOdd) {
+                        return SizedBox(height: 12.h);
+                      }
+
+                      final quizIndex = index ~/ 2;
+                      final quiz = controller.quizzes[quizIndex];
+                      return Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: ListTile(
+                          leading: const Icon(Icons.quiz, color: AppColors.c2),
+                          title: GlobalText.medium(
+                            quiz.quizName ?? 'Kuis Tanpa Judul',
                             textAlign: TextAlign.start,
-                          )
-                        : null,
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () {
-                      // Arahkan ke detail kuis
-                      Get.toNamed(
-                        AppRoutes.adminDetailQuiz,
-                        arguments: {
-                          'quizId': quiz.id,
-                          'titleQuiz': quiz.quizName,
-                          'onQuizDeleted': () =>
-                              controller.fetchQuizzesForCourse()
-                        },
+                          ),
+                          subtitle: quiz.timeLimit != null
+                              ? GlobalText.regular(
+                                  'Durasi: ${quiz.timeLimit} menit',
+                                  color: Colors.grey,
+                                  fontSize: 12.sp,
+                                  textAlign: TextAlign.start,
+                                )
+                              : null,
+                          trailing:
+                              const Icon(Icons.arrow_forward_ios, size: 16),
+                          onTap: () {
+                            // Arahkan ke detail kuis
+                            Get.toNamed(
+                              AppRoutes.adminDetailQuiz,
+                              arguments: {
+                                'quizId': quiz.id,
+                                'titleQuiz': quiz.quizName,
+                                'onQuizDeleted': () =>
+                                    controller.fetchQuizzesForCourse()
+                              },
+                            );
+                          },
+                        ),
                       );
                     },
+                    childCount:
+                        controller.quizzes.isEmpty ? 0 : controller.quizzes.length * 2 - 1,
                   ),
-                );
-              },
-            ),
-        ],
-      ),
+                ),
+        ),
+        SliverToBoxAdapter(child: SizedBox(height: 16.h)),
+      ],
     );
   }
 
   Widget _buildEditMode(AdminCourseDetailController controller) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
-      child: Column(
-        children: [
-          TextField(
-            controller: controller.courseNameController,
-            onChanged: (v) => controller.editedCourseName.value = v,
-            decoration: const InputDecoration(labelText: 'Judul Materi'),
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.all(16.w),
+          sliver: SliverToBoxAdapter(
+            child: Column(
+              children: [
+                TextField(
+                  controller: controller.courseNameController,
+                  onChanged: (v) => controller.editedCourseName.value = v,
+                  decoration: const InputDecoration(labelText: 'Judul Materi'),
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -358,10 +395,10 @@ class AdminCourseDetailScreen extends StatelessWidget {
   /// Widget untuk membangun tampilan konten dari List
   Widget _buildContentView(
       List<dynamic> contentItems, AdminCourseDetailController controller) {
-    return Column(
-      children: List.generate(
-        _getProcessedContentLength(contentItems),
-        (index) {
+    final totalItems = _getProcessedContentLength(contentItems);
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
           final processedItem = _getProcessedContentItem(contentItems, index);
 
           if (processedItem['type'] == 'image_gallery') {
@@ -399,6 +436,7 @@ class AdminCourseDetailScreen extends StatelessWidget {
             }
           }
         },
+        childCount: totalItems,
       ),
     );
   }
@@ -623,24 +661,19 @@ class AdminCourseDetailScreen extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                Image.network(
-                  imageUrl,
+                CachedNetworkImage(
+                  imageUrl: imageUrl,
                   fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      color: Colors.grey[200],
-                      child: const Center(child: CircularProgressIndicator()),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: Icon(Icons.broken_image, color: Colors.grey),
-                      ),
-                    );
-                  },
+                  placeholder: (context, url) => Container(
+                    color: Colors.grey[200],
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: Icon(Icons.broken_image, color: Colors.grey),
+                    ),
+                  ),
                 ),
                 // Zoom icon overlay
                 Positioned(
@@ -703,24 +736,19 @@ class AdminCourseDetailScreen extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                Image.network(
-                  imageUrl,
+                CachedNetworkImage(
+                  imageUrl: imageUrl,
                   fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      color: Colors.grey[200],
-                      child: const Center(child: CircularProgressIndicator()),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: Icon(Icons.broken_image, color: Colors.grey),
-                      ),
-                    );
-                  },
+                  placeholder: (context, url) => Container(
+                    color: Colors.grey[200],
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: Icon(Icons.broken_image, color: Colors.grey),
+                    ),
+                  ),
                 ),
                 // Dark overlay with count
                 Container(
@@ -779,43 +807,38 @@ class AdminCourseDetailScreen extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12.r),
-                child: Image.network(
-                  imageUrl,
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
                   fit: BoxFit.cover,
                   width: double.infinity,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return SizedBox(
-                      height: 200.h,
-                      child: const Center(child: CircularProgressIndicator()),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      height: 200.h,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.broken_image,
-                                size: 50, color: Colors.grey),
-                            SizedBox(height: 8),
-                            Text(
-                              'Gagal memuat gambar',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 14,
-                              ),
+                  placeholder: (context, url) => SizedBox(
+                    height: 200.h,
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    height: 200.h,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.broken_image,
+                              size: 50, color: Colors.grey),
+                          SizedBox(height: 8),
+                          Text(
+                            'Gagal memuat gambar',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    );
-                  },
+                    ),
+                  ),
                 ),
               ),
               // Icon zoom di pojok kanan atas
@@ -904,20 +927,25 @@ class AdminCourseDetailScreen extends StatelessWidget {
                     alignment: Alignment.center,
                     children: [
                       // YouTube thumbnail
-                      Image.network(
-                        'https://img.youtube.com/vi/$videoId/maxresdefault.jpg',
+                      CachedNetworkImage(
+                        imageUrl:
+                            'https://img.youtube.com/vi/$videoId/maxresdefault.jpg',
                         fit: BoxFit.cover,
                         width: double.infinity,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.grey[300],
-                            child: Icon(
-                              Icons.video_library,
-                              size: 60.sp,
-                              color: Colors.grey[600],
-                            ),
-                          );
-                        },
+                        placeholder: (context, url) => Container(
+                          color: Colors.grey[300],
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: Colors.grey[300],
+                          child: Icon(
+                            Icons.video_library,
+                            size: 60.sp,
+                            color: Colors.grey[600],
+                          ),
+                        ),
                       ),
                       // Play button overlay
                       Container(

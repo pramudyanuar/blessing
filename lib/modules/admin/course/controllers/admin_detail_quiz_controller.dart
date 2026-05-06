@@ -2,17 +2,20 @@ import 'package:blessing/data/quiz/models/response/question_response.dart';
 import 'package:blessing/data/quiz/models/response/question_option_response.dart';
 import 'package:blessing/data/quiz/repository/question_option_repository.dart';
 import 'package:blessing/data/quiz/repository/question_repository_impl.dart';
+import 'package:blessing/data/quiz/repository/quiz_answer_repository_impl.dart';
 import 'package:blessing/data/quiz/repository/quiz_repository_impl.dart';
 import 'package:get/get.dart';
 
 class AdminDetailQuizController extends GetxController {
   final QuestionRepository _questionRepository = QuestionRepository();
   final QuestionOptionRepository _optionRepository = QuestionOptionRepository();
+  final QuizAnswerRepository _quizAnswerRepository = QuizAnswerRepository();
   final QuizRepository _quizRepository = QuizRepository();
   // final ReportCardRepository _reportCardRepository = ReportCardRepository();
 
   var questions = <QuestionResponse>[].obs;
   var optionsByQuestion = <String, List<QuestionOptionResponse>>{}.obs;
+  var correctAnswerByQuestion = <String, String>{}.obs;
   // var reportData = <AllReportCardsResponse>[].obs;
   var isLoadingQuestions = false.obs;
   var isLoadingOptions = false.obs;
@@ -45,6 +48,7 @@ class AdminDetailQuizController extends GetxController {
       if (result != null) {
         questions.assignAll(result.questions);
         await fetchOptionsForQuestions();
+        await fetchCorrectAnswersForQuiz();
       }
     } finally {
       isLoadingQuestions.value = false;
@@ -75,6 +79,39 @@ class AdminDetailQuizController extends GetxController {
       }
     } finally {
       isLoadingOptions.value = false;
+    }
+  }
+
+  Future<void> fetchCorrectAnswersForQuiz() async {
+    try {
+      final result = await _quizAnswerRepository.getAllQuizAnswers(
+        quizId: quizId,
+        size: 200,
+      );
+      if (result == null) return;
+
+      final mapped = <String, String>{};
+      for (final answer in result.answers) {
+        final options = optionsByQuestion[answer.questionId] ?? [];
+        if (options.isNotEmpty) {
+          final index =
+              options.indexWhere((option) => option.id == answer.optionId);
+          if (index >= 0 && index < options.length) {
+            final letter = String.fromCharCode('A'.codeUnitAt(0) + index);
+            mapped[answer.questionId] = '$letter. ${options[index].option}';
+            continue;
+          }
+        }
+
+        if (answer.option?.option != null &&
+            answer.option!.option.trim().isNotEmpty) {
+          mapped[answer.questionId] = answer.option!.option.trim();
+        }
+      }
+
+      correctAnswerByQuestion.assignAll(mapped);
+    } catch (e) {
+      // Keep UI usable if this optional data fails
     }
   }
 

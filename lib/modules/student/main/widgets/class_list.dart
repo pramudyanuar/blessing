@@ -13,43 +13,51 @@ class ClassList extends StatelessWidget {
     // Cari controller yang sudah di-inject di halaman MainStudent
     final controller = Get.find<MainStudentController>();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GlobalText.bold(
-          "Mata Pelajaran",
-          fontSize: 16.sp,
-          color: Colors.black,
-          textAlign: TextAlign.left,
-        ),
-        SizedBox(height: 16.h),
-        Obx(() {
-          if (controller.isLoadingSubjects.value) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+    return SliverPadding(
+      padding: EdgeInsets.fromLTRB(12.w, 0, 12.w, 12.w),
+      sliver: Obx(() {
+        final isLoading = controller.isLoadingSubjects.value;
+        final subjects = controller.filteredSubjectList;
+        final hasSearch = controller.searchQuery.value.isNotEmpty;
+        final isEmpty = subjects.isEmpty;
 
-          // Check the filtered list now
-          if (controller.filteredSubjectList.isEmpty) {
-            // Differentiate between no data at all vs. no search results
-            if (controller.searchQuery.value.isNotEmpty) {
-              return const Center(
-                child: Text("Mata pelajaran tidak ditemukan."),
-              );
-            }
-            return const Center(
-              child: Text("Tidak ada mata pelajaran yang tersedia."),
-            );
-          }
+        final hasItems = !isLoading && !isEmpty;
+        final totalCount = hasItems ? 2 + subjects.length : 3;
 
-          // Build the list using the filtered data
-          return ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: controller.filteredSubjectList.length,
-            itemBuilder: (context, index) {
-              final subject = controller.filteredSubjectList[index];
+        return SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              if (index == 0) {
+                return GlobalText.bold(
+                  "Mata Pelajaran",
+                  fontSize: 16.sp,
+                  color: Colors.black,
+                  textAlign: TextAlign.left,
+                );
+              }
+
+              if (index == 1) {
+                return SizedBox(height: 16.h);
+              }
+
+              if (isLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              if (isEmpty) {
+                return Center(
+                  child: Text(
+                    hasSearch
+                        ? "Mata pelajaran tidak ditemukan."
+                        : "Tidak ada mata pelajaran yang tersedia.",
+                  ),
+                );
+              }
+
+              final subjectIndex = index - 2;
+              final subject = subjects[subjectIndex];
               return ClassCard(
                 subjectId: subject.id,
                 subjectName: subject.subjectName ?? 'Tanpa Nama',
@@ -58,9 +66,10 @@ class ClassList extends StatelessWidget {
                 subtitle: 'SMA Blessing',
               );
             },
-          );
-        }),
-      ],
+            childCount: totalCount,
+          ),
+        );
+      }),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/image_viewer_screen.dart';
 import 'package:blessing/data/quiz/models/response/question_response.dart'; // 1. Tambahkan import ini
 import 'package:blessing/modules/student/quiz_attempt/controller/quiz_attempt_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -66,11 +67,20 @@ class QuestionCard extends StatelessWidget {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(4.r),
                           // Gunakan Image.network untuk memuat dari URL
-                          child: Image.network(
-                            content.data,
+                          child: CachedNetworkImage(
+                            imageUrl: content.data,
                             fit: BoxFit.contain,
                             width: double.infinity,
-                            errorBuilder: (_, __, ___) => Container(
+                            placeholder: (context, url) => Container(
+                              height: 150,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(4.r),
+                              ),
+                              child: const CircularProgressIndicator(),
+                            ),
+                            errorWidget: (context, url, error) => Container(
                               height: 150,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(

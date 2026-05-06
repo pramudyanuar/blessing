@@ -6,6 +6,7 @@ import 'package:blessing/core/global_components/search_bar.dart';
 import 'package:blessing/modules/admin/course/controllers/admin_detail_quiz_controller.dart';
 import 'package:blessing/modules/admin/course/quiz_result_controller.dart';
 import 'package:blessing/data/report/repository/report_repository_impl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -111,6 +112,8 @@ class _DetailTab extends StatelessWidget {
               itemBuilder: (context, index) {
                 final question = controller.questions[index];
                 final options = controller.optionsByQuestion[question.id] ?? [];
+                final correctAnswer =
+                    controller.correctAnswerByQuestion[question.id];
 
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
@@ -144,10 +147,17 @@ class _DetailTab extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(vertical: 6),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
-                                child: Image.network(
-                                  c.data,
+                                child: CachedNetworkImage(
+                                  imageUrl: c.data,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Container(
+                                  placeholder: (context, url) => Container(
+                                    height: 150,
+                                    color: Colors.grey[200],
+                                    alignment: Alignment.center,
+                                    child: const CircularProgressIndicator(),
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      Container(
                                     height: 150,
                                     color: Colors.grey[200],
                                     alignment: Alignment.center,
@@ -173,6 +183,25 @@ class _DetailTab extends StatelessWidget {
                               leading: const Icon(Icons.circle_outlined),
                               title: Text(opt.option),
                             )),
+                        if (correctAnswer != null &&
+                            correctAnswer.trim().isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            'Kunci Jawaban:',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            correctAnswer,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(color: Colors.green.shade700),
+                          ),
+                        ],
                       ],
                     ),
                   ),
