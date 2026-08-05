@@ -21,15 +21,20 @@ class CourseDetailScreen extends StatelessWidget {
 
     return BaseWidgetContainer(
       appBar: AppBar(
-        backgroundColor: AppColors.c2,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        elevation: 3,
+        shadowColor: Colors.black.withValues(alpha: 0.4),
+        toolbarHeight: 65.h,
         // Judul AppBar akan reaktif terhadap nama course
-        title: Obx(() => GlobalText.regular(
+        title: Obx(() => GlobalText.bold(
               controller.course.value?.courseName ?? 'Detail Materi',
-              color: Colors.white,
+              color: Colors.black,
+              fontSize: 16.sp,
+              fontFamily: 'Inter',
             )),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.c2),
           onPressed: () => Get.back(),
         ),
       ),
@@ -684,9 +689,9 @@ class CourseDetailScreen extends StatelessWidget {
         padding: EdgeInsets.all(16.w),
         margin: EdgeInsets.only(bottom: 8.h),
         decoration: BoxDecoration(
-          color: Colors.blue.shade50,
+          color: AppColors.c3.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Colors.blue.shade200),
+          border: Border.all(color: AppColors.c3.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
@@ -694,12 +699,12 @@ class CourseDetailScreen extends StatelessWidget {
               width: 40.w,
               height: 40.w,
               decoration: BoxDecoration(
-                color: Colors.blue.shade100,
+                color: AppColors.c3.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: Icon(
                 Icons.link,
-                color: Colors.blue.shade600,
+                color: AppColors.c2,
                 size: 20.sp,
               ),
             ),
@@ -708,28 +713,25 @@ class CourseDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  GlobalText.semiBold(
                     'Link External',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14.sp,
-                      color: Colors.blue.shade700,
-                    ),
+                    fontSize: 14.sp,
+                    color: AppColors.c2,
+                    textAlign: TextAlign.start,
                   ),
                   SizedBox(height: 4.h),
-                  Text(
+                  GlobalText.regular(
                     url.length > 50 ? '${url.substring(0, 50)}...' : url,
-                    style: TextStyle(
-                      color: Colors.blue.shade600,
-                      fontSize: 12.sp,
-                    ),
+                    color: AppColors.c3,
+                    fontSize: 12.sp,
+                    textAlign: TextAlign.start,
                   ),
                 ],
               ),
             ),
             Icon(
               Icons.open_in_new,
-              color: Colors.blue.shade600,
+              color: AppColors.c2,
               size: 20.sp,
             ),
           ],

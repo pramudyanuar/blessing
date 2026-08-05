@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "224621096154",
+    "project_id": "pendaftaran-orbits",
+    "storage_bucket": "pendaftaran-orbits.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:224621096154:android:8f49e78d7d9d6ed1ed89e3",
+        "android_client_info": {
+          "package_name": "com.blessing.learningapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgTAmF__jv2XSoXe2QdqwkaN73yBSIEx4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

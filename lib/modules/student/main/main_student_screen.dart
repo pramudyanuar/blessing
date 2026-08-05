@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import 'package:flutter/services.dart';
+
 class MainStudent extends StatelessWidget {
   const MainStudent({super.key});
 
@@ -16,14 +18,23 @@ class MainStudent extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<MainStudentController>();
 
-    return BaseWidgetContainer(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight),
-        child: Obx(() => StudentAppBar(
-            name: controller.name.value,
-            classInfo: controller.classInfo.value,
-            profileImageUrl: 'assets/images/image.png')),
-      ),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final shouldPop = await controller.onWillPop();
+        if (shouldPop) {
+          SystemNavigator.pop();
+        }
+      },
+      child: BaseWidgetContainer(
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight),
+          child: Obx(() => StudentAppBar(
+              name: controller.name.value,
+              classInfo: controller.classInfo.value,
+              profileImageUrl: 'assets/images/image.png')),
+        ),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -69,6 +80,6 @@ class MainStudent extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ),);
   }
 }

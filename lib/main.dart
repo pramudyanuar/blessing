@@ -20,6 +20,11 @@ Future<void> disableScreenshot() async {
 }
 
 void main() async {
+  // Disable debugPrint in release mode to prevent logs leak
+  if (kReleaseMode) {
+    debugPrint = (String? message, {int? wrapWidth}) {};
+  }
+
   WidgetsFlutterBinding.ensureInitialized();
   
   // Initialize crash reporting first

@@ -1,3 +1,4 @@
+import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_button.dart';
 import 'package:blessing/core/global_components/global_confirmation_dialog.dart';
@@ -28,7 +29,7 @@ class ProfileScreen extends StatelessWidget {
         }
       },
       child: BaseWidgetContainer(
-        backgroundColor: const Color(0xFFE9EBF0),
+        backgroundColor: AppColors.c5,
       body: SafeArea(
         child: Stack(
           children: [
@@ -84,7 +85,7 @@ class ProfileScreen extends StatelessWidget {
                               child: Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: const BoxDecoration(
-                                  color: Color(0xFF0D47A1),
+                                  color: AppColors.c2,
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(Icons.camera_alt,
@@ -101,6 +102,13 @@ class ProfileScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: Obx(() => Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -255,7 +263,7 @@ class ProfileScreen extends StatelessWidget {
                       onPressed: () {
                         Get.toNamed(AppRoutes.reportCard);
                       },
-                      color: const Color(0xFF0D47A1),
+                      color: AppColors.c2,
                       width: double.infinity,
                       height: 40.h,
                     ),
@@ -304,7 +312,7 @@ class ProfileScreen extends StatelessWidget {
                 left: 10.w,
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back_ios_new,
-                      color: Colors.black54),
+                      color: AppColors.c2),
                   onPressed: () => Get.back(),
                 ),
               ),
@@ -327,14 +335,14 @@ class ProfileScreen extends StatelessWidget {
                   if (controller.isEditMode.value) {
                     return IconButton(
                       icon:
-                          const Icon(Icons.check, color: Colors.blue, size: 28),
+                          const Icon(Icons.check, color: AppColors.c2, size: 28),
                       onPressed: controller.saveProfile,
                       tooltip: 'Simpan',
                     );
                   } else {
                     return IconButton(
                       icon: const Icon(Icons.edit_outlined,
-                          color: Colors.black54),
+                          color: AppColors.c2),
                       onPressed: controller.toggleEditMode,
                       tooltip: 'Edit Profil',
                     );

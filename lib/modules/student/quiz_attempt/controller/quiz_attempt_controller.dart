@@ -1,6 +1,8 @@
 // lib/modules/student/quiz_attempt/controller/quiz_attempt_controller.dart
 
 import 'dart:async';
+import 'package:no_screenshot/no_screenshot.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:blessing/core/global_components/global_confirmation_dialog.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/data/quiz/models/response/question_option_response.dart';
@@ -34,6 +36,12 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
 
   Timer? _timer;
 
+  // Security & Performance Additions
+  final RxInt outOfFocusCount = 0.obs;
+  bool _showWarningDialogPending = false;
+  final RxMap<String, Map<String, dynamic>> pendingSyncAnswers = <String, Map<String, dynamic>>{}.obs;
+  bool _isSyncing = false;
+
   final RxInt currentQuestionIndex = 0.obs;
   late final PageController pageController;
 
@@ -56,6 +64,13 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
     // Register observer untuk lifecycle changes
     WidgetsBinding.instance.addObserver(this);
     pageController = PageController();
+
+    // Block screenshots during exam
+    try {
+      NoScreenshot.instance.screenshotOff();
+    } catch (e) {
+      debugPrint("Failed to block screenshots: $e");
+    }
 
     // Handle arguments - bisa String (quizId) atau Map (for resume)
     if (Get.arguments is String) {
@@ -81,6 +96,13 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
 
   @override
   void onClose() {
+    // Re-enable screenshots
+    try {
+      NoScreenshot.instance.screenshotOn();
+    } catch (e) {
+      debugPrint("Failed to re-enable screenshots: $e");
+    }
+
     // Remove observer saat controller ditutup
     WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
@@ -92,14 +114,51 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     
+    final isQuizRunning = !isLoading.value &&
+        errorMessage.value.isEmpty &&
+        remainingSeconds.value > 0;
+
+    if (!isQuizRunning) return;
+
     // Cek jika user menekan home button atau switch app
     if (state == AppLifecycleState.paused) {
       debugPrint('Quiz: App moved to background (home button atau switch app)');
-      
-      // Jangan auto-submit saat paused, biarkan user lanjutin asalkan waktu masih ada
-      // Auto-submit hanya akan terjadi saat time habis (di _handleTimeUp)
+      outOfFocusCount.value++;
+      _showWarningDialogPending = true;
+
+      // Jika melanggar >= 3 kali, auto submit langsung
+      if (outOfFocusCount.value >= 3) {
+        submitQuiz(autoSubmitted: true);
+      }
     } else if (state == AppLifecycleState.resumed) {
       debugPrint('Quiz: App resumed');
+      if (_showWarningDialogPending && outOfFocusCount.value < 3) {
+        _showWarningDialogPending = false;
+        Get.dialog(
+          AlertDialog(
+            title: const Text(
+              "Peringatan Kecurangan!",
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+            content: Text(
+              "Anda terdeteksi keluar dari aplikasi ujian.\n\n"
+              "Jumlah pelanggaran: ${outOfFocusCount.value} / 3.\n\n"
+              "Jika Anda keluar aplikasi sebanyak 3 kali, ujian akan otomatis dikirim secara permanen.",
+              style: TextStyle(fontSize: 14.sp),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Get.back(),
+                child: const Text(
+                  "Saya Mengerti",
+                  style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+          barrierDismissible: false,
+        );
+      }
     }
   }
 
@@ -335,9 +394,7 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
     return "00:$minutes:$seconds";
   }
 
-  // --- Quiz Logic ---
-
-  /// Dipanggil saat pengguna memilih jawaban. Langsung mengirim jawaban ke server.
+  /// Dipanggil saat pengguna memilih jawaban. Menggunakan background queue agar robust saat koneksi putus.
   Future<void> selectAnswer(int questionIndex, int answerIndex) async {
     final question = questions[questionIndex];
     final options = optionsByQuestion[question.id];
@@ -353,33 +410,75 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
     if (previousAnswerId == selectedOption.id) return; // Tidak ada perubahan
 
     final bool isUpdating = previousAnswerId != null;
-    userAnswers[question.id] = selectedOption.id; // Update UI dulu
+    userAnswers[question.id] = selectedOption.id; // Update UI langsung agar instan
+
+    // Tambahkan jawaban ke queue sinkronisasi
+    pendingSyncAnswers[question.id] = {
+      'optionId': selectedOption.id,
+      'isUpdating': isUpdating,
+      'previousOptionId': previousAnswerId,
+    };
+
+    // Jalankan sinkronisasi background
+    _syncPendingAnswers();
+  }
+
+  /// Sinkronisasi background untuk jawaban-jawaban yang tertunda
+  Future<void> _syncPendingAnswers() async {
+    if (_isSyncing || pendingSyncAnswers.isEmpty) return;
+    _isSyncing = true;
 
     try {
-      if (isUpdating) {
-        final request = CreateUserAnswerRequest(
+      while (pendingSyncAnswers.isNotEmpty) {
+        final String questionId = pendingSyncAnswers.keys.first;
+        final Map<String, dynamic>? pendingData = pendingSyncAnswers[questionId];
+        if (pendingData == null) {
+          pendingSyncAnswers.remove(questionId);
+          continue;
+        }
+
+        final String optionId = pendingData['optionId'] as String;
+        final bool isUpdating = pendingData['isUpdating'] as bool;
+
+        try {
+          final request = CreateUserAnswerRequest(
             sessionId: sessionId!,
-            questionId: question.id,
-            optionId: selectedOption.id);
-        final response = await _answerRepository.updateUserAnswer(request);
-        if (response == null) throw Exception("Gagal memperbarui jawaban");
-        debugPrint("Jawaban berhasil diperbarui untuk soal: ${question.id}");
-      } else {
-        final request = CreateUserAnswerRequest(
-            sessionId: sessionId!,
-            questionId: question.id,
-            optionId: selectedOption.id);
-        final response = await _answerRepository.createUserAnswer(request);
-        if (response == null) throw Exception("Gagal menyimpan jawaban");
-        debugPrint("Jawaban berhasil disimpan untuk soal: ${question.id}");
+            questionId: questionId,
+            optionId: optionId,
+          );
+
+          dynamic response;
+          if (isUpdating) {
+            response = await _answerRepository.updateUserAnswer(request);
+          } else {
+            response = await _answerRepository.createUserAnswer(request);
+          }
+
+          if (response != null) {
+            // Berhasil disinkronkan, hapus dari queue
+            pendingSyncAnswers.remove(questionId);
+            debugPrint("Jawaban berhasil disinkronkan ke server untuk soal: $questionId");
+          } else {
+            throw Exception("Response server null");
+          }
+        } catch (e) {
+          debugPrint("Gagal mensinkronkan jawaban untuk soal $questionId: $e");
+          // Tampilkan snackbar peringatan sekali saja agar user tahu koneksi lambat
+          Get.snackbar(
+            "Koneksi Lambat",
+            "Jawaban tersimpan lokal. Akan dikirim otomatis jika jaringan stabil.",
+            backgroundColor: Colors.orange.withValues(alpha: 0.9),
+            colorText: Colors.white,
+            icon: const Icon(Icons.wifi_off, color: Colors.white),
+            duration: const Duration(seconds: 4),
+            snackPosition: SnackPosition.BOTTOM,
+          );
+          // Hentikan proses sinkronisasi, antrean tetap berada di pendingSyncAnswers
+          break;
+        }
       }
-    } catch (e) {
-      userAnswers[question.id] = previousAnswerId; // Rollback jika gagal
-      Get.snackbar(
-          "Gagal", "Gagal menyimpan jawaban. Periksa koneksi internet Anda.",
-          backgroundColor: Colors.red.withValues(alpha: 0.8),
-          colorText: Colors.white);
-      debugPrint("Error saat menyimpan jawaban: $e");
+    } finally {
+      _isSyncing = false;
     }
   }
 
@@ -462,11 +561,51 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
       return;
     }
 
+    // Selesaikan sisa sinkronisasi jawaban yang tertunda jika ada
+    if (pendingSyncAnswers.isNotEmpty) {
+      debugPrint("Mencoba melakukan sinkronisasi sisa jawaban sebelum submit...");
+      await _syncPendingAnswers();
+    }
+
+    // Jika masih ada sisa jawaban yang gagal tersinkronkan dan ini bukan autosubmit
+    if (pendingSyncAnswers.isNotEmpty && !autoSubmitted) {
+      Get.back(); // Tutup dialog loading
+      Get.dialog(
+        GlobalConfirmationDialog(
+          message: "Beberapa jawaban Anda belum tersimpan ke server karena gangguan koneksi. Tetap kirim ujian?",
+          onYes: () async {
+            Get.back(); // Tutup dialog konfirmasi
+            await _submitSessionFinal(autoSubmitted);
+          },
+          onNo: () {
+            Get.back(); // Tutup dialog
+            startTimer(); // Mulai kembali timer
+          },
+          yesText: "Tetap Kirim",
+          noText: "Hubungkan Ulang",
+        ),
+        barrierDismissible: false,
+      );
+      return;
+    }
+
+    await _submitSessionFinal(autoSubmitted);
+  }
+
+  Future<void> _submitSessionFinal(bool autoSubmitted) async {
+    // Pastikan dialog loading aktif
+    if (Get.isDialogOpen == false) {
+      Get.dialog(const Center(child: CircularProgressIndicator()),
+          barrierDismissible: false);
+    }
+
     // Panggil API untuk menandai sesi telah selesai
     final result = await _sessionRepository.submitSession(sessionId!,
         autoSubmitted: autoSubmitted);
 
-    Get.back(); // Tutup dialog loading
+    if (Get.isDialogOpen == true) {
+      Get.back(); // Tutup dialog loading
+    }
 
     if (result != null) {
       // Navigate ke quiz result screen untuk menampilkan skor dan pilihan see discussion/all attempts

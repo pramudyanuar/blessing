@@ -6,6 +6,8 @@ import 'package:blessing/modules/admin/manage_student/admin_manage_student_scree
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'package:flutter/services.dart';
+
 class MainAdminScreen extends StatelessWidget {
   MainAdminScreen({super.key});
 
@@ -18,28 +20,38 @@ class MainAdminScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => Scaffold(
-          body: BaseWidgetContainer(
-            backgroundColor: AppColors.c5,
-            body: _screens[controller.selectedIndex.value],
-          ),
-          bottomNavigationBar: BottomNavigationBar(
-            backgroundColor: Colors.white,
-            currentIndex: controller.selectedIndex.value,
-            onTap: controller.changeIndex,
-            selectedItemColor: AppColors.c2,
-            unselectedItemColor: AppColors.c6,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home,),
-                label: 'Homepage',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.people_rounded,),
-                label: 'Manage Students',
-              ),
-            ],
-          ),
-        ));
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final shouldPop = await controller.onWillPop();
+        if (shouldPop) {
+          SystemNavigator.pop();
+        }
+      },
+      child: Obx(() => Scaffold(
+            body: BaseWidgetContainer(
+              backgroundColor: AppColors.c5,
+              body: _screens[controller.selectedIndex.value],
+            ),
+            bottomNavigationBar: BottomNavigationBar(
+              backgroundColor: Colors.white,
+              currentIndex: controller.selectedIndex.value,
+              onTap: controller.changeIndex,
+              selectedItemColor: AppColors.c2,
+              unselectedItemColor: AppColors.c6,
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home,),
+                  label: 'Homepage',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.people_rounded,),
+                  label: 'Manage Students',
+                ),
+              ],
+            ),
+          )),
+    );
   }
 }

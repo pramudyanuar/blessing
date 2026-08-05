@@ -31,11 +31,24 @@ class QuizReviewScreen extends StatelessWidget {
         backgroundColor: AppColors.c5,
         appBar: AppBar(
           centerTitle: false,
-          title: GlobalText.semiBold("Pembahasan Kuis", fontSize: 16.sp),
+          leading: canPop
+              ? IconButton(
+                  icon: const Icon(Icons.arrow_back_ios, color: AppColors.c2),
+                  onPressed: () => Get.back(),
+                )
+              : null,
+          title: GlobalText.bold(
+            "Pembahasan Kuis",
+            fontSize: 16.sp,
+            color: Colors.black,
+            fontFamily: 'Inter',
+          ),
           backgroundColor: Colors.white,
-          elevation: 0.5,
-          automaticallyImplyLeading:
-              canPop, // Sembunyikan back button jika tidak bisa back
+          surfaceTintColor: Colors.white,
+          elevation: 3,
+          shadowColor: Colors.black.withValues(alpha: 0.4),
+          toolbarHeight: 65.h,
+          automaticallyImplyLeading: false,
         ),
         body: Obx(() {
           if (controller.isLoading.value) {
@@ -58,9 +71,9 @@ class QuizReviewScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12.r),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey.withValues(alpha: 0.1),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
@@ -240,19 +253,19 @@ class QuizReviewScreen extends StatelessWidget {
 
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(12.w),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8.r),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: statusColor.withValues(alpha: 0.3),
+          color: statusColor.withValues(alpha: 0.2),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),

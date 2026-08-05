@@ -65,7 +65,7 @@ class GlobalText extends StatelessWidget {
     return GlobalText(
       key: key,
       text: text,
-      fontSize: fontSize.sp,
+      fontSize: fontSize,
       fontWeight: fontWeight,
       color: color,
       textAlign: textAlign,
@@ -90,7 +90,7 @@ class GlobalText extends StatelessWidget {
     return GlobalText(
       key: key,
       text: text,
-      fontSize: fontSize.sp,
+      fontSize: fontSize,
       fontWeight: FontWeight.w300,
       color: color,
       textAlign: textAlign,
@@ -115,7 +115,7 @@ class GlobalText extends StatelessWidget {
     return GlobalText(
       key: key,
       text: text,
-      fontSize: fontSize.sp,
+      fontSize: fontSize,
       fontWeight: FontWeight.w400,
       color: color,
       textAlign: textAlign,
@@ -140,7 +140,7 @@ class GlobalText extends StatelessWidget {
     return GlobalText(
       key: key,
       text: text,
-      fontSize: fontSize.sp,
+      fontSize: fontSize,
       fontWeight: FontWeight.w500,
       color: color,
       textAlign: textAlign,
@@ -165,7 +165,7 @@ class GlobalText extends StatelessWidget {
     return GlobalText(
       key: key,
       text: text,
-      fontSize: fontSize.sp,
+      fontSize: fontSize,
       fontWeight: FontWeight.w600,
       color: color,
       textAlign: textAlign,
@@ -190,7 +190,7 @@ class GlobalText extends StatelessWidget {
     return GlobalText(
       key: key,
       text: text,
-      fontSize: fontSize.sp,
+      fontSize: fontSize,
       fontWeight: FontWeight.w700,
       color: color,
       textAlign: textAlign,
@@ -215,7 +215,7 @@ class GlobalText extends StatelessWidget {
     return GlobalText(
       key: key,
       text: text,
-      fontSize: fontSize.sp,
+      fontSize: fontSize,
       fontWeight: FontWeight.w800,
       color: color,
       textAlign: textAlign,

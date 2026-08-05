@@ -3,6 +3,7 @@
 import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_text.dart';
+import 'package:blessing/core/global_components/global_button.dart';
 import 'package:blessing/modules/student/quiz_attempt/controller/quiz_attempt_controller.dart';
 import 'package:blessing/modules/student/quiz_attempt/widgets/question_navigation_drawer.dart';
 import 'package:blessing/modules/student/quiz_attempt/widgets/quiz_attempt_body.dart';
@@ -33,30 +34,42 @@ class QuizAttemptScreen extends StatelessWidget {
       child: BaseWidgetContainer(
         scaffoldKey: scaffoldKey,
         appBar: AppBar(
-          backgroundColor: AppColors.c1,
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.white,
+          elevation: 3,
+          shadowColor: Colors.black.withValues(alpha: 0.4),
+          toolbarHeight: 65.h,
           automaticallyImplyLeading: false,
-          title: GlobalText.bold("Kuis"), // Judul bisa dibuat dinamis
-          centerTitle: true,
-          flexibleSpace: SafeArea(
-            child: Container(
-              alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.only(left: 16),
-              child: Obx(() => Text(
-                    // Tampilkan timer jika kuis sedang berjalan
+          leadingWidth: 100.w,
+          leading: Center(
+            child: Obx(() => Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(color: Colors.red.shade200),
+                  ),
+                  child: GlobalText.bold(
                     !controller.isLoading.value &&
                             controller.errorMessage.value.isEmpty
                         ? controller.timerText
                         : "00:00:00",
-                    style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold),
-                  )),
-            ),
+                    color: Colors.red,
+                    fontSize: 13.sp,
+                    fontFamily: 'Inter',
+                  ),
+                )),
           ),
+          title: GlobalText.bold(
+            "Kuis",
+            fontSize: 16.sp,
+            color: Colors.black,
+            fontFamily: 'Inter',
+          ),
+          centerTitle: true,
           actions: [
             Obx(() => IconButton(
-                  icon: const Icon(Icons.menu),
+                  icon: const Icon(Icons.menu, color: AppColors.c2),
                   // Nonaktifkan tombol menu saat loading atau jika ada error conflict
                   onPressed: controller.isLoading.value ||
                           controller.isQuizAlreadyAttempted.value
@@ -78,42 +91,47 @@ class QuizAttemptScreen extends StatelessWidget {
               child: Center(
                 child: Padding(
                   padding: EdgeInsets.all(24.w),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.check_circle_outline,
-                        size: 80,
-                        color: Colors.green,
-                      ),
-                      SizedBox(height: 16.h),
-                      GlobalText.bold(
-                        "Kuis Telah Dikerjakan",
-                        fontSize: 20.sp,
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 8.h),
-                      GlobalText.regular(
-                        controller.errorMessage.value,
-                        textAlign: TextAlign.center,
-                        fontSize: 16.sp,
-                      ),
-                      SizedBox(height: 24.h),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.c2,
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 32.w, vertical: 12.h),
+                  child: Container(
+                    padding: EdgeInsets.all(24.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
-                        onPressed: () =>
-                            Get.back(), // Kembali ke halaman sebelumnya
-                        child: GlobalText.medium(
-                          "Kembali",
-                          color: Colors.white,
-                          fontSize: 16.sp,
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.check_circle_outline,
+                          size: 70,
+                          color: Colors.green,
                         ),
-                      ),
-                    ],
+                        SizedBox(height: 16.h),
+                        GlobalText.bold(
+                          "Kuis Telah Dikerjakan",
+                          fontSize: 18.sp,
+                          color: Colors.black,
+                        ),
+                        SizedBox(height: 8.h),
+                        GlobalText.regular(
+                          controller.errorMessage.value,
+                          fontSize: 13.sp,
+                          color: Colors.grey.shade600,
+                        ),
+                        SizedBox(height: 24.h),
+                        GlobalButton(
+                          text: "Kembali",
+                          height: 45.h,
+                          onPressed: () => Get.back(),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -125,25 +143,44 @@ class QuizAttemptScreen extends StatelessWidget {
             return SafeArea(
               child: Center(
                 child: Padding(
-                  padding: EdgeInsets.all(16.w),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.error_outline, color: Colors.red, size: 60.r),
-                      SizedBox(height: 16.h),
-                      GlobalText.regular(
-                        controller.errorMessage.value,
-                        textAlign: TextAlign.center,
-                        color: Colors.red,
-                        fontSize: 16.sp,
-                      ),
-                      SizedBox(height: 20.h),
-                      ElevatedButton(
-                        onPressed: () =>
-                            controller.initiateQuiz(), // Tombol coba lagi
-                        child: const Text('Coba Lagi'),
-                      )
-                    ],
+                  padding: EdgeInsets.all(24.w),
+                  child: Container(
+                    padding: EdgeInsets.all(24.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.error_outline, color: Colors.red, size: 60.r),
+                        SizedBox(height: 16.h),
+                        GlobalText.bold(
+                          "Terjadi Kesalahan",
+                          fontSize: 18.sp,
+                          color: Colors.black,
+                        ),
+                        SizedBox(height: 8.h),
+                        GlobalText.regular(
+                          controller.errorMessage.value,
+                          color: Colors.grey.shade600,
+                          fontSize: 13.sp,
+                        ),
+                        SizedBox(height: 24.h),
+                        GlobalButton(
+                          text: "Coba Lagi",
+                          height: 45.h,
+                          onPressed: () => controller.initiateQuiz(),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

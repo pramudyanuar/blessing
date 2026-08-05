@@ -21,20 +21,23 @@ class ReportCardScreen extends StatelessWidget {
       backgroundColor: AppColors.c5,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 0.5,
         surfaceTintColor: Colors.white,
+        elevation: 3,
+        shadowColor: Colors.black.withValues(alpha: 0.4),
+        toolbarHeight: 65.h,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.c2),
           onPressed: () => Get.back(),
         ),
-        title: GlobalText.semiBold(
+        title: GlobalText.bold(
           'Report Card',
-          fontSize: 18.sp,
+          fontSize: 16.sp,
           color: Colors.black,
+          fontFamily: 'Inter',
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.black),
+            icon: const Icon(Icons.refresh, color: AppColors.c2),
             onPressed: controller.refreshData,
           ),
         ],

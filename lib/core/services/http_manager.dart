@@ -3,7 +3,9 @@
 import 'dart:io';
 import 'package:blessing/core/services/auth_interceptor.dart'; // Pastikan path ini benar
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart' hide Response, FormData, MultipartFile;
 import 'package:http_parser/http_parser.dart';
 
 abstract class HttpMethods {
@@ -51,6 +53,7 @@ class HttpManager {
     Map<String, dynamic>? headers,
     Map<String, dynamic>? body,
     Map<String, dynamic>? queryParameters,
+    bool showToastOnError = true,
   }) async {
     // --- PERUBAHAN UTAMA DI SINI ---
     // 1. Membuat map header dasar.
@@ -88,6 +91,9 @@ class HttpManager {
     } on DioException catch (e) {
       debugPrint(
           'HttpManager DioException [${e.requestOptions.path}]: ${e.response?.data}');
+      if (showToastOnError) {
+        _showUserFriendlyErrorToast(e);
+      }
       return {
         'statusCode': e.response?.statusCode,
         'statusMessage': e.response?.statusMessage ?? e.message,
@@ -108,6 +114,7 @@ class HttpManager {
     required String url,
     required File file,
     String fileFieldKey = 'file',
+    bool showToastOnError = true,
   }) async {
     final headersDefault = {'accept': 'application/json'};
 
@@ -138,6 +145,9 @@ class HttpManager {
     } on DioException catch (e) {
       debugPrint(
           'HttpManager (uploadFileRequest) DioException [${e.requestOptions.path}]: ${e.response?.data}');
+      if (showToastOnError) {
+        _showUserFriendlyErrorToast(e);
+      }
       return {
         'statusCode': e.response?.statusCode,
         'statusMessage': e.response?.statusMessage ?? e.message,
@@ -150,5 +160,115 @@ class HttpManager {
         'error': e.toString(),
       };
     }
+  }
+
+  /// Menampilkan toaster peringatan yang user-friendly berdasarkan jenis error
+  void _showUserFriendlyErrorToast(DioException e) {
+    final message = _filterErrorMessage(e);
+
+    // Tampilkan snackbar custom warna putih dengan rounding dan ikon di atas layar
+    Get.rawSnackbar(
+      messageText: Row(
+        children: [
+          const Icon(
+            Icons.warning_amber_rounded,
+            color: Colors.redAccent,
+            size: 24,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: Colors.black87,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+      backgroundColor: Colors.white,
+      snackPosition: SnackPosition.TOP,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      borderRadius: 12,
+      borderColor: Colors.redAccent.withOpacity(0.2),
+      borderWidth: 1,
+      boxShadows: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.08),
+          blurRadius: 12,
+          offset: const Offset(0, 4),
+        ),
+      ],
+      duration: const Duration(seconds: 4),
+      barBlur: 0,
+      dismissDirection: DismissDirection.horizontal,
+    );
+  }
+
+  /// Memfilter pesan kesalahan mentah dari backend ke bahasa Indonesia
+  String _filterErrorMessage(DioException e) {
+    if (e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.sendTimeout ||
+        e.type == DioExceptionType.receiveTimeout) {
+      return "Waktu koneksi habis. Mohon pastikan internet Anda stabil.";
+    }
+    if (e.type == DioExceptionType.connectionError ||
+        e.type == DioExceptionType.badCertificate) {
+      return "Gagal terhubung ke server. Silakan periksa jaringan internet Anda.";
+    }
+
+    if (e.response != null) {
+      final statusCode = e.response!.statusCode;
+      final responseData = e.response!.data;
+
+      String rawMessage = "";
+      if (responseData != null && responseData is Map) {
+        rawMessage = (responseData['errors'] ?? 
+                      responseData['message'] ?? 
+                      responseData['error'] ?? "").toString().trim().toLowerCase();
+      }
+
+      // Pemetaan pesan kesalahan mentah BE -> Bahasa Indonesia yang rapi
+      if (rawMessage.contains("email already exist") || rawMessage.contains("duplicate key")) {
+        return "Email sudah terdaftar. Silakan gunakan email lain.";
+      }
+      if (rawMessage.contains("unauthorized") || 
+          rawMessage.contains("invalid email or password") || 
+          rawMessage.contains("incorrect password") ||
+          (rawMessage.contains("record not found") && rawMessage.contains("login"))) {
+        return "Email atau kata sandi salah. Silakan periksa kembali.";
+      }
+      if (rawMessage.contains("not found") || rawMessage.contains("record not found")) {
+        return "Data tidak ditemukan di server.";
+      }
+      if (rawMessage.contains("validation error") || rawMessage.contains("bad request")) {
+        return "Data tidak valid. Mohon periksa kembali form Anda.";
+      }
+      if (rawMessage.contains("token") && (rawMessage.contains("invalid") || rawMessage.contains("expired"))) {
+        return "Sesi Anda telah berakhir. Silakan masuk kembali.";
+      }
+      if (rawMessage.contains("grade_level must be a number")) {
+        return "Tingkat kelas harus berupa angka yang valid.";
+      }
+
+      // Fallback berdasarkan HTTP Status Code jika tidak ada pencocokan teks di atas
+      if (statusCode == 400) {
+        return "Permintaan tidak valid. Mohon periksa kembali input Anda.";
+      } else if (statusCode == 401) {
+        return "Sesi Anda telah berakhir. Silakan masuk kembali.";
+      } else if (statusCode == 403) {
+        return "Anda tidak memiliki izin untuk melakukan tindakan ini.";
+      } else if (statusCode == 404) {
+        return "Data atau halaman tidak ditemukan.";
+      } else if (statusCode == 409) {
+        return "Terjadi konflik data pada server.";
+      } else if (statusCode != null && statusCode >= 500) {
+        return "Terjadi gangguan pada server. Silakan coba beberapa saat lagi.";
+      }
+    }
+
+    return "Terjadi kesalahan koneksi. Silakan coba lagi.";
   }
 }

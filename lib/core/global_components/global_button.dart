@@ -18,11 +18,11 @@ class GlobalButton extends StatelessWidget {
     required this.text,
     this.onPressed,
     this.width = 300,
-    this.height = 60,
+    this.height = 48,
     this.isLoading = false,
     this.color,
-    this.borderRadius = 10,
-    this.fontSize = 18, // <-- Default font size
+    this.borderRadius = 12,
+    this.fontSize = 15, // <-- Default font size
   });
 
   @override
