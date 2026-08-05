@@ -206,7 +206,33 @@ class CreateQuizScreen extends StatelessWidget {
                 padding: EdgeInsets.symmetric(vertical: 10.h),
               ),
             ),
-          )
+          ),
+
+          // --- PEMBAHASAN SOAL ---
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.h),
+            child: Divider(height: 1, color: Colors.grey.shade300),
+          ),
+          GlobalText.semiBold("Pembahasan Soal (Opsional)", fontSize: 14.sp),
+          SizedBox(height: 12.h),
+
+          // Image picker untuk gambar pembahasan
+          _buildExplanationImagePicker(controller, questionIndex),
+          SizedBox(height: 12.h),
+
+          // Teks penjelasan pembahasan
+          _buildTextFormField(
+            hint: 'Tulis penjelasan / pembahasan soal...',
+            maxLines: 3,
+            controller: question.explanationController,
+          ),
+          SizedBox(height: 12.h),
+
+          // Tautan video pembahasan
+          _buildTextFormField(
+            hint: 'Tautan video pembahasan (YouTube) opsional...',
+            controller: question.videoUrlController,
+          ),
         ],
       ),
     );
@@ -358,49 +384,51 @@ class CreateQuizScreen extends StatelessWidget {
     final question = controller.questions[questionIndex];
     final textController = question.optionControllers[optionIndex];
 
-    return Obx(
-      () => RadioGroup<int>(
-        groupValue: question.correctAnswerIndex.value,
-        onChanged: (value) {
-          if (value != null) {
-            question.correctAnswerIndex.value = value;
-          }
-        },
-        child: Row(
-          children: [
-            Radio<int>(
-              value: optionIndex,
-              activeColor: AppColors.c2,
+    return Obx(() {
+      final isSelected = question.correctAnswerIndex.value == optionIndex;
+      return Row(
+        children: [
+          IconButton(
+            icon: Icon(
+              isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
+              color: isSelected ? Colors.green.shade600 : Colors.grey.shade400,
+              size: 26.sp,
             ),
-            Expanded(
-              child: _buildTextFormField(
-                hint: 'Tulis Jawaban',
-                controller: textController,
+            onPressed: () {
+              question.correctAnswerIndex.value = optionIndex;
+            },
+            tooltip: 'Tandai sebagai jawaban benar',
+          ),
+          Expanded(
+            child: _buildTextFormField(
+              hint: 'Tulis Jawaban',
+              controller: textController,
+              isSelected: isSelected,
+            ),
+          ),
+          if (question.optionControllers.length > 2)
+            IconButton(
+              icon: Icon(
+                Icons.remove_circle_outline,
+                color: Colors.red.shade400,
               ),
-            ),
-            if (question.optionControllers.length > 2)
-              IconButton(
-                icon: Icon(
-                  Icons.remove_circle_outline,
-                  color: Colors.red.shade400,
-                ),
-                onPressed: () =>
-                    controller.removeOption(questionIndex, optionIndex),
-                tooltip: 'Hapus Opsi',
-              )
-            else
-              SizedBox(width: 48.w),
-          ],
-        ),
-      ),
-    );
+              onPressed: () =>
+                  controller.removeOption(questionIndex, optionIndex),
+              tooltip: 'Hapus Opsi',
+            )
+          else
+            SizedBox(width: 48.w),
+        ],
+      );
+    });
   }
 
   Widget _buildTextFormField(
       {required String hint,
       int maxLines = 1,
       TextEditingController? controller,
-      TextInputType? keyboardType}) {
+      TextInputType? keyboardType,
+      bool isSelected = false}) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
@@ -409,18 +437,96 @@ class CreateQuizScreen extends StatelessWidget {
         hintText: hint,
         hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14.sp),
         filled: true,
-        fillColor: const Color(0xFFFAFAFA),
+        fillColor: isSelected ? Colors.green.shade50 : const Color(0xFFFAFAFA),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.r),
-            borderSide: BorderSide(color: Colors.grey.shade300)),
+            borderSide: BorderSide(
+                color: isSelected ? Colors.green.shade300 : Colors.grey.shade300)),
         enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.r),
-            borderSide: BorderSide(color: Colors.grey.shade300)),
+            borderSide: BorderSide(
+                color: isSelected ? Colors.green.shade300 : Colors.grey.shade300)),
         focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.r),
-            borderSide: BorderSide(color: AppColors.c2)),
+            borderSide: BorderSide(
+                color: isSelected ? Colors.green.shade600 : AppColors.c2)),
       ),
     );
+  }
+
+  Widget _buildExplanationImagePicker(CreateQuizController controller, int questionIndex) {
+    final question = controller.questions[questionIndex];
+
+    return Obx(() {
+      if (question.explanationImageFile.value == null) {
+        return GestureDetector(
+          onTap: () => controller.pickImageForExplanation(questionIndex),
+          child: DottedBorder(
+            child: Container(
+              height: 100.h,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.add_photo_alternate_outlined,
+                      color: Colors.grey.shade500, size: 28.sp),
+                  SizedBox(height: 4.h),
+                  Text("Tambah Gambar Pembahasan",
+                      style: TextStyle(
+                          color: Colors.grey.shade600, fontSize: 12.sp)),
+                ],
+              ),
+            ),
+          ),
+        );
+      } else {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(8.r),
+          child: Stack(
+            alignment: Alignment.topRight,
+            children: [
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return GestureDetector(
+                    onTap: () => _showFullImageDialog(context, question.explanationImageFile.value!),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: constraints.maxWidth,
+                          maxHeight: 200.h,
+                        ),
+                        child: Image.file(
+                          question.explanationImageFile.value!,
+                          fit: BoxFit.scaleDown,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              Container(
+                margin: EdgeInsets.all(8.w),
+                decoration: const BoxDecoration(
+                  color: Colors.black54,
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.close, color: Colors.white, size: 18.sp),
+                  onPressed: () =>
+                      controller.removeImageForExplanation(questionIndex),
+                  tooltip: 'Hapus Gambar',
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    });
   }
 }

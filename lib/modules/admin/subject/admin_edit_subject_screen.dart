@@ -58,8 +58,8 @@ class _AdminEditSubjectScreenState extends State<AdminEditSubjectScreen> {
       );
 
       if (result != null) {
-        CustomSnackbar.show(title: 'Sukses', message: 'Mata pelajaran berhasil diperbarui');
         Get.back(result: true);
+        CustomSnackbar.show(title: 'Sukses', message: 'Mata pelajaran berhasil diperbarui');
       } else {
         CustomSnackbar.show(title: 'Error', message: 'Gagal memperbarui mata pelajaran', isError: true);
       }

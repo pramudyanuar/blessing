@@ -366,12 +366,76 @@ class AdminCourseDetailScreen extends StatelessWidget {
           padding: EdgeInsets.all(16.w),
           sliver: SliverToBoxAdapter(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                GlobalText.semiBold('Judul Materi', fontSize: 14.sp, color: AppColors.c2),
+                SizedBox(height: 8.h),
                 TextField(
                   controller: controller.courseNameController,
                   onChanged: (v) => controller.editedCourseName.value = v,
-                  decoration: const InputDecoration(labelText: 'Judul Materi'),
+                  style: TextStyle(fontSize: 14.sp, color: AppColors.c2),
+                  decoration: InputDecoration(
+                    hintText: 'Masukkan judul materi',
+                    fillColor: Colors.white,
+                    filled: true,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                      borderSide: const BorderSide(color: AppColors.c2),
+                    ),
+                  ),
                 ),
+                SizedBox(height: 20.h),
+                GlobalText.semiBold('Deskripsi / Konten Teks', fontSize: 14.sp, color: AppColors.c2),
+                SizedBox(height: 8.h),
+                Obx(() {
+                  if (controller.contentControllers.isEmpty) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.h),
+                      child: GlobalText.regular('Tidak ada konten teks untuk diedit', color: Colors.grey, fontSize: 13.sp),
+                    );
+                  }
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: controller.contentControllers.length,
+                    separatorBuilder: (context, index) => SizedBox(height: 12.h),
+                    itemBuilder: (context, index) {
+                      return TextField(
+                        controller: controller.contentControllers[index],
+                        maxLines: null,
+                        keyboardType: TextInputType.multiline,
+                        style: TextStyle(fontSize: 13.sp, color: AppColors.c2, height: 1.5),
+                        decoration: InputDecoration(
+                          hintText: 'Tulis isi materi...',
+                          fillColor: Colors.white,
+                          filled: true,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                            borderSide: const BorderSide(color: AppColors.c2),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }),
               ],
             ),
           ),

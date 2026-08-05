@@ -238,10 +238,10 @@ class AdminManageCourseListController extends GetxController {
     Get.back();
 
     if (result != null) {
+      Get.back(result: true);
       CustomSnackbar.show(
           title: 'Berhasil',
           message: 'Mata pelajaran "${title.value}" berhasil dihapus.');
-      Get.back(result: true);
     } else {
       CustomSnackbar.show(
           title: 'Error',

@@ -91,8 +91,8 @@ class _AdminSubjectDetailScreenState extends State<AdminSubjectDetailScreen> {
     try {
       final result = await _subjectRepository.deleteSubject(subjectId);
       if (result != null) {
-        CustomSnackbar.show(title: 'Sukses', message: 'Mata pelajaran berhasil dihapus');
         Get.back(result: true);
+        CustomSnackbar.show(title: 'Sukses', message: 'Mata pelajaran berhasil dihapus');
       } else {
         CustomSnackbar.show(title: 'Error', message: 'Gagal menghapus mata pelajaran', isError: true);
       }

@@ -23,6 +23,7 @@ class AdminCourseDetailController extends GetxController {
   final isEditing = false.obs;
   final editedCourseName = ''.obs;
   final editedContents = <String>[].obs;
+  final contentControllers = <TextEditingController>[].obs;
 
   // --- TAMBAHAN: State untuk Kuis ---
   final quizzes = <QuizResponse>[].obs;
@@ -48,6 +49,15 @@ class AdminCourseDetailController extends GetxController {
         );
       }
     });
+  }
+
+  @override
+  void onClose() {
+    courseNameController.dispose();
+    for (final ctrl in contentControllers) {
+      ctrl.dispose();
+    }
+    super.onClose();
   }
 
   Future<void> fetchCourseDetail() async {
@@ -92,8 +102,18 @@ class AdminCourseDetailController extends GetxController {
       editedCourseName.value = course.value!.courseName ?? '';
       editedContents.value = course.value!.content!
           .where((c) => c.type == 'text')
-          .map((c) => c.data)
+          .map((c) => c.data.toString())
           .toList();
+      
+      // Reset dan isi controllers untuk tiap teks materi
+      for (final ctrl in contentControllers) {
+        ctrl.dispose();
+      }
+      contentControllers.clear();
+      for (final text in editedContents) {
+        contentControllers.add(TextEditingController(text: text));
+      }
+
       isEditing.value = true;
       // Set controller text when editing starts
       courseNameController.text = editedCourseName.value;
@@ -137,15 +157,14 @@ class AdminCourseDetailController extends GetxController {
     // Update editedCourseName from controller before saving
     editedCourseName.value = courseNameController.text;
 
-    final textContents =
-        course.value!.content!.where((c) => c.type == 'text').toList();
-
+    int textIndex = 0;
     final updatedContent = course.value!.content!.map((c) {
       if (c.type == 'text') {
-        final index = textContents.indexOf(c);
+        final textValue = contentControllers[textIndex].text;
+        textIndex++;
         return {
           "type": "text",
-          "data": editedContents[index],
+          "data": textValue,
         };
       } else {
         return {

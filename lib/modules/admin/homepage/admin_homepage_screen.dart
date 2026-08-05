@@ -115,8 +115,10 @@ class AdminHomepageScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.c2,
         onPressed: () {
-          Get.toNamed(AppRoutes.adminCreateSubject)
-              ?.then((value) => controller.fetchAllSubjects());
+          Get.toNamed(
+            AppRoutes.adminCreateSubject,
+            arguments: {'kelas': controller.selectedKelas.value},
+          )?.then((value) => controller.fetchAllSubjects());
         },
         child: const Icon(
           Icons.add,

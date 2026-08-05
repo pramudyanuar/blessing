@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/data/course/repository/course_repository_impl.dart';
 import 'package:flutter/material.dart';
@@ -117,8 +118,10 @@ class AdminUploadCourseController extends GetxController {
       // --- Selesai Membangun Payload ---
 
       if (finalPayloadContent.isEmpty) {
-        Get.snackbar(
-            'Error', 'Konten (deskripsi atau gambar) tidak boleh kosong');
+        CustomSnackbar.show(
+            title: 'Error',
+            message: 'Konten (deskripsi atau gambar) tidak boleh kosong',
+            isError: true);
         return;
       }
 
@@ -130,11 +133,9 @@ class AdminUploadCourseController extends GetxController {
           subjectId: subjectId);
 
       if (success) {
-        Get.snackbar(
-          'Berhasil',
-          'Materi berhasil diunggah',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
+        CustomSnackbar.show(
+          title: 'Berhasil',
+          message: 'Materi berhasil diunggah',
         );
 
         // Tunggu sebentar agar user bisa melihat notifikasi sukses
@@ -148,19 +149,17 @@ class AdminUploadCourseController extends GetxController {
           onCourseCreated!();
         }
       } else {
-        Get.snackbar(
-          'Gagal',
-          'Terjadi kesalahan saat mengunggah materi',
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+        CustomSnackbar.show(
+          title: 'Gagal',
+          message: 'Terjadi kesalahan saat mengunggah materi',
+          isError: true,
         );
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Terjadi kesalahan saat mengunggah materi',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+      CustomSnackbar.show(
+        title: 'Error',
+        message: 'Terjadi kesalahan saat mengunggah materi',
+        isError: true,
       );
     } finally {
       isLoading.value = false; // Pastikan loading state selalu di-reset

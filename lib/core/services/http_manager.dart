@@ -4,8 +4,7 @@ import 'dart:io';
 import 'package:blessing/core/services/auth_interceptor.dart'; // Pastikan path ini benar
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/get.dart' hide Response, FormData, MultipartFile;
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:http_parser/http_parser.dart';
 
 abstract class HttpMethods {
@@ -165,45 +164,10 @@ class HttpManager {
   /// Menampilkan toaster peringatan yang user-friendly berdasarkan jenis error
   void _showUserFriendlyErrorToast(DioException e) {
     final message = _filterErrorMessage(e);
-
-    // Tampilkan snackbar custom warna putih dengan rounding dan ikon di atas layar
-    Get.rawSnackbar(
-      messageText: Row(
-        children: [
-          const Icon(
-            Icons.warning_amber_rounded,
-            color: Colors.redAccent,
-            size: 24,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              message,
-              style: const TextStyle(
-                color: Colors.black87,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-      backgroundColor: Colors.white,
-      snackPosition: SnackPosition.TOP,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      borderRadius: 12,
-      borderColor: Colors.redAccent.withOpacity(0.2),
-      borderWidth: 1,
-      boxShadows: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.08),
-          blurRadius: 12,
-          offset: const Offset(0, 4),
-        ),
-      ],
-      duration: const Duration(seconds: 4),
-      barBlur: 0,
-      dismissDirection: DismissDirection.horizontal,
+    CustomSnackbar.show(
+      title: 'Peringatan',
+      message: message,
+      isError: true,
     );
   }
 

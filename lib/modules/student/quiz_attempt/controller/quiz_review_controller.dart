@@ -88,6 +88,7 @@ class QuizReviewController extends GetxController {
               'questionText': q.questionText,
               'questionImages': q.questionImages,
               'questionNumber': q.questionNumber,
+              'explanation': q.explanation,
             },
             'userAnswer': q.userAnswer != null
                 ? {'option': q.userAnswer}

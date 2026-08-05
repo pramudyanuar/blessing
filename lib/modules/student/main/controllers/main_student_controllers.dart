@@ -182,8 +182,11 @@ class MainStudentController extends GetxController {
   Future<void> fetchSubjects() async {
     try {
       isLoadingSubjects.value = true;
+      final userData = await CacheUtil().getData('user_data');
+      final int? gradeLevel = userData != null ? userData['grade_level'] as int? : null;
+
       // Menggunakan getAllSubjectsComplete() untuk mengambil semua data tanpa paginasi
-      final result = await _subjectRepository.getAllSubjectsComplete();
+      final result = await _subjectRepository.getAllSubjectsComplete(gradeLevel: gradeLevel);
       if (result.isNotEmpty) {
         subjectList.assignAll(result);
         filteredSubjectList

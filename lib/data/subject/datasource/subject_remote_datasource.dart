@@ -14,10 +14,14 @@ class SubjectDataSource {
       getAllSubjects({
     int page = 1,
     int size = 10,
+    int? gradeLevel,
   }) async {
     try {
+      final url = gradeLevel != null
+          ? '${Endpoints.getAllSubjects}?page=$page&size=$size&grade_level=$gradeLevel'
+          : '${Endpoints.getAllSubjects}?page=$page&size=$size';
       final response = await _httpManager.restRequest(
-        url: '${Endpoints.getAllSubjects}?page=$page&size=$size',
+        url: url,
         method: HttpMethods.get,
       );
 
@@ -46,13 +50,13 @@ class SubjectDataSource {
   }
 
   /// Mengambil semua data mata pelajaran tanpa paginasi (mengambil semua halaman).
-  Future<List<SubjectResponse>> getAllSubjectsComplete() async {
+  Future<List<SubjectResponse>> getAllSubjectsComplete({int? gradeLevel}) async {
     List<SubjectResponse> allSubjects = [];
     int page = 1;
     const int size = 100; // Ambil 100 item per halaman untuk efisiensi
 
     while (true) {
-      final result = await getAllSubjects(page: page, size: size);
+      final result = await getAllSubjects(page: page, size: size, gradeLevel: gradeLevel);
       if (result == null) break;
 
       allSubjects.addAll(result.subjects);

@@ -10,6 +10,9 @@ class QuestionModel {
       <TextEditingController>[].obs;
   final Rx<File?> imageFile = Rx<File?>(null);
   final RxInt correctAnswerIndex = 0.obs; // <-- Tambahkan ini
+  final TextEditingController explanationController = TextEditingController();
+  final TextEditingController videoUrlController = TextEditingController();
+  final Rx<File?> explanationImageFile = Rx<File?>(null);
 
   QuestionModel() {
     // Memulai dengan 2 opsi jawaban default
@@ -20,6 +23,8 @@ class QuestionModel {
   // Fungsi untuk membersihkan semua controller dari memori
   void dispose() {
     descriptionController.dispose();
+    explanationController.dispose();
+    videoUrlController.dispose();
     for (var controller in optionControllers) {
       controller.dispose();
     }

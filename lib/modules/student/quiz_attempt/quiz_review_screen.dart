@@ -9,6 +9,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class QuizReviewScreen extends StatelessWidget {
   const QuizReviewScreen({super.key});
@@ -343,12 +344,17 @@ class QuizReviewScreen extends StatelessWidget {
           SizedBox(height: 8.h),
 
           // Jawaban Benar (hanya tampil jika salah)
-          if (!isCorrect)
+          if (!isCorrect) ...[
             _buildAnswerRow(
               label: 'Jawaban Benar:',
               answer: _extractAnswerValue(correctAnswer),
               isCorrect: true,
             ),
+            SizedBox(height: 8.h),
+          ],
+
+          // Pembahasan (jika ada)
+          _buildExplanationSection(question),
         ],
       ),
     );
@@ -521,5 +527,159 @@ class QuizReviewScreen extends StatelessWidget {
     if (score >= 60) return 'C';
     if (score >= 50) return 'D';
     return 'F';
+  }
+
+  Widget _buildExplanationSection(dynamic question) {
+    if (question == null) return const SizedBox.shrink();
+
+    final explanationList = question is Map<String, dynamic>
+        ? question['explanation'] as List?
+        : null;
+
+    if (explanationList == null || explanationList.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.h),
+          child: Divider(height: 1, color: Colors.grey.shade200),
+        ),
+        Row(
+          children: [
+            Icon(Icons.lightbulb_outline, size: 16.sp, color: AppColors.c2),
+            SizedBox(width: 4.w),
+            GlobalText.semiBold(
+              'Pembahasan',
+              fontSize: 12.sp,
+              color: AppColors.c2,
+            ),
+          ],
+        ),
+        SizedBox(height: 6.h),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(12.w),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF9FAFC),
+            borderRadius: BorderRadius.circular(8.r),
+            border: Border.all(color: Colors.blue.shade50),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: explanationList.map<Widget>((block) {
+              final type = block is ContentBlock ? block.type : (block['type'] as String?);
+              final data = block is ContentBlock ? block.data : (block['data'] as String?);
+              
+              if (type == 'text' && data != null && data.trim().isNotEmpty) {
+                return Padding(
+                  padding: EdgeInsets.only(bottom: 6.h),
+                  child: GlobalText.regular(
+                    data,
+                    fontSize: 11.5.sp,
+                    color: Colors.black87,
+                  ),
+                );
+              } else if (type == 'image' && data != null && data.trim().isNotEmpty) {
+                return Padding(
+                  padding: EdgeInsets.only(bottom: 6.h),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(6.r),
+                    child: CachedNetworkImage(
+                      imageUrl: data,
+                      placeholder: (context, url) => const Center(
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => const Icon(Icons.error),
+                    ),
+                  ),
+                );
+              } else if (type == 'video_link' && data != null && data.trim().isNotEmpty) {
+                return Padding(
+                  padding: EdgeInsets.only(bottom: 6.h),
+                  child: YoutubeExplanationPlayer(videoUrl: data),
+                );
+              }
+              return const SizedBox.shrink();
+            }).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class YoutubeExplanationPlayer extends StatefulWidget {
+  final String videoUrl;
+
+  const YoutubeExplanationPlayer({super.key, required this.videoUrl});
+
+  @override
+  State<YoutubeExplanationPlayer> createState() => _YoutubeExplanationPlayerState();
+}
+
+class _YoutubeExplanationPlayerState extends State<YoutubeExplanationPlayer> {
+  late YoutubePlayerController _controller;
+  bool _isValid = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final videoId = YoutubePlayer.convertUrlToId(widget.videoUrl);
+    if (videoId != null) {
+      _isValid = true;
+      _controller = YoutubePlayerController(
+        initialVideoId: videoId,
+        flags: const YoutubePlayerFlags(
+          autoPlay: false,
+          mute: false,
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    if (_isValid) {
+      _controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_isValid) {
+      return Container(
+        padding: EdgeInsets.all(12.w),
+        decoration: BoxDecoration(
+          color: Colors.red.shade50,
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+        child: GlobalText.regular(
+          'Tautan video tidak valid',
+          fontSize: 12.sp,
+          color: Colors.red,
+        ),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8.r),
+      child: YoutubePlayer(
+        controller: _controller,
+        showVideoProgressIndicator: true,
+        progressIndicatorColor: AppColors.c2,
+        progressColors: const ProgressBarColors(
+          playedColor: AppColors.c2,
+          handleColor: AppColors.c2,
+        ),
+      ),
+    );
   }
 }
