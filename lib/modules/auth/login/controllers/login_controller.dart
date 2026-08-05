@@ -15,11 +15,27 @@ class LoginController extends GetxController {
   final RxBool isPasswordVisible = false.obs;
 
   void login() async {
-    if (usernameController.text.isEmpty || passwordController.text.isEmpty) {
+    final email = usernameController.text.trim();
+    final password = passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
       Get.snackbar(
         "Gagal",
-        "Username dan password tidak boleh kosong.",
+        "Email dan password tidak boleh kosong.",
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.withValues(alpha: 0.8),
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    if (!GetUtils.isEmail(email)) {
+      Get.snackbar(
+        "Gagal",
+        "Format email yang Anda masukkan tidak valid.",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.withValues(alpha: 0.8),
+        colorText: Colors.white,
       );
       return;
     }
@@ -28,8 +44,8 @@ class LoginController extends GetxController {
 
     try {
       final request = LoginUserRequest(
-        email: usernameController.text,
-        password: passwordController.text,
+        email: email,
+        password: password,
       );
 
       final loginResponse = await _userRepository.login(request);

@@ -42,7 +42,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
       children: [
         GlobalText.bold(
           widget.label,
-          fontSize: 16.sp,
+          fontSize: 14.sp,
         ),
         SizedBox(height: 8.h),
         Container(
@@ -51,7 +51,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
             borderRadius: BorderRadius.circular(25.r),
             boxShadow: [
               BoxShadow(
-                color: Colors.black26,
+                color: Colors.black12,
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -60,10 +60,11 @@ class _AuthTextFieldState extends State<AuthTextField> {
           child: TextField(
             controller: widget.controller,
             obscureText: widget.isPassword ? _obscureText : false,
+            style: TextStyle(fontSize: 14.sp),
             decoration: InputDecoration(
               hintText: widget.hintText,
               hintStyle: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 13.sp,
                 color: Colors.grey,
               ),
               filled: true,
@@ -73,12 +74,13 @@ class _AuthTextFieldState extends State<AuthTextField> {
                 borderSide: BorderSide.none,
               ),
               contentPadding:
-                  EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
+                  EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
               suffixIcon: widget.isPassword
                   ? IconButton(
                       icon: Icon(
                         _obscureText ? Icons.visibility_off : Icons.visibility,
                         color: Colors.grey,
+                        size: 20.r,
                       ),
                       onPressed: _togglePasswordVisibility,
                     )

@@ -12,13 +12,14 @@ class SubjectRepository {
       getAllSubjects({
     int page = 1,
     int size = 10,
+    int? gradeLevel,
   }) {
-    return _dataSource.getAllSubjects(page: page, size: size);
+    return _dataSource.getAllSubjects(page: page, size: size, gradeLevel: gradeLevel);
   }
 
   /// Mengambil semua data mata pelajaran tanpa paginasi.
-  Future<List<SubjectResponse>> getAllSubjectsComplete() {
-    return _dataSource.getAllSubjectsComplete();
+  Future<List<SubjectResponse>> getAllSubjectsComplete({int? gradeLevel}) {
+    return _dataSource.getAllSubjectsComplete(gradeLevel: gradeLevel);
   }
 
   /// Membuat mata pelajaran baru (hanya untuk Admin).

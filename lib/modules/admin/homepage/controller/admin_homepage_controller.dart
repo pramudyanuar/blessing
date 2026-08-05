@@ -13,7 +13,7 @@ class AdminHomepageController extends GetxController {
 
   // --- CACHE ---
   final _cacheUtil = CacheUtil();
-  final _cacheKey = 'all_admin_subjects';
+  String get _cacheKey => 'all_admin_subjects_${selectedKelas.value}';
 
   // --- STATE ---
   var isLoading = true.obs;
@@ -85,7 +85,9 @@ class AdminHomepageController extends GetxController {
         isLoading.value = true;
       }
 
-      final subjects = await _subjectRepository.getAllSubjectsComplete();
+      final subjects = await _subjectRepository.getAllSubjectsComplete(
+        gradeLevel: selectedKelas.value,
+      );
 
       _allSubjects.assignAll(subjects); // Simpan ke list master
 
@@ -103,12 +105,13 @@ class AdminHomepageController extends GetxController {
     }
   }
 
-  /// Mengganti status UI tab kelas, tidak lagi memfilter list.
+  /// Mengganti status UI tab kelas, dan memfilter list berdasarkan kelas tersebut.
   void selectKelas(int kelas) {
     selectedKelas.value = kelas;
-    // Panggilan _filterSubjects() di sini tidak lagi diperlukan karena tidak ada filter kelas,
-    // tapi tidak masalah jika tetap ada.
-    _filterSubjects();
+    _allSubjects.clear();
+    displayedSubjects.clear();
+    _loadSubjectsFromCache();
+    fetchAllSubjects();
   }
 
   Future<void> logout() async {

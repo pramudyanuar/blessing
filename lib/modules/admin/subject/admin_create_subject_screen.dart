@@ -20,12 +20,19 @@ class _AdminCreateSubjectScreenState extends State<AdminCreateSubjectScreen> {
   late final TextEditingController nameController;
   late final SubjectRepository _subjectRepository;
   bool isLoading = false;
+  int? targetKelas;
+  bool isSpecificClass = true;
 
   @override
   void initState() {
     super.initState();
     nameController = TextEditingController();
     _subjectRepository = Get.find<SubjectRepository>();
+
+    final args = Get.arguments as Map<String, dynamic>?;
+    if (args != null && args['kelas'] != null) {
+      targetKelas = args['kelas'] as int?;
+    }
   }
 
   @override
@@ -45,12 +52,15 @@ class _AdminCreateSubjectScreenState extends State<AdminCreateSubjectScreen> {
     setState(() => isLoading = true);
 
     try {
-      final request = CreateSubjectRequest(subjectName: name);
+      final request = CreateSubjectRequest(
+        subjectName: name,
+        gradeLevel: (isSpecificClass && targetKelas != null) ? targetKelas! : 0,
+      );
       final result = await _subjectRepository.createSubject(request);
 
       if (result != null) {
-        CustomSnackbar.show(title: 'Sukses', message: 'Mata pelajaran berhasil dibuat');
         Get.back(result: true);
+        CustomSnackbar.show(title: 'Sukses', message: 'Mata pelajaran berhasil dibuat');
       } else {
         CustomSnackbar.show(title: 'Error', message: 'Gagal membuat mata pelajaran', isError: true);
       }
@@ -118,6 +128,71 @@ class _AdminCreateSubjectScreenState extends State<AdminCreateSubjectScreen> {
                 ),
               ),
             ),
+
+            if (targetKelas != null) ...[
+              SizedBox(height: 24.h),
+              GlobalText.medium(
+                'Kategori Kelas',
+                fontSize: 13.sp,
+                color: Colors.black87,
+              ),
+              SizedBox(height: 8.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: ChoiceChip(
+                      label: Center(
+                        child: GlobalText.medium(
+                          'Umum (Semua Kelas)',
+                          fontSize: 12.sp,
+                          color: !isSpecificClass ? Colors.white : Colors.black54,
+                        ),
+                      ),
+                      selected: !isSpecificClass,
+                      onSelected: (selected) {
+                        if (selected) {
+                          setState(() => isSpecificClass = false);
+                        }
+                      },
+                      selectedColor: AppColors.c2,
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        side: BorderSide(
+                          color: !isSpecificClass ? AppColors.c2 : Colors.grey.shade300,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: ChoiceChip(
+                      label: Center(
+                        child: GlobalText.medium(
+                          'Kelas $targetKelas',
+                          fontSize: 12.sp,
+                          color: isSpecificClass ? Colors.white : Colors.black54,
+                        ),
+                      ),
+                      selected: isSpecificClass,
+                      onSelected: (selected) {
+                        if (selected) {
+                          setState(() => isSpecificClass = true);
+                        }
+                      },
+                      selectedColor: AppColors.c2,
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        side: BorderSide(
+                          color: isSpecificClass ? AppColors.c2 : Colors.grey.shade300,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
 
             SizedBox(height: 40.h),
 

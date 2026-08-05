@@ -24,6 +24,27 @@ class MainStudentController extends GetxController {
   // State untuk search
   var searchQuery = ''.obs;
 
+  // Double-back to exit logic
+  DateTime? _lastPressedAt;
+
+  Future<bool> onWillPop() async {
+    final now = DateTime.now();
+    if (_lastPressedAt == null ||
+        now.difference(_lastPressedAt!) > const Duration(seconds: 2)) {
+      _lastPressedAt = now;
+      Get.snackbar(
+        "Keluar Aplikasi",
+        "Tekan sekali lagi untuk keluar dari aplikasi.",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.black87,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+      );
+      return false;
+    }
+    return true;
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -161,8 +182,11 @@ class MainStudentController extends GetxController {
   Future<void> fetchSubjects() async {
     try {
       isLoadingSubjects.value = true;
+      final userData = await CacheUtil().getData('user_data');
+      final int? gradeLevel = userData != null ? userData['grade_level'] as int? : null;
+
       // Menggunakan getAllSubjectsComplete() untuk mengambil semua data tanpa paginasi
-      final result = await _subjectRepository.getAllSubjectsComplete();
+      final result = await _subjectRepository.getAllSubjectsComplete(gradeLevel: gradeLevel);
       if (result.isNotEmpty) {
         subjectList.assignAll(result);
         filteredSubjectList

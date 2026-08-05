@@ -3,6 +3,7 @@
 import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_text.dart';
+import 'package:blessing/core/global_components/global_button.dart';
 import 'package:blessing/modules/student/quiz_attempt/controller/quiz_attempts_list_controller.dart';
 import 'package:blessing/modules/student/quiz_attempt/widgets/attempt_list_item.dart';
 import 'package:flutter/material.dart';
@@ -18,21 +19,28 @@ class QuizAttemptsListScreen extends GetView<QuizAttemptsListController> {
       backgroundColor: AppColors.c5,
       appBar: AppBar(
         centerTitle: false,
-        title: GlobalText.semiBold(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.c2),
+          onPressed: () => Get.back(),
+        ),
+        title: GlobalText.bold(
           "Daftar Attempt - ${controller.quizName}",
-          fontSize: 14.sp,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+          fontSize: 16.sp,
+          color: Colors.black,
+          fontFamily: 'Inter',
         ),
         backgroundColor: Colors.white,
-        elevation: 0.5,
+        surfaceTintColor: Colors.white,
+        elevation: 3,
+        shadowColor: Colors.black.withValues(alpha: 0.4),
+        toolbarHeight: 65.h,
       ),
       body: Obx(
         () {
           if (controller.isLoading.value && controller.attempts.isEmpty) {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(
-                color: const Color(0xFF1976D2),
+                color: AppColors.c2,
               ),
             );
           }
@@ -54,16 +62,10 @@ class QuizAttemptsListScreen extends GetView<QuizAttemptsListController> {
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 24.h),
-                  ElevatedButton(
+                  GlobalButton(
+                    text: "Coba Lagi",
+                    width: 140.w,
                     onPressed: () => controller.loadAttempts(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1976D2),
-                    ),
-                    child: GlobalText.semiBold(
-                      "Coba Lagi",
-                      fontSize: 14.sp,
-                      color: Colors.white,
-                    ),
                   ),
                 ],
               ),
@@ -82,8 +84,9 @@ class QuizAttemptsListScreen extends GetView<QuizAttemptsListController> {
                   ),
                   SizedBox(height: 16.h),
                   GlobalText.medium(
-                    "Belum ada attempt untuk quiz ini",
+                    "Belum ada attempt untuk kuis ini",
                     fontSize: 14.sp,
+                    color: Colors.grey.shade600,
                   ),
                 ],
               ),
@@ -99,24 +102,26 @@ class QuizAttemptsListScreen extends GetView<QuizAttemptsListController> {
                 Container(
                   padding: EdgeInsets.all(12.w),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE3F2FD),
+                    color: AppColors.c3.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                     border: Border.all(
-                      color: const Color(0xFF1976D2).withValues(alpha: 0.3),
+                      color: AppColors.c3.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(
                     children: [
                       Icon(
                         Icons.info_outline,
-                        color: const Color(0xFF1976D2),
+                        color: AppColors.c2,
                         size: 20.sp,
                       ),
                       SizedBox(width: 12.w),
                       Expanded(
                         child: GlobalText.medium(
                           "Total attempt: ${controller.attempts.length}",
-                          fontSize: 12.sp,
+                          fontSize: 13.sp,
+                          color: AppColors.c2,
+                          textAlign: TextAlign.left,
                         ),
                       ),
                     ],
@@ -159,10 +164,14 @@ class QuizAttemptsListScreen extends GetView<QuizAttemptsListController> {
                               ElevatedButton.icon(
                                 onPressed: () =>
                                     controller.loadPreviousPage(),
-                                icon: const Icon(Icons.chevron_left),
-                                label: const Text("Sebelumnya"),
+                                icon: const Icon(Icons.chevron_left, color: Colors.white),
+                                label: GlobalText.semiBold("Sebelumnya", fontSize: 13.sp, color: Colors.white),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF1976D2),
+                                  backgroundColor: AppColors.c2,
+                                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                  ),
                                 ),
                               ),
                             SizedBox(width: 12.w),
@@ -170,10 +179,14 @@ class QuizAttemptsListScreen extends GetView<QuizAttemptsListController> {
                               ElevatedButton.icon(
                                 onPressed: () =>
                                     controller.loadNextPage(),
-                                label: const Text("Berikutnya"),
-                                icon: const Icon(Icons.chevron_right),
+                                icon: const Icon(Icons.chevron_right, color: Colors.white),
+                                label: GlobalText.semiBold("Berikutnya", fontSize: 13.sp, color: Colors.white),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF1976D2),
+                                  backgroundColor: AppColors.c2,
+                                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                  ),
                                 ),
                               ),
                           ],

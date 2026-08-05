@@ -1,5 +1,6 @@
 // lib/modules/student/quiz_attempt/widgets/attempt_list_item.dart
 
+import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/data/session/models/response/quiz_attempt_summary.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:flutter/material.dart';
@@ -40,8 +41,8 @@ class AttemptListItem extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.05),
-              blurRadius: 4,
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 6,
               offset: const Offset(0, 2),
             ),
           ],
@@ -56,7 +57,7 @@ class AttemptListItem extends StatelessWidget {
                 GlobalText.semiBold(
                   "Attempt #$attemptNumber",
                   fontSize: 14.sp,
-                  color: const Color(0xFF1976D2),
+                  color: AppColors.c2,
                 ),
                 GlobalText.medium(
                   formattedDate,
@@ -81,7 +82,7 @@ class AttemptListItem extends StatelessWidget {
                         GlobalText.bold(
                           "${attempt.score}",
                           fontSize: 18.sp,
-                          color: const Color(0xFF1976D2),
+                          color: AppColors.c2,
                         ),
                         GlobalText.medium(
                           "/100",
@@ -146,13 +147,13 @@ class AttemptListItem extends StatelessWidget {
                     padding:
                         EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                     decoration: BoxDecoration(
-                      color: Colors.blue.withValues(alpha: 0.1),
+                      color: AppColors.c3.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6.r),
                     ),
                     child: GlobalText.medium(
                       "Klik untuk detail",
                       fontSize: 11.sp,
-                      color: Colors.blue,
+                      color: AppColors.c2,
                     ),
                   ),
               ],
@@ -164,11 +165,11 @@ class AttemptListItem extends StatelessWidget {
               alignment: Alignment.centerRight,
               child: TextButton.icon(
                 onPressed: onTap,
-                icon: Icon(Icons.arrow_forward, size: 16.sp),
+                icon: Icon(Icons.arrow_forward, size: 16.sp, color: AppColors.c2),
                 label: GlobalText.medium(
                   "Lihat Detail",
                   fontSize: 12.sp,
-                  color: const Color(0xFF1976D2),
+                  color: AppColors.c2,
                 ),
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 8.w),

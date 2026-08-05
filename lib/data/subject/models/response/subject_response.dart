@@ -3,12 +3,14 @@
 class SubjectResponse {
   final String id;
   final String? subjectName;
+  final int gradeLevel;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
   SubjectResponse({
     required this.id,
     this.subjectName,
+    this.gradeLevel = 0,
     this.createdAt,
     this.updatedAt,
   });
@@ -17,6 +19,7 @@ class SubjectResponse {
       SubjectResponse(
         id: json["id"],
         subjectName: json["subject_name"],
+        gradeLevel: json["grade_level"] ?? 0,
         createdAt: json["created_at"] == null
             ? null
             : DateTime.parse(json["created_at"]),
@@ -30,6 +33,7 @@ class SubjectResponse {
   Map<String, dynamic> toJson() => {
         "id": id,
         "subject_name": subjectName,
+        "grade_level": gradeLevel,
         // Konversi DateTime menjadi string format ISO 8601 agar kompatibel dengan JSON
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),

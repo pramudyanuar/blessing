@@ -104,6 +104,26 @@ class CreateQuizController extends GetxController {
   void removeImageForQuestion(int questionIndex) {
     questions[questionIndex].imageFile.value = null;
   }
+
+  Future<void> pickImageForExplanation(int questionIndex) async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+      );
+
+      if (pickedFile != null) {
+        questions[questionIndex].explanationImageFile.value = File(pickedFile.path);
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Gagal memilih gambar: $e",
+          snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+
+  void removeImageForExplanation(int questionIndex) {
+    questions[questionIndex].explanationImageFile.value = null;
+  }
   // --- SELESAI FUNGSI BARU ---
 
   // --- FUNGSI BARU UNTUK VALIDASI ---
@@ -274,8 +294,38 @@ class CreateQuizController extends GetxController {
               final correctOptionId =
                   options.options[questionModel.correctAnswerIndex.value].id;
 
+              // Upload explanation image if present
+              String? explanationImageUrl;
+              if (questionModel.explanationImageFile.value != null) {
+                explanationImageUrl = await _questionRepository.uploadQuestionImage(
+                  questionModel.explanationImageFile.value!,
+                );
+              }
+
+              // Build explanation blocks
+              final explanationBlocks = <ContentBlock>[];
+              if (questionModel.explanationController.text.trim().isNotEmpty) {
+                explanationBlocks.add(ContentBlock(
+                  type: 'text',
+                  data: questionModel.explanationController.text.trim(),
+                ));
+              }
+              if (explanationImageUrl != null && explanationImageUrl.isNotEmpty) {
+                explanationBlocks.add(ContentBlock(
+                  type: 'image',
+                  data: explanationImageUrl,
+                ));
+              }
+              if (questionModel.videoUrlController.text.trim().isNotEmpty) {
+                explanationBlocks.add(ContentBlock(
+                  type: 'video_link',
+                  data: questionModel.videoUrlController.text.trim(),
+                ));
+              }
+
               final createAnswerRequest = CreateQuizAnswerRequest(
                 optionId: correctOptionId,
+                explanation: explanationBlocks.isNotEmpty ? explanationBlocks : null,
               );
               await _quizAnswerRepository.createQuizAnswer(createAnswerRequest);
             }

@@ -24,29 +24,37 @@ class QuizResultScreen extends StatelessWidget {
       },
       child: BaseWidgetContainer(
         backgroundColor: AppColors.c5,
-        appBar: AppBar(
-          centerTitle: false,
-          title: GlobalText.semiBold("Hasil Kuis", fontSize: 16.sp),
-          backgroundColor: Colors.white,
-          elevation: 0.5,
-          automaticallyImplyLeading: false, // Hapus back button di appbar
+      appBar: AppBar(
+        centerTitle: false,
+        title: GlobalText.bold(
+          "Hasil Kuis",
+          fontSize: 16.sp,
+          color: Colors.black,
+          fontFamily: 'Inter',
         ),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(16.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        elevation: 3,
+        shadowColor: Colors.black.withValues(alpha: 0.4),
+        toolbarHeight: 65.h,
+        automaticallyImplyLeading: false, // Hapus back button di appbar
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
             // Container Nilai
             Container(
-              padding: EdgeInsets.all(16.w),
+              padding: EdgeInsets.all(20.w),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12.r),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withValues(alpha: 0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
@@ -54,21 +62,21 @@ class QuizResultScreen extends StatelessWidget {
                 children: [
                   GlobalText.bold(
                     quizName,
-                    fontSize: 24.sp,
-                    color: const Color(0xFF1976D2),
+                    fontSize: 22.sp,
+                    color: AppColors.c2,
                   ),
                   SizedBox(height: 20.h),
                   Container(
-                    width: 60.w,
-                    height: 60.h,
+                    width: 70.w,
+                    height: 70.w,
                     decoration: const BoxDecoration(
                       color: Color(0xFFE8F5E8),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.check, color: Colors.green, size: 30.sp),
+                    child: Icon(Icons.check, color: Colors.green, size: 36.sp),
                   ),
                   SizedBox(height: 20.h),
-                  GlobalText.semiBold("Skor Kamu", fontSize: 16.sp),
+                  GlobalText.semiBold("Skor Kamu", fontSize: 16.sp, color: Colors.black87),
                   SizedBox(height: 8.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -77,8 +85,8 @@ class QuizResultScreen extends StatelessWidget {
                     children: [
                       GlobalText.bold(
                         "$score",
-                        fontSize: 36.sp,
-                        color: const Color(0xFF1976D2),
+                        fontSize: 40.sp,
+                        color: AppColors.c2,
                       ),
                       GlobalText.medium("/100",
                           fontSize: 18.sp, color: Colors.grey),
@@ -100,16 +108,16 @@ class QuizResultScreen extends StatelessWidget {
                             'fetchFromServer': true,
                           },
                         ),
-                        icon: const Icon(Icons.description),
+                        icon: const Icon(Icons.description, color: AppColors.c2),
                         label: GlobalText.semiBold(
                           "Lihat Pembahasan",
                           fontSize: 14.sp,
-                          color: const Color(0xFF1976D2),
+                          color: AppColors.c2,
                         ),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF1976D2),
+                          foregroundColor: AppColors.c2,
                           side: const BorderSide(
-                            color: Color(0xFF1976D2),
+                            color: AppColors.c2,
                           ),
                           padding: EdgeInsets.symmetric(vertical: 12.h),
                           shape: RoundedRectangleBorder(
@@ -131,16 +139,16 @@ class QuizResultScreen extends StatelessWidget {
                             'quizName': quizName,
                           },
                         ),
-                        icon: const Icon(Icons.history),
+                        icon: const Icon(Icons.history, color: AppColors.c2),
                         label: GlobalText.semiBold(
                           "Lihat Semua Attempt",
                           fontSize: 14.sp,
-                          color: const Color(0xFF1976D2),
+                          color: AppColors.c2,
                         ),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF1976D2),
+                          foregroundColor: AppColors.c2,
                           side: const BorderSide(
-                            color: Color(0xFF1976D2),
+                            color: AppColors.c2,
                           ),
                           padding: EdgeInsets.symmetric(vertical: 12.h),
                           shape: RoundedRectangleBorder(
@@ -159,16 +167,17 @@ class QuizResultScreen extends StatelessWidget {
                         (route) => route.isFirst,
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1976D2),
+                        backgroundColor: AppColors.c2,
                         foregroundColor: Colors.white,
                         padding: EdgeInsets.symmetric(vertical: 12.h),
+                        elevation: 2,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                       ),
                       child: GlobalText.semiBold(
                         "Kembali ke Halaman Depan",
-                        fontSize: 16.sp,
+                        fontSize: 15.sp,
                         color: Colors.white,
                       ),
                     ),
@@ -176,9 +185,9 @@ class QuizResultScreen extends StatelessWidget {
                 ],
               ),
             ),
-            ],
-          ),
+          ],
         ),
+      ),
       ),
     );
   }

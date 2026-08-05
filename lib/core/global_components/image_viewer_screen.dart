@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
-import 'package:get/get.dart';
 
 class ImageViewerScreen extends StatefulWidget {
   final String imageUrl;
@@ -61,7 +60,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
               elevation: 0,
               leading: IconButton(
                 icon: const Icon(Icons.close),
-                onPressed: () => Get.back(),
+                onPressed: () => Navigator.pop(context),
               ),
               title: _isGalleryMode
                   ? Text(

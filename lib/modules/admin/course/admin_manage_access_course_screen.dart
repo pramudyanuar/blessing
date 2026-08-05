@@ -92,30 +92,59 @@ class AdminManageAccessCourseScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final userAccess = controller.userAccessList[index];
               return Card(
-                margin: EdgeInsets.symmetric(vertical: 4.h),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    child: Text(userAccess.user.username!
-                        .substring(0, 1)
-                        .toUpperCase()),
-                  ),
-                  title: Text(userAccess.user.username ?? ''),
-                  subtitle: Text(userAccess.user.email ?? ''),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.red),
-                    onPressed: () {
-                      Get.dialog(
-                        GlobalConfirmationDialog(
-                          message:
-                              "Apakah kamu yakin ingin menghapus akses untuk ${userAccess.user.username}?",
-                          onYes: () {
-                            Get.back();
-                            controller.removeUserAccess(userAccess.id);
-                          },
-                          onNo: () => Get.back(),
-                        ),
-                      );
-                    },
+                elevation: 1,
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                  side: BorderSide(color: Colors.grey.shade200, width: 1),
+                ),
+                margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 4.w),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4.h),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: AppColors.c2.withValues(alpha: 0.1),
+                      foregroundColor: AppColors.c2,
+                      child: Text(
+                        userAccess.user.username!
+                            .substring(0, 1)
+                            .toUpperCase(),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    title: Text(
+                      userAccess.user.username ?? '',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14.sp,
+                        color: AppColors.c2,
+                      ),
+                      softWrap: true,
+                    ),
+                    subtitle: Text(
+                      userAccess.user.email ?? '',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: Colors.grey.shade600,
+                      ),
+                      softWrap: true,
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete_outline, color: Colors.red),
+                      onPressed: () {
+                        Get.dialog(
+                          GlobalConfirmationDialog(
+                            message:
+                                "Apakah kamu yakin ingin menghapus akses untuk ${userAccess.user.username}?",
+                            onYes: () {
+                              Get.back();
+                              controller.removeUserAccess(userAccess.id);
+                            },
+                            onNo: () => Get.back(),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
               );

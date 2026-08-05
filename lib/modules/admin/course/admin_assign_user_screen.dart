@@ -94,27 +94,44 @@ class AdminAssignUserScreen extends StatelessWidget {
                         controller.existingUserIds.contains(user.id);
 
                     return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      elevation: 1,
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        side: BorderSide(color: Colors.grey.shade200, width: 1),
+                      ),
+                      margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 4.w),
                       child: ListTile(
-                        contentPadding: const EdgeInsets.only(left: 8.0),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
                         onTap: () => controller.toggleUserSelection(user.id),
                         leading: Checkbox(
                           value: isSelected,
+                          activeColor: AppColors.c2,
                           onChanged: (bool? value) {
                             controller.toggleUserSelection(user.id);
                           },
                         ),
-                        title: Text(user.username ?? 'Tanpa Nama'),
+                        title: Text(
+                          user.username ?? 'Tanpa Nama',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14.sp,
+                            color: AppColors.c2,
+                          ),
+                          softWrap: true,
+                        ),
                         subtitle: Text(
                           'Kelas ${user.gradeLevel}${hasExistingAccess ? " • Sudah memiliki akses" : ""}',
                           style: TextStyle(
                             color: hasExistingAccess
-                                ? Theme.of(context).primaryColor
-                                : null,
+                                ? Colors.green.shade600
+                                : Colors.grey.shade600,
                             fontWeight: hasExistingAccess
-                                ? FontWeight.bold
+                                ? FontWeight.w600
                                 : FontWeight.normal,
+                            fontSize: 12.sp,
                           ),
+                          softWrap: true,
                         ),
                       ),
                     );
@@ -130,35 +147,53 @@ class AdminAssignUserScreen extends StatelessWidget {
 
   /// Widget terpisah untuk bagian filter agar lebih rapi
   Widget _buildFilterSection(AdminAssignUserController controller) {
-    return Material(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                onChanged: controller.onSearchChanged,
-                decoration: const InputDecoration(
-                  hintText: 'Cari nama siswa...',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12),
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.all(16.w),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              onChanged: controller.onSearchChanged,
+              decoration: InputDecoration(
+                hintText: 'Cari nama siswa...',
+                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14.sp),
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                fillColor: const Color(0xFFFAFAFA),
+                filled: true,
+                contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                  borderSide: const BorderSide(color: AppColors.c2),
                 ),
               ),
             ),
-            const SizedBox(width: 16),
-            // Dropdown yang dibungkus agar terlihat lebih baik
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: Colors.grey),
-              ),
-              child: Obx(() => DropdownButton<String>(
+          ),
+          SizedBox(width: 12.w),
+          // Dropdown yang dibungkus agar terlihat lebih baik
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 2.h),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAFAFA),
+              borderRadius: BorderRadius.circular(8.r),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Obx(() => DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
                     value: controller.selectedKelas.value,
-                    underline:
-                        const SizedBox(), // Hilangkan garis bawah default
+                    style: TextStyle(
+                        color: AppColors.c2,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500),
+                    icon: const Icon(Icons.arrow_drop_down, color: AppColors.c2),
                     items: controller.kelasList
                         .map((kelas) => DropdownMenuItem(
                               value: kelas,
@@ -166,10 +201,10 @@ class AdminAssignUserScreen extends StatelessWidget {
                             ))
                         .toList(),
                     onChanged: controller.onKelasChanged,
-                  )),
-            ),
-          ],
-        ),
+                  ),
+                )),
+          ),
+        ],
       ),
     );
   }

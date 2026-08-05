@@ -1,3 +1,5 @@
+import 'package:blessing/data/core/models/content_block.dart';
+
 class QuizSummaryResponse {
   final String sessionId;
   final String quizId;
@@ -61,6 +63,7 @@ class QuizSummaryQuestionResponse {
   final String correctAnswerId;
   final String correctAnswer;
   final bool isCorrect;
+  final List<ContentBlock> explanation;
 
   QuizSummaryQuestionResponse({
     required this.questionId,
@@ -72,6 +75,7 @@ class QuizSummaryQuestionResponse {
     required this.correctAnswerId,
     required this.correctAnswer,
     required this.isCorrect,
+    required this.explanation,
   });
 
   factory QuizSummaryQuestionResponse.fromJson(Map<String, dynamic> json) {
@@ -85,6 +89,11 @@ class QuizSummaryQuestionResponse {
       correctAnswerId: json['correct_answer_id'] as String,
       correctAnswer: json['correct_answer'] as String,
       isCorrect: json['is_correct'] as bool,
+      explanation: json['explanation'] != null
+          ? (json['explanation'] as List)
+              .map((e) => ContentBlock.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : [],
     );
   }
 

@@ -54,16 +54,16 @@ class CourseCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTapAction,
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+        margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16.r),
-          boxShadow: const [
+          borderRadius: BorderRadius.circular(12.r),
+          boxShadow: [
             BoxShadow(
-              color: Colors.black12,
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 8.0,
-              offset: Offset(0, 4),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -150,8 +150,8 @@ class CourseCard extends StatelessWidget {
               "Lihat Detail",
               style: TextStyle(
                 fontSize: 13.sp,
-                color: Colors.blue,
-                fontWeight: FontWeight.w500,
+                color: AppColors.c2,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -191,7 +191,7 @@ class CourseCard extends StatelessWidget {
         else
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF2E5B9F),
+              color: AppColors.c2,
               borderRadius: BorderRadius.circular(20.r),
             ),
             padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),

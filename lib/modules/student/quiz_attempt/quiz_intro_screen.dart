@@ -15,17 +15,20 @@ class QuizIntroScreen extends StatelessWidget {
     final controller = Get.find<QuizIntroController>();
 
     return BaseWidgetContainer(
+      backgroundColor: AppColors.c5,
       appBar: AppBar(
         centerTitle: false,
-        title: GlobalText.semiBold(
+        title: GlobalText.bold(
           "Detail Kuis",
           fontSize: 16.sp,
-          color: AppColors.c2,
+          color: Colors.black,
+          fontFamily: 'Inter',
         ),
         backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        shadowColor: Colors.grey.withValues(alpha: 0.2),
-        elevation: 0.5,
+        surfaceTintColor: Colors.white,
+        elevation: 3,
+        shadowColor: Colors.black.withValues(alpha: 0.4),
+        toolbarHeight: 65.h,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.c2),
           onPressed: () => Navigator.pop(context),
@@ -51,176 +54,173 @@ class QuizIntroScreen extends StatelessWidget {
 
         final details = controller.quizDetails.value;
         return Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20.w),
           child: Column(
             children: [
-              Card(
-                color: Colors.white,
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.r),
-                  side: BorderSide(color: AppColors.c2, width: 0.5.w),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Show score prominently if submitted
-                      Obx(() {
-                        if (controller.quizStatus.value ==
-                            QuizAttemptStatus.submitted) {
-                          return Column(
-                            children: [
-                              Center(
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      width: 120.r,
-                                      height: 120.r,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                          colors: [
-                                            AppColors.c2.withValues(alpha: 0.8),
-                                            AppColors.c2,
-                                          ],
+                padding: EdgeInsets.all(20.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Show score prominently if submitted
+                    Obx(() {
+                      if (controller.quizStatus.value ==
+                          QuizAttemptStatus.submitted) {
+                        return Column(
+                          children: [
+                            Center(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: 110.r,
+                                    height: 110.r,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: const LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          AppColors.c3,
+                                          AppColors.c2,
+                                        ],
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppColors.c2
+                                              .withValues(alpha: 0.3),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 4),
                                         ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: AppColors.c2
-                                                .withValues(alpha: 0.3),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 4),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            controller
+                                                .previousScore.value
+                                                .toString(),
+                                            style: TextStyle(
+                                              fontSize: 40.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                              fontFamily: 'Inter',
+                                            ),
+                                          ),
+                                          Text(
+                                            'dari 100',
+                                            style: TextStyle(
+                                              fontSize: 11.sp,
+                                              color: Colors.white70,
+                                              fontFamily: 'Inter',
+                                            ),
                                           ),
                                         ],
                                       ),
-                                      child: Center(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              controller
-                                                  .previousScore.value
-                                                  .toString(),
-                                              style: TextStyle(
-                                                fontSize: 48.sp,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            Text(
-                                              'dari 100',
-                                              style: TextStyle(
-                                                fontSize: 12.sp,
-                                                color: Colors.white70,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
                                     ),
-                                    SizedBox(height: 16.h),
-                                    Text(
-                                      'Kuis Selesai',
-                                      style: TextStyle(
-                                        fontSize: 18.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.c2,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                  SizedBox(height: 12.h),
+                                  GlobalText.bold(
+                                    'Kuis Selesai',
+                                    fontSize: 16.sp,
+                                    color: AppColors.c2,
+                                  ),
+                                ],
                               ),
-                              SizedBox(height: 16.h),
-                            ],
-                          );
-                        }
-                        return const SizedBox.shrink();
-                      }),
-                      Text(
-                        details['title'] ?? 'Judul Kuis',
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.c2,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildInfoRow(
-                        icon: Icons.timer_outlined,
-                        label: 'Durasi',
-                        value: '${details['duration']} Menit',
-                      ),
-                      const SizedBox(height: 8),
-                      _buildInfoRow(
-                        icon: Icons.help_outline,
-                        label: 'Jumlah Soal',
-                        value: '${details['totalQuestions'] ?? 0} soal',
-                      ),
-                      // Status indicator
-                      SizedBox(height: 12.h),
-                      Obx(() {
-                        String statusText = '';
-                        Color statusColor = Colors.blue;
-
-                        switch (controller.quizStatus.value) {
-                          case QuizAttemptStatus.notStarted:
-                            statusText = 'Belum dimulai';
-                            statusColor = Colors.grey;
-                            break;
-                          case QuizAttemptStatus.inProgress:
-                            statusText = 'Sedang dikerjakan';
-                            statusColor = Colors.orange;
-                            break;
-                          case QuizAttemptStatus.submitted:
-                            statusText = 'Sudah diselesaikan';
-                            statusColor = Colors.green;
-                            break;
-                        }
-
-                        return Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 12.w,
-                            vertical: 6.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: statusColor.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(6.r),
-                            border: Border.all(color: statusColor),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                controller.quizStatus.value ==
-                                        QuizAttemptStatus.inProgress
-                                    ? Icons.schedule
-                                    : controller.quizStatus.value ==
-                                            QuizAttemptStatus.submitted
-                                        ? Icons.check_circle
-                                        : Icons.pending,
-                                color: statusColor,
-                                size: 14.sp,
-                              ),
-                              SizedBox(width: 6.w),
-                              Text(
-                                statusText,
-                                style: TextStyle(
-                                  color: statusColor,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(height: 16.h),
+                          ],
                         );
-                      }),
-                    ],
-                  ),
+                      }
+                      return const SizedBox.shrink();
+                    }),
+                    GlobalText.bold(
+                      details['title'] ?? 'Judul Kuis',
+                      fontSize: 18.sp,
+                      color: AppColors.c2,
+                      textAlign: TextAlign.left,
+                    ),
+                    SizedBox(height: 16.h),
+                    _buildInfoRow(
+                      icon: Icons.timer_outlined,
+                      label: 'Durasi',
+                      value: '${details['duration']} Menit',
+                    ),
+                    SizedBox(height: 10.h),
+                    _buildInfoRow(
+                      icon: Icons.help_outline,
+                      label: 'Jumlah Soal',
+                      value: '${details['totalQuestions'] ?? 0} soal',
+                    ),
+                    // Status indicator
+                    SizedBox(height: 16.h),
+                    Obx(() {
+                      String statusText = '';
+                      Color statusColor = Colors.blue;
+
+                      switch (controller.quizStatus.value) {
+                        case QuizAttemptStatus.notStarted:
+                          statusText = 'Belum dimulai';
+                          statusColor = Colors.grey.shade600;
+                          break;
+                        case QuizAttemptStatus.inProgress:
+                          statusText = 'Sedang dikerjakan';
+                          statusColor = Colors.orange;
+                          break;
+                        case QuizAttemptStatus.submitted:
+                          statusText = 'Sudah diselesaikan';
+                          statusColor = Colors.green;
+                          break;
+                      }
+
+                      return Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10.w,
+                          vertical: 6.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6.r),
+                          border: Border.all(color: statusColor.withValues(alpha: 0.3)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              controller.quizStatus.value ==
+                                      QuizAttemptStatus.inProgress
+                                  ? Icons.schedule
+                                  : controller.quizStatus.value ==
+                                          QuizAttemptStatus.submitted
+                                      ? Icons.check_circle
+                                      : Icons.pending_actions,
+                              color: statusColor,
+                              size: 14.sp,
+                            ),
+                            SizedBox(width: 6.w),
+                            GlobalText.semiBold(
+                              statusText,
+                              color: statusColor,
+                              fontSize: 11.sp,
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
                 ),
               ),
               const Spacer(),
@@ -241,11 +241,22 @@ class QuizIntroScreen extends StatelessWidget {
                           onPressed: controller.resumeQuiz,
                         ),
                         SizedBox(height: 8.h),
-                        OutlinedButton(
-                          onPressed: controller.startNewQuiz,
-                          child: const Text(
-                            'Mulai Ulang',
-                            style: TextStyle(color: AppColors.c2),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton(
+                            onPressed: controller.startNewQuiz,
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: AppColors.c2),
+                              padding: EdgeInsets.symmetric(vertical: 12.h),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                            ),
+                            child: GlobalText.semiBold(
+                              'Mulai Ulang',
+                              color: AppColors.c2,
+                              fontSize: 14.sp,
+                            ),
                           ),
                         ),
                       ],
@@ -259,20 +270,42 @@ class QuizIntroScreen extends StatelessWidget {
                           onPressed: controller.viewResult,
                         ),
                         SizedBox(height: 8.h),
-                        OutlinedButton(
-                          onPressed: controller.viewAttemptsList,
-                          child: const Text(
-                            'Lihat Semua Attempt',
-                            style: TextStyle(color: AppColors.c2),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton(
+                            onPressed: controller.viewAttemptsList,
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: AppColors.c2),
+                              padding: EdgeInsets.symmetric(vertical: 12.h),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                            ),
+                            child: GlobalText.semiBold(
+                              'Lihat Semua Attempt',
+                              color: AppColors.c2,
+                              fontSize: 14.sp,
+                            ),
                           ),
                         ),
                         if (controller.canRetake.value) ...[
                           SizedBox(height: 8.h),
-                          OutlinedButton(
-                            onPressed: controller.retakeQuiz,
-                            child: const Text(
-                              'Coba Lagi',
-                              style: TextStyle(color: AppColors.c2),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              onPressed: controller.retakeQuiz,
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: AppColors.c2),
+                                padding: EdgeInsets.symmetric(vertical: 12.h),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                ),
+                              ),
+                              child: GlobalText.semiBold(
+                                'Coba Lagi',
+                                color: AppColors.c2,
+                                fontSize: 14.sp,
+                              ),
                             ),
                           ),
                         ],
@@ -280,7 +313,7 @@ class QuizIntroScreen extends StatelessWidget {
                     );
                 }
               }),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
             ],
           ),
         );
@@ -295,20 +328,20 @@ class QuizIntroScreen extends StatelessWidget {
   }) {
     return Row(
       children: [
-        Icon(icon, color: AppColors.c2, size: 22),
-        const SizedBox(width: 12),
-        Text(
+        Icon(icon, color: AppColors.c2, size: 20.sp),
+        SizedBox(width: 12.w),
+        GlobalText.semiBold(
           label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          fontSize: 14.sp,
+          color: Colors.black87,
         ),
-        const SizedBox(width: 6),
+        SizedBox(width: 8.w),
         Expanded(
-          child: Text(
+          child: GlobalText.regular(
             value,
-            style: const TextStyle(fontSize: 16, color: Colors.black87),
+            fontSize: 14.sp,
+            color: Colors.black54,
+            textAlign: TextAlign.left,
             overflow: TextOverflow.ellipsis,
           ),
         ),
