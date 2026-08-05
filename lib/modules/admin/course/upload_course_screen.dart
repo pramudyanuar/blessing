@@ -8,7 +8,7 @@ import 'package:blessing/core/global_components/custom_text_field.dart';
 import 'package:blessing/modules/admin/course/controllers/admin_upload_course_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import 'package:get/get.dart';
 
 class UploadCourseScreen extends StatelessWidget {
@@ -147,7 +147,7 @@ class UploadCourseScreen extends StatelessWidget {
                     if (item['type'] == 'image' && item['data'] is File) {
                       final file = item['data'] as File;
                       return _buildFileItem(
-                        icon: FontAwesomeIcons.image,
+                        icon: Icons.image_outlined,
                         fileName: file.path.split('/').last,
                         size:
                             '${(file.lengthSync() / 1024 / 1024).toStringAsFixed(2)} MB',
@@ -236,16 +236,16 @@ class UploadCourseScreen extends StatelessWidget {
     required VoidCallback onRemove,
   }) {
     // Determine icon and color based on URL
-    IconData linkIcon = FontAwesomeIcons.link;
+    IconData linkIcon = Icons.link;
     Color color = Colors.blue.shade300;
     String displayText = 'Link';
 
     if (link.contains('youtube.com') || link.contains('youtu.be')) {
-      linkIcon = FontAwesomeIcons.youtube;
+      linkIcon = Icons.smart_display_outlined;
       color = Colors.red.shade300;
       displayText = 'Video YouTube';
     } else if (link.contains('vimeo.com')) {
-      linkIcon = FontAwesomeIcons.vimeo;
+      linkIcon = Icons.videocam_outlined;
       color = Colors.blue.shade400;
       displayText = 'Video Vimeo';
     }
