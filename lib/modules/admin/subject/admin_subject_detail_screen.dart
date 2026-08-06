@@ -44,9 +44,8 @@ class _AdminSubjectDetailScreenState extends State<AdminSubjectDetailScreen> {
 
     setState(() => isLoading = true);
     try {
-      // Fetch all subjects to find the one we need
-      final allSubjects = await _subjectRepository.getAllSubjectsComplete();
-      final found = allSubjects.firstWhereOrNull((s) => s.id == subjectId);
+      // Langsung fetch by ID — tidak perlu ambil semua subjects
+      final found = await _subjectRepository.getSubjectById(subjectId);
 
       setState(() {
         subject = found;

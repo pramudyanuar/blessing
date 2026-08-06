@@ -71,6 +71,32 @@ class SubjectDataSource {
     return allSubjects;
   }
 
+  /// Mengambil satu mata pelajaran berdasarkan ID.
+  Future<SubjectResponse?> getSubjectById(String subjectId) async {
+    try {
+      final url = '${Endpoints.getAllSubjects}/$subjectId';
+      final response = await _httpManager.restRequest(
+        url: url,
+        method: HttpMethods.get,
+      );
+
+      if (response['statusCode'] == 200 && response['data'] != null) {
+        final responseData = response['data'] as Map<String, dynamic>?;
+        final data = responseData?['data'];
+        if (data != null) {
+          return SubjectResponse.fromJson(data as Map<String, dynamic>);
+        }
+        return null;
+      } else {
+        debugPrint('getSubjectById failed: ${response["statusMessage"]}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('getSubjectById error: $e');
+      return null;
+    }
+  }
+
   /// Membuat mata pelajaran baru (hanya untuk Admin).
   Future<SubjectResponse?> createSubject(CreateSubjectRequest data) async {
     try {

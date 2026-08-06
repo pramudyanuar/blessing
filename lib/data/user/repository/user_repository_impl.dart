@@ -37,12 +37,27 @@ class UserRepository {
   Future<({List<UserResponse> users, PagingResponse paging})?> getAllUsers({
     int page = 1,
     int size = 9,
+    int? gradeLevel,
   }) {
-    return _dataSource.getAllUsers(page: page, size: size);
+    return _dataSource.getAllUsers(page: page, size: size, gradeLevel: gradeLevel);
+  }
+
+  /// Ambil semua siswa dari 1 kelas tertentu — server yang filter, tidak perlu loop.
+  Future<List<UserResponse>> getUsersByGradeLevel(int gradeLevel) async {
+    final result = await _dataSource.getAllUsers(
+      page: 1,
+      size: 500, // ukuran besar untuk ambil semua sekaligus
+      gradeLevel: gradeLevel,
+    );
+    return result?.users ?? [];
   }
 
   Future<List<UserResponse>> getAllUsersComplete() {
     return _dataSource.getAllUsersComplete();
+  }
+
+  Future<List<UserResponse>> getTodayBirthdays() {
+    return _dataSource.getTodayBirthdays();
   }
 
   Future<UserResponse?> deleteUserAdmin(String userId) {

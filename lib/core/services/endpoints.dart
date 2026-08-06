@@ -21,6 +21,7 @@ class Endpoints {
   static final String logoutUser = _url('/api/users/logout');
   static final String updateUser = _url('/api/users');
   static final String getAllUsers = _url('/api/admin/users');
+  static final String todayBirthdays = _url('/api/admin/users/today-birthdays');
   static final String updateUserForAdmin = _url('/api/admin/users/{id}');
   static final String deleteUserForAdmin = _url('/api/admin/users/{id}');
 

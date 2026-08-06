@@ -37,4 +37,9 @@ class SubjectRepository {
   Future<SubjectResponse?> deleteSubject(String subjectId) {
     return _dataSource.deleteSubject(subjectId);
   }
+
+  /// Mengambil satu mata pelajaran berdasarkan ID.
+  Future<SubjectResponse?> getSubjectById(String subjectId) {
+    return _dataSource.getSubjectById(subjectId);
+  }
 }

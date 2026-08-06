@@ -1,4 +1,3 @@
-import 'package:blessing/data/course/models/response/user_course_response.dart'; // Pastikan import ini ada
 import 'package:blessing/data/course/repository/course_repository_impl.dart';
 import 'package:blessing/data/user/models/response/user_response.dart';
 import 'package:blessing/data/user/repository/user_repository_impl.dart';
@@ -17,11 +16,12 @@ class AdminAssignUserController extends GetxController {
   final RxBool isAssigning = false.obs;
 
   // User Data & Filtering
-  final RxList<UserResponse> allUsers = <UserResponse>[].obs;
   final RxList<UserResponse> filteredUsers = <UserResponse>[].obs;
   final RxString selectedKelas = '7'.obs;
   final List<String> kelasList = ['7', '8', '9', '10', '11', '12'];
   final RxString searchQuery = ''.obs;
+  // Cache semua user dari kelas aktif (untuk filter search lokal)
+  final List<UserResponse> _usersInCurrentKelas = [];
 
   // Selection Management
   final RxSet<String> selectedUserIds = <String>{}.obs;
@@ -41,69 +41,70 @@ class AdminAssignUserController extends GetxController {
       return;
     }
 
+    // Listener: re-fetch dari server saat kelas berubah
+    ever(selectedKelas, (_) => _fetchUsersForCurrentKelas());
+    // Listener: filter search lokal saat query berubah
+    ever(searchQuery, (_) => _applySearch());
+
     // Panggil fungsi inisialisasi data
     _initializeData();
-
-    // Listener untuk filter otomatis
-    ever(selectedKelas, (_) => _filterUsers());
-    ever(searchQuery, (_) => _filterUsers());
   }
 
-  /// Mengambil semua data yang dibutuhkan secara bersamaan
+  /// Inisialisasi: ambil existing permissions dan fetch user kelas awal.
   Future<void> _initializeData() async {
     isLoading.value = true;
     errorMessage.value = '';
     try {
-      // Jalankan kedua future secara paralel untuk efisiensi
-      final results = await Future.wait([
-        _userRepository.getAllUsersComplete(),
-        _courseRepository.adminGetAllUserCoursesByCourseId(courseId: courseId),
-      ]);
+      // Ambil existing permissions
+      final existingPermissions = await _courseRepository
+          .adminGetAllUserCoursesByCourseId(courseId: courseId);
 
-      // --- Proses hasil dari `getAllUsersComplete` ---
-      final allUsersResult = results[0] as List<UserResponse>?;
-      if (allUsersResult != null) {
-        allUsers.assignAll(allUsersResult);
-      } else {
-        throw 'Gagal mendapatkan daftar siswa.';
-      }
-
-      // --- Proses hasil dari `adminGetAllUserCoursesByCourseId` ---
-      // =========================================================
-      // PERBAIKAN DI SINI: Tambahkan cast `as List<UserCourseResponse>?`
-      // =========================================================
-      final existingPermissionsResult = results[1] as List<UserCourseResponse>?;
-      if (existingPermissionsResult != null) {
-        // Ambil semua ID user yang sudah punya akses
-        final ids = existingPermissionsResult
+      if (existingPermissions != null) {
+        final ids = existingPermissions
             .map((permission) => permission.user.id)
             .toSet();
         existingUserIds.assignAll(ids);
-        // Langsung centang user yang sudah punya akses
         selectedUserIds.assignAll(ids);
       }
-      // Jika null, tidak apa-apa, artinya belum ada yang punya akses
 
-      _filterUsers(); // Terapkan filter awal setelah semua data siap
+      // Fetch user untuk kelas awal
+      await _fetchUsersForCurrentKelas();
     } catch (e) {
       errorMessage.value = "Gagal memuat data: $e";
       debugPrint("Error initializing data: $e");
+      isLoading.value = false;
+    }
+  }
+
+  /// Fetch siswa dari server berdasarkan kelas aktif.
+  Future<void> _fetchUsersForCurrentKelas() async {
+    isLoading.value = true;
+    try {
+      final gradeLevel = int.tryParse(selectedKelas.value) ?? 7;
+      // Server yang filter berdasarkan grade_level — tidak perlu fetch semua
+      final result = await _userRepository.getUsersByGradeLevel(gradeLevel);
+      _usersInCurrentKelas
+        ..clear()
+        ..addAll(result);
+      _applySearch();
+    } catch (e) {
+      debugPrint("Error fetching users for kelas: $e");
     } finally {
       isLoading.value = false;
     }
   }
 
-  void _filterUsers() {
-    final kelas = selectedKelas.value;
+  /// Filter search lokal (kelas sudah dihandle server).
+  void _applySearch() {
     final query = searchQuery.value.toLowerCase();
-
-    final results = allUsers.where((user) {
-      final kelasMatch = user.gradeLevel.toString() == kelas;
-      final nameMatch = user.username?.toLowerCase().contains(query) ?? false;
-      return kelasMatch && (query.isEmpty || nameMatch);
-    }).toList();
-
-    filteredUsers.assignAll(results);
+    if (query.isEmpty) {
+      filteredUsers.assignAll(_usersInCurrentKelas);
+    } else {
+      filteredUsers.assignAll(
+        _usersInCurrentKelas.where(
+            (u) => u.username?.toLowerCase().contains(query) ?? false),
+      );
+    }
   }
 
   void onKelasChanged(String? newValue) {
