@@ -4,7 +4,6 @@ import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/modules/student/main/widgets/birth_date_setup_dialog.dart';
 import 'package:get/get.dart';
 import 'package:blessing/core/utils/cache_util.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class MainStudentController extends GetxController {

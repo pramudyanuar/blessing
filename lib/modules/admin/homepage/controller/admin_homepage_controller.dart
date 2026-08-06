@@ -2,8 +2,11 @@ import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/core/utils/cache_util.dart';
 import 'package:blessing/data/subject/models/response/subject_response.dart';
 import 'package:blessing/data/subject/repository/subject_repository_impl.dart';
+import 'package:blessing/data/user/models/response/user_response.dart';
 import 'package:blessing/data/user/repository/user_repository_impl.dart';
 import 'package:blessing/main.dart';
+import 'package:blessing/modules/admin/homepage/widgets/admin_birthday_popup.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 class AdminHomepageController extends GetxController {
@@ -30,6 +33,36 @@ class AdminHomepageController extends GetxController {
     super.onInit();
     _loadSubjectsFromCache();
     fetchAllSubjects();
+    _checkBirthdayStudentsAndShow();
+  }
+
+  /// Cek siapa saja siswa yang ulang tahun hari ini, dan tampilkan popup sekali per hari.
+  Future<void> _checkBirthdayStudentsAndShow() async {
+    try {
+      final now = DateTime.now();
+      final cacheKey =
+          'admin_birthday_popup_${now.year}-${now.month}-${now.day}';
+
+      // Sudah pernah tampil hari ini? Skip.
+      if (_cacheUtil.hasData(cacheKey)) return;
+
+      // Panggil endpoint khusus — server sudah filter siswa yang ultah hari ini
+      final List<UserResponse> birthdayStudents =
+          await _userRepository.getTodayBirthdays();
+
+      if (birthdayStudents.isEmpty) return;
+
+      // Tandai sudah tampil hari ini
+      await _cacheUtil.setData(cacheKey, true);
+
+      // Tampilkan popup
+      Get.dialog(
+        AdminBirthdayPopup(birthdayStudents: birthdayStudents),
+        barrierDismissible: true,
+      );
+    } catch (e) {
+      debugPrint('[AdminHomepageController] Birthday check error: $e');
+    }
   }
 
   // --- PERUBAHAN DI SINI ---

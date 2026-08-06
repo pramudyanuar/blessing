@@ -146,15 +146,19 @@ class UserDataSource {
   Future<({List<UserResponse> users, PagingResponse paging})?> getAllUsers({
     int page = 1,
     int size = 9,
+    int? gradeLevel,
   }) async {
     try {
+      final queryParams = StringBuffer('?page=$page&size=$size');
+      if (gradeLevel != null) queryParams.write('&grade_level=$gradeLevel');
+
       final response = await _httpManager.restRequest(
-        url: '${Endpoints.getAllUsers}?page=$page&size=$size',
+        url: '${Endpoints.getAllUsers}$queryParams',
         method: HttpMethods.get,
       );
 
       if (response['statusCode'] == 200 && response['data'] != null) {
-        debugPrint('getAllUsers DataSource response: ${response['data']}');
+        debugPrint('getAllUsers DataSource response: ${response["data"]}');
 
         final responseData = response['data'] as Map<String, dynamic>;
         final users = (responseData['data'] as List?)
@@ -167,7 +171,7 @@ class UserDataSource {
         return (users: users, paging: paging);
       } else {
         debugPrint(
-            'getAllUsers DataSource failed: ${response['statusMessage']}');
+            'getAllUsers DataSource failed: ${response["statusMessage"]}');
         return null;
       }
     } catch (e) {
@@ -197,6 +201,37 @@ class UserDataSource {
     }
 
     return allUsers;
+  }
+
+  /// Fetch siswa yang ulang tahun hari ini via endpoint khusus.
+  Future<List<UserResponse>> getTodayBirthdays() async {
+    try {
+      final response = await _httpManager.restRequest(
+        url: Endpoints.todayBirthdays,
+        method: HttpMethods.get,
+      );
+
+      if (response['statusCode'] == 200 && response['data'] != null) {
+        final rawData = response['data'];
+        // Backend returns: { data: [...] }
+        final List<dynamic> list =
+            (rawData is Map && rawData.containsKey('data'))
+                ? (rawData['data'] as List? ?? [])
+                : (rawData is List ? rawData : []);
+
+        debugPrint('[getTodayBirthdays] found ${list.length} students');
+        return list
+            .map((e) => UserResponse.fromJson(e as Map<String, dynamic>))
+            .toList();
+      } else {
+        debugPrint(
+            'getTodayBirthdays failed: ${response['statusMessage']}');
+        return [];
+      }
+    } catch (e) {
+      debugPrint('getTodayBirthdays error: $e');
+      return [];
+    }
   }
 
 

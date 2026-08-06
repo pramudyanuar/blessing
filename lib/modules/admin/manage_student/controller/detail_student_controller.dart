@@ -170,7 +170,7 @@ class DetailStudentController extends GetxController {
         isEditMode.value = false;
         CustomSnackbar.show(
             title: "Sukses", message: "Data siswa berhasil diperbarui");
-        Get.find<AdminManageStudentController>().fetchStudents();
+        Get.find<AdminManageStudentController>().fetchStudentsByKelas();
       } else {
         CustomSnackbar.show(
             title: "Gagal",
@@ -193,7 +193,7 @@ class DetailStudentController extends GetxController {
       if (deletedUser != null) {
         CustomSnackbar.show(title: "Sukses", message: "User berhasil dihapus");
         final adminController = Get.find<AdminManageStudentController>();
-        await adminController.fetchStudents();
+        await adminController.fetchStudentsByKelas();
 
         // Panggil callback tambahan jika tersedia
         if (onStudentDeleted != null) {

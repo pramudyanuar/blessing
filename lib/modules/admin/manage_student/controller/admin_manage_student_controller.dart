@@ -6,53 +6,37 @@ class AdminManageStudentController extends GetxController {
   var selectedKelas = '1'.obs;
   final List<String> kelasList = ['1','2','3','4','5','6', '7', '8', '9', '10', '11', '12'];
 
-  final RxList<Map<String, String>> allStudents = <Map<String, String>>[].obs;
-  final RxList<Map<String, String>> filteredStudents =
-      <Map<String, String>>[].obs;
+  final RxList<Map<String, String>> students = <Map<String, String>>[].obs;
+  final RxList<Map<String, String>> filteredStudents = <Map<String, String>>[].obs;
 
   final RxString searchQuery = ''.obs;
-  final RxBool isLoading = false.obs; // Tambahkan loading state
+  final RxBool isLoading = false.obs;
 
-  final _cacheKey = 'all_students';
+  final _repository = UserRepository();
 
   @override
   void onInit() {
     super.onInit();
-    _loadFromCache();
-    fetchStudents();
+    fetchStudentsByKelas();
 
-    // re-filter tiap kali searchQuery berubah
-    ever(searchQuery, (_) => filterStudents());
-    // juga re-filter tiap kelas berubah
-    ever(selectedKelas, (_) => filterStudents());
+    // Re-fetch dari server saat kelas berubah
+    ever(selectedKelas, (_) => fetchStudentsByKelas());
+    // Re-filter lokal saat search berubah (tidak perlu re-fetch)
+    ever(searchQuery, (_) => _applySearch());
   }
 
-  Future<void> _loadFromCache() async {
-    final cachedData = CacheUtil().getData(_cacheKey);
-    if (cachedData != null) {
-      final mappedCache = (cachedData as List).cast<Map>();
-      allStudents.assignAll(
-        mappedCache
-            .map((e) =>
-                e.map((k, v) => MapEntry(k.toString(), v?.toString() ?? '')))
-            .toList(),
-      );
-      filterStudents();
-    } else {
-      // Jika tidak ada cache, set loading true sampai fetch selesai
-      isLoading.value = true;
-    }
-  }
-
-  Future<void> fetchStudents() async {
+  /// Fetch siswa berdasarkan kelas dari server — server yang filter, bukan FE.
+  Future<void> fetchStudentsByKelas() async {
     try {
-      isLoading.value = true; // Set loading state
+      isLoading.value = true;
+      filteredStudents.clear();
 
-      final repository = UserRepository();
+      final gradeLevel = int.tryParse(selectedKelas.value) ?? 1;
 
-      final students = await repository.getAllUsersComplete();
+      // Gunakan getUsersByGradeLevel — 1 request, server yang filter
+      final result = await _repository.getUsersByGradeLevel(gradeLevel);
 
-      final mappedStudents = students
+      final mapped = result
           .map((user) => <String, String>{
                 'id': user.id.toString(),
                 'nama': user.username ?? '',
@@ -61,40 +45,36 @@ class AdminManageStudentController extends GetxController {
               })
           .toList();
 
-      allStudents.assignAll(mappedStudents);
-      CacheUtil().setData(_cacheKey, mappedStudents);
+      students.assignAll(mapped);
+      _applySearch();
 
-      filterStudents();
+      // Cache per kelas
+      CacheUtil().setData('students_kelas_${selectedKelas.value}', mapped);
     } catch (e) {
-      // print('Error fetching students: $e');
-      // Tetap reset loading state meski ada error
-      allStudents.clear();
+      students.clear();
       filteredStudents.clear();
     } finally {
-      isLoading.value = false; // Reset loading state
+      isLoading.value = false;
+    }
+  }
+
+  /// Filter lokal berdasarkan search query saja (kelas sudah dihandle server).
+  void _applySearch() {
+    final query = searchQuery.value.toLowerCase();
+    if (query.isEmpty) {
+      filteredStudents.assignAll(students);
+    } else {
+      filteredStudents.assignAll(
+        students.where((s) => s['nama']!.toLowerCase().contains(query)),
+      );
     }
   }
 
   void selectKelas(String kelas) {
     selectedKelas.value = kelas;
-    // filterStudents();  // sudah otomatis karena ever(selectedKelas)
   }
 
   void setSearchQuery(String query) {
     searchQuery.value = query;
-    // filterStudents(); // sudah otomatis karena ever(searchQuery)
-  }
-
-  void filterStudents() {
-    final kelas = selectedKelas.value;
-    final query = searchQuery.value.toLowerCase();
-
-    final results = allStudents.where((student) {
-      final kelasMatch = student['kelas'] == kelas;
-      final nameMatch = student['nama']?.toLowerCase().contains(query) ?? false;
-      return kelasMatch && (query.isEmpty || nameMatch);
-    }).toList();
-
-    filteredStudents.assignAll(results);
   }
 }

@@ -36,7 +36,7 @@ class AdminManageStudentScreen extends StatelessWidget {
                     )
                   : RefreshIndicator(
                       onRefresh: () async {
-                        await controller.fetchStudents();
+                        await controller.fetchStudentsByKelas();
                       },
                       child: controller.filteredStudents.isEmpty
                           ? Center(
@@ -72,7 +72,7 @@ class AdminManageStudentScreen extends StatelessWidget {
                                       arguments: {
                                         'id': student['id'],
                                         'onStudentDeleted': () =>
-                                            controller.fetchStudents(),
+                                            controller.fetchStudentsByKelas(),
                                       },
                                     );
                                   },
@@ -157,7 +157,7 @@ class AdminManageStudentScreen extends StatelessWidget {
             icon: const Icon(Icons.person_add_alt_1, color: Colors.white),
             onPressed: () {
               Get.toNamed(AppRoutes.addStudent, arguments: {
-                'onStudentAdded': () => controller.fetchStudents(),
+                'onStudentAdded': () => controller.fetchStudentsByKelas(),
               });
             },
           ),

@@ -8,7 +8,7 @@ import '../../../modules/student/quiz_attempt/widgets/attempt_list_item.dart';
 import 'admin_quiz_attempts_list_controller.dart';
 
 class AdminQuizAttemptsListScreen extends GetView<AdminQuizAttemptsListController> {
-  const AdminQuizAttemptsListScreen({Key? key}) : super(key: key);
+  const AdminQuizAttemptsListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
