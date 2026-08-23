@@ -81,13 +81,8 @@ class LoginController extends GetxController {
             snackPosition: SnackPosition.BOTTOM,
           );
         }
-      } else {
-        Get.snackbar(
-          "Error",
-          "Username atau password salah.",
-          snackPosition: SnackPosition.BOTTOM,
-        );
       }
+      // No else here: HttpManager already shows an error toast for a failed login request.
     } catch (e) {
       Get.log("Login Error: $e");
       Get.snackbar(

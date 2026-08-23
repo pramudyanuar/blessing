@@ -60,7 +60,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
           child: TextField(
             controller: widget.controller,
             obscureText: widget.isPassword ? _obscureText : false,
-            style: TextStyle(fontSize: 14.sp),
+            style: TextStyle(fontSize: 14.sp, color: Colors.black87),
             decoration: InputDecoration(
               hintText: widget.hintText,
               hintStyle: TextStyle(
