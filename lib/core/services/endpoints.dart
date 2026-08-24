@@ -1,15 +1,6 @@
-import 'package:flutter/foundation.dart';
-
 class Endpoints {
-  static final String baseUrl = _initBaseUrl();
-
-  static String _initBaseUrl() {
-    if (kReleaseMode) {
-      return 'https://blessing-be-953847069536.asia-southeast2.run.app';
-    }
-    // Gunakan localhost karena port 3000 sudah di-forward menggunakan adb reverse
-    return 'http://localhost:3000';
-  }
+  static const String baseUrl =
+      'https://blessing-be-953847069536.asia-southeast2.run.app';
 
   static String _url(String path) => '$baseUrl$path';
 

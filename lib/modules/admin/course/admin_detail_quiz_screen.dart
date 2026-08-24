@@ -3,9 +3,12 @@ import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_confirmation_dialog.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/core/global_components/search_bar.dart';
+import 'package:blessing/data/core/models/content_block.dart';
 import 'package:blessing/modules/admin/course/controllers/admin_detail_quiz_controller.dart';
 import 'package:blessing/modules/admin/course/quiz_result_controller.dart';
 import 'package:blessing/data/report/repository/report_repository_impl.dart';
+import 'package:blessing/modules/student/quiz_attempt/quiz_review_screen.dart'
+    show YoutubeExplanationPlayer;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -114,6 +117,8 @@ class _DetailTab extends StatelessWidget {
                 final options = controller.optionsByQuestion[question.id] ?? [];
                 final correctAnswer =
                     controller.correctAnswerByQuestion[question.id];
+                final explanation =
+                    controller.explanationByQuestion[question.id] ?? [];
 
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
@@ -202,6 +207,18 @@ class _DetailTab extends StatelessWidget {
                                 ?.copyWith(color: Colors.green.shade700),
                           ),
                         ],
+                        if (explanation.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Text(
+                            'Pembahasan:',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 6),
+                          ..._buildExplanationBlocks(context, explanation),
+                        ],
                       ],
                     ),
                   ),
@@ -212,6 +229,47 @@ class _DetailTab extends StatelessWidget {
         ],
       );
     });
+  }
+
+  List<Widget> _buildExplanationBlocks(
+      BuildContext context, List<ContentBlock> blocks) {
+    return blocks.map<Widget>((block) {
+      if (block.type == 'text' && block.data.trim().isNotEmpty) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Text(block.data, style: Theme.of(context).textTheme.bodyMedium),
+        );
+      } else if (block.type == 'image' && block.data.isNotEmpty) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: CachedNetworkImage(
+              imageUrl: block.data,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Container(
+                height: 150,
+                color: Colors.grey[200],
+                alignment: Alignment.center,
+                child: const CircularProgressIndicator(),
+              ),
+              errorWidget: (context, url, error) => Container(
+                height: 150,
+                color: Colors.grey[200],
+                alignment: Alignment.center,
+                child: const Text("Gagal memuat gambar"),
+              ),
+            ),
+          ),
+        );
+      } else if (block.type == 'video_link' && block.data.isNotEmpty) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: YoutubeExplanationPlayer(videoUrl: block.data),
+        );
+      }
+      return const SizedBox.shrink();
+    }).toList();
   }
 }
 

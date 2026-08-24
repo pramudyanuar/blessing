@@ -2,6 +2,8 @@ import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/modules/admin/report_card/controller/admin_answer_review_controller.dart';
+import 'package:blessing/modules/student/quiz_attempt/quiz_review_screen.dart'
+    show YoutubeExplanationPlayer;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -168,7 +170,7 @@ class AdminAnswerReviewScreen extends StatelessWidget {
                     _buildQuestionCard(question),
                     SizedBox(height: 12.h),
                     // Explanation if available
-                    if (question.explanation != null)
+                    if (question.explanation.isNotEmpty)
                       _buildExplanationCard(question),
                   ],
                 ),
@@ -485,11 +487,42 @@ class AdminAnswerReviewScreen extends StatelessWidget {
             color: AppColors.c2,
           ),
           SizedBox(height: 8.h),
-          GlobalText.regular(
-            currentQuestion.explanation ?? '',
-            fontSize: 13.sp,
-            color: Colors.grey.shade700,
-          ),
+          ...currentQuestion.explanation.map((block) {
+            if (block.type == 'text' && block.data.trim().isNotEmpty) {
+              return Padding(
+                padding: EdgeInsets.only(bottom: 6.h),
+                child: GlobalText.regular(
+                  block.data,
+                  fontSize: 13.sp,
+                  color: Colors.grey.shade700,
+                ),
+              );
+            } else if (block.type == 'image' && block.data.isNotEmpty) {
+              return Padding(
+                padding: EdgeInsets.only(bottom: 6.h),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(6.r),
+                  child: CachedNetworkImage(
+                    imageUrl: block.data,
+                    placeholder: (context, url) => const Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => const Icon(Icons.error),
+                  ),
+                ),
+              );
+            } else if (block.type == 'video_link' && block.data.isNotEmpty) {
+              return Padding(
+                padding: EdgeInsets.only(bottom: 6.h),
+                child: YoutubeExplanationPlayer(videoUrl: block.data),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
         ],
       ),
     );

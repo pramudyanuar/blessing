@@ -1,3 +1,4 @@
+import 'package:blessing/data/core/models/content_block.dart';
 import 'package:blessing/data/quiz/models/response/question_response.dart';
 import 'package:blessing/data/quiz/models/response/question_option_response.dart';
 import 'package:blessing/data/quiz/repository/question_option_repository.dart';
@@ -16,6 +17,7 @@ class AdminDetailQuizController extends GetxController {
   var questions = <QuestionResponse>[].obs;
   var optionsByQuestion = <String, List<QuestionOptionResponse>>{}.obs;
   var correctAnswerByQuestion = <String, String>{}.obs;
+  var explanationByQuestion = <String, List<ContentBlock>>{}.obs;
   // var reportData = <AllReportCardsResponse>[].obs;
   var isLoadingQuestions = false.obs;
   var isLoadingOptions = false.obs;
@@ -86,11 +88,12 @@ class AdminDetailQuizController extends GetxController {
     try {
       final result = await _quizAnswerRepository.getAllQuizAnswers(
         quizId: quizId,
-        size: 200,
+        size: 100, // batas maksimal size yang divalidasi backend
       );
       if (result == null) return;
 
       final mapped = <String, String>{};
+      final mappedExplanation = <String, List<ContentBlock>>{};
       for (final answer in result.answers) {
         final options = optionsByQuestion[answer.questionId] ?? [];
         if (options.isNotEmpty) {
@@ -99,17 +102,22 @@ class AdminDetailQuizController extends GetxController {
           if (index >= 0 && index < options.length) {
             final letter = String.fromCharCode('A'.codeUnitAt(0) + index);
             mapped[answer.questionId] = '$letter. ${options[index].option}';
-            continue;
           }
         }
 
-        if (answer.option?.option != null &&
+        if (!mapped.containsKey(answer.questionId) &&
+            answer.option?.option != null &&
             answer.option!.option.trim().isNotEmpty) {
           mapped[answer.questionId] = answer.option!.option.trim();
+        }
+
+        if (answer.explanation.isNotEmpty) {
+          mappedExplanation[answer.questionId] = answer.explanation;
         }
       }
 
       correctAnswerByQuestion.assignAll(mapped);
+      explanationByQuestion.assignAll(mappedExplanation);
     } catch (e) {
       // Keep UI usable if this optional data fails
     }

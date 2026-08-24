@@ -39,12 +39,12 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    // Example: Handle 401 Unauthorized errors globally
-    if (err.response?.statusCode == 401) {
-      // print(
-      //     'AuthInterceptor: Unauthorized request at ${err.requestOptions.path}');
-      // print('AuthInterceptor: Request headers: ${err.requestOptions.headers}');
-      // For example, you could log the user out:
+    final path = err.requestOptions.path;
+    final isAuthEndpoint = path.contains('/login') || path.contains('/register');
+
+    // A 401 on /login just means wrong credentials, not an expired session —
+    // only force a logout redirect for 401s on already-authenticated requests.
+    if (err.response?.statusCode == 401 && !isAuthEndpoint) {
       secureStorageUtil.deleteAccessToken();
       Get.offAllNamed(AppRoutes.login);
     }

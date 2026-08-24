@@ -116,7 +116,6 @@ class MainApp extends StatelessWidget {
               ),
             ),
           ),
-          home: child,
         );
       },
     );

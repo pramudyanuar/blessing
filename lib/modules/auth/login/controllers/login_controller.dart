@@ -81,8 +81,11 @@ class LoginController extends GetxController {
             snackPosition: SnackPosition.BOTTOM,
           );
         }
+      } else {
+        // HttpManager already shows an error toast for the failed request;
+        // just clear the password so the user isn't stuck retyping over a wrong one.
+        passwordController.clear();
       }
-      // No else here: HttpManager already shows an error toast for a failed login request.
     } catch (e) {
       Get.log("Login Error: $e");
       Get.snackbar(

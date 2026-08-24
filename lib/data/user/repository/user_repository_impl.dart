@@ -42,14 +42,28 @@ class UserRepository {
     return _dataSource.getAllUsers(page: page, size: size, gradeLevel: gradeLevel);
   }
 
-  /// Ambil semua siswa dari 1 kelas tertentu — server yang filter, tidak perlu loop.
+  /// Ambil semua siswa dari 1 kelas tertentu — server yang filter berdasarkan grade_level.
+  /// Size dibatasi backend maksimal 100 per halaman, jadi loop semua halaman.
   Future<List<UserResponse>> getUsersByGradeLevel(int gradeLevel) async {
-    final result = await _dataSource.getAllUsers(
-      page: 1,
-      size: 500, // ukuran besar untuk ambil semua sekaligus
-      gradeLevel: gradeLevel,
-    );
-    return result?.users ?? [];
+    const pageSize = 100;
+    final List<UserResponse> allUsers = [];
+    int page = 1;
+
+    while (true) {
+      final result = await _dataSource.getAllUsers(
+        page: page,
+        size: pageSize,
+        gradeLevel: gradeLevel,
+      );
+      if (result == null) break;
+
+      allUsers.addAll(result.users);
+
+      if (result.users.length < pageSize) break;
+      page++;
+    }
+
+    return allUsers;
   }
 
   Future<List<UserResponse>> getAllUsersComplete() {

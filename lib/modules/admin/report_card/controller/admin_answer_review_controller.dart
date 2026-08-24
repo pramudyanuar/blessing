@@ -1,4 +1,5 @@
 import 'package:blessing/core/utils/app_routes.dart';
+import 'package:blessing/data/core/models/content_block.dart';
 import 'package:blessing/data/quiz/models/response/question_option_response.dart';
 import 'package:blessing/data/quiz/repository/question_option_repository.dart';
 import 'package:blessing/data/session/models/response/session_question_detail_response.dart';
@@ -109,7 +110,7 @@ class AdminAnswerReviewController extends GetxController {
               correctAnswer: correctAnswerDisplay ?? q.correctAnswer,
               isCorrect: q.isCorrect,
               options: mappedOptions,
-              explanation: null, // Backend belum provide explanation
+              explanation: q.explanation,
             ),
           );
         }
@@ -204,7 +205,7 @@ class QuestionReviewData {
   final String correctAnswer;
   final bool isCorrect;
   final List<Map<String, dynamic>> options;
-  final String? explanation;
+  final List<ContentBlock> explanation;
 
   QuestionReviewData({
     required this.questionNumber,
@@ -214,6 +215,6 @@ class QuestionReviewData {
     required this.correctAnswer,
     required this.isCorrect,
     required this.options,
-    this.explanation,
+    this.explanation = const [],
   });
 }

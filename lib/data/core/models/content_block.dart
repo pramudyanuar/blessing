@@ -1,7 +1,7 @@
 // lib/data/core/models/content_block.dart
 
 class ContentBlock {
-  final String type; // "text" or "image"
+  final String type; // "text", "image", or "video_link" (YouTube URL)
   final String data;
 
   ContentBlock({
