@@ -121,7 +121,9 @@ class QuizIntroController extends GetxController {
           previousScore.value = completedQuiz.score ?? 0;
           // ✅ SIMPAN sessionId dari report card
           sessionId.value = completedQuiz.sessionId ?? '';
-          canRetake.value = false;
+          // Backend has no restriction on re-attempting a submitted quiz —
+          // always allow retaking from here once it's been completed.
+          canRetake.value = true;
           return;
         }
       }
