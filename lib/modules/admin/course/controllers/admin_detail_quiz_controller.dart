@@ -1,3 +1,4 @@
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/data/core/models/content_block.dart';
 import 'package:blessing/data/quiz/models/response/question_response.dart';
 import 'package:blessing/data/quiz/models/response/question_option_response.dart';
@@ -129,13 +130,17 @@ class AdminDetailQuizController extends GetxController {
       final success = await _quizRepository.deleteQuiz(quizId);
       if (success) {
         Get.back(); // keluar dari detail quiz
-        Get.snackbar("Berhasil", "Kuis berhasil dihapus");
+        CustomSnackbar.show(title: "Berhasil", message: "Kuis berhasil dihapus");
         // Panggil callback untuk refresh data quiz di halaman sebelumnya
         if (onQuizDeleted != null) {
           onQuizDeleted!();
         }
       } else {
-        Get.snackbar("Gagal", "Tidak bisa menghapus kuis");
+        CustomSnackbar.show(
+          title: "Gagal",
+          message: "Tidak bisa menghapus kuis",
+          isError: true,
+        );
       }
     } finally {
       isDeleting.value = false;

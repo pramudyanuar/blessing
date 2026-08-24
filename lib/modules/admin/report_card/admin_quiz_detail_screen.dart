@@ -1,5 +1,6 @@
 import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/data/report/model/response/quiz_report.dart';
@@ -321,10 +322,9 @@ class AdminQuizDetailScreen extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  Get.snackbar(
-                    'Export',
-                    'Fitur export segera hadir',
-                    duration: const Duration(seconds: 2),
+                  CustomSnackbar.show(
+                    title: 'Export',
+                    message: 'Fitur export segera hadir',
                   );
                 },
                 icon: Icon(Icons.download, color: AppColors.c2, size: 20.sp),

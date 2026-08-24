@@ -1,7 +1,10 @@
+import 'package:blessing/data/quiz/repository/question_repository_impl.dart';
 import 'package:blessing/data/quiz/repository/quiz_repository_impl.dart';
 import 'package:blessing/data/report/repository/report_repository_impl.dart';
 import 'package:blessing/data/session/repository/session_repository_impl.dart';
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/core/utils/app_routes.dart';
+import 'package:blessing/modules/student/quiz_attempt/controller/quiz_attempt_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -10,6 +13,7 @@ enum QuizAttemptStatus { notStarted, inProgress, submitted }
 class QuizIntroController extends GetxController {
   // --- Dependencies ---
   final QuizRepository _quizRepository = QuizRepository();
+  final QuestionRepository _questionRepository = QuestionRepository();
   final ReportRepository _reportRepository = ReportRepository();
   final SessionRepository _sessionRepository = SessionRepository();
 
@@ -80,10 +84,16 @@ class QuizIntroController extends GetxController {
     try {
       final response = await _quizRepository.getQuizById(quizId);
       if (response != null) {
+        final questionsResult = await _questionRepository.getAllQuestions(
+          quizId: quizId,
+          page: 1,
+          size: 1,
+        );
+
         quizDetails.value = {
           "title": response.quizName,
           "duration": response.timeLimit,
-          "totalQuestions": 0,
+          "totalQuestions": questionsResult?.paging.totalItem ?? 0,
         };
       } else {
         throw Exception("Gagal memuat detail kuis.");
@@ -153,9 +163,15 @@ class QuizIntroController extends GetxController {
   /// Mulai quiz baru (create new session)
   void startNewQuiz() {
     if (quizId.isNotEmpty) {
+      // Force a fresh QuizAttemptController: if a previous attempt's instance
+      // is still alive, GetX would reuse it and its stale (already-submitted)
+      // sessionId, making the new attempt's submit fail.
+      if (Get.isRegistered<QuizAttemptController>()) {
+        Get.delete<QuizAttemptController>(force: true);
+      }
       Get.toNamed(AppRoutes.quizAttempt, arguments: quizId);
     } else {
-      Get.snackbar("Error", "ID Kuis tidak valid.");
+      CustomSnackbar.show(title: "Error", message: "ID Kuis tidak valid.", isError: true);
     }
   }
 
@@ -172,7 +188,11 @@ class QuizIntroController extends GetxController {
         },
       );
     } else {
-      Get.snackbar("Error", "Tidak dapat melanjutkan kuis. Data session hilang.");
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Tidak dapat melanjutkan kuis. Data session hilang.",
+        isError: true,
+      );
     }
   }
 

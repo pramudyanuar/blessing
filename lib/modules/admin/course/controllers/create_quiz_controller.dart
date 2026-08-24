@@ -55,8 +55,11 @@ class CreateQuizController extends GetxController {
       questions[index].dispose();
       questions.removeAt(index);
     } else {
-      Get.snackbar("Gagal", "Kuis harus memiliki setidaknya satu pertanyaan.",
-          snackPosition: SnackPosition.BOTTOM);
+      CustomSnackbar.show(
+        title: "Gagal",
+        message: "Kuis harus memiliki setidaknya satu pertanyaan.",
+        isError: true,
+      );
     }
   }
 
@@ -65,9 +68,11 @@ class CreateQuizController extends GetxController {
     if (question.optionControllers.length < 5) {
       question.optionControllers.add(TextEditingController());
     } else {
-      Get.snackbar(
-          "Batas Maksimal", "Anda hanya dapat menambahkan hingga 5 opsi.",
-          snackPosition: SnackPosition.BOTTOM);
+      CustomSnackbar.show(
+        title: "Batas Maksimal",
+        message: "Anda hanya dapat menambahkan hingga 5 opsi.",
+        isError: true,
+      );
     }
   }
 
@@ -78,9 +83,11 @@ class CreateQuizController extends GetxController {
       question.optionControllers[optionIndex].dispose();
       question.optionControllers.removeAt(optionIndex);
     } else {
-      Get.snackbar(
-          "Gagal", "Pertanyaan harus memiliki setidaknya dua opsi jawaban.",
-          snackPosition: SnackPosition.BOTTOM);
+      CustomSnackbar.show(
+        title: "Gagal",
+        message: "Pertanyaan harus memiliki setidaknya dua opsi jawaban.",
+        isError: true,
+      );
     }
   }
 
@@ -96,8 +103,11 @@ class CreateQuizController extends GetxController {
         questions[questionIndex].imageFile.value = File(pickedFile.path);
       }
     } catch (e) {
-      Get.snackbar("Error", "Gagal memilih gambar: $e",
-          snackPosition: SnackPosition.BOTTOM);
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Gagal memilih gambar: $e",
+        isError: true,
+      );
     }
   }
 
@@ -116,8 +126,11 @@ class CreateQuizController extends GetxController {
         questions[questionIndex].explanationImageFile.value = File(pickedFile.path);
       }
     } catch (e) {
-      Get.snackbar("Error", "Gagal memilih gambar: $e",
-          snackPosition: SnackPosition.BOTTOM);
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Gagal memilih gambar: $e",
+        isError: true,
+      );
     }
   }
 
@@ -181,36 +194,10 @@ class CreateQuizController extends GetxController {
 
   // --- FUNGSI UNTUK MENAMPILKAN PESAN ERROR DENGAN WARNA MERAH DAN TANDA X ---
   void _showErrorMessage(String message) {
-    Get.snackbar(
-      "",
-      "",
-      titleText: Row(
-        children: [
-          Icon(Icons.close, color: Colors.white, size: 20),
-          SizedBox(width: 8),
-          Text(
-            "Error",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-      messageText: Text(
-        message,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 14,
-        ),
-      ),
-      backgroundColor: Colors.red.shade600,
-      snackPosition: SnackPosition.TOP,
-      duration: Duration(seconds: 4),
-      margin: EdgeInsets.all(16),
-      borderRadius: 8,
-      icon: Icon(Icons.close, color: Colors.white),
+    CustomSnackbar.show(
+      title: "Error",
+      message: message,
+      isError: true,
     );
   }
 

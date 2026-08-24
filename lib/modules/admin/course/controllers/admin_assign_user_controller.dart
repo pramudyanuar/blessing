@@ -1,3 +1,4 @@
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/data/course/repository/course_repository_impl.dart';
 import 'package:blessing/data/user/models/response/user_response.dart';
 import 'package:blessing/data/user/repository/user_repository_impl.dart';
@@ -129,8 +130,11 @@ class AdminAssignUserController extends GetxController {
   /// Mengirim data user terpilih ke API
   Future<void> assignSelectedUsers() async {
     if (selectedUserIds.isEmpty) {
-      Get.snackbar('Perhatian', 'Pilih setidaknya satu siswa untuk ditugaskan.',
-          backgroundColor: Colors.orange);
+      CustomSnackbar.show(
+        title: 'Perhatian',
+        message: 'Pilih setidaknya satu siswa untuk ditugaskan.',
+        isError: true,
+      );
 
       // Tunggu sebentar agar user bisa melihat notifikasi peringatan
       await Future.delayed(const Duration(seconds: 2));
@@ -145,8 +149,10 @@ class AdminAssignUserController extends GetxController {
 
     // Jika tidak ada user baru yang dipilih, tampilkan pesan
     if (newUserIds.isEmpty) {
-      Get.snackbar('Info', 'Semua siswa yang dipilih sudah memiliki akses.',
-          backgroundColor: Colors.blue, colorText: Colors.white);
+      CustomSnackbar.show(
+        title: 'Info',
+        message: 'Semua siswa yang dipilih sudah memiliki akses.',
+      );
 
       // Tunggu sebentar agar user bisa melihat notifikasi info
       await Future.delayed(const Duration(seconds: 1));
@@ -164,8 +170,10 @@ class AdminAssignUserController extends GetxController {
     isAssigning.value = false;
 
     if (success) {
-      Get.snackbar('Berhasil', 'Akses siswa telah diperbarui.',
-          backgroundColor: Colors.green, colorText: Colors.white);
+      CustomSnackbar.show(
+        title: 'Berhasil',
+        message: 'Akses siswa telah diperbarui.',
+      );
 
       // Tunggu sebentar agar user bisa melihat notifikasi sukses
       await Future.delayed(const Duration(seconds: 1));
@@ -173,8 +181,11 @@ class AdminAssignUserController extends GetxController {
       // Kembali ke manage access course dengan result success
       Get.back(result: true);
     } else {
-      Get.snackbar('Gagal', 'Terjadi kesalahan saat memperbarui akses.',
-          backgroundColor: Colors.red, colorText: Colors.white);
+      CustomSnackbar.show(
+        title: 'Gagal',
+        message: 'Terjadi kesalahan saat memperbarui akses.',
+        isError: true,
+      );
 
       // Tunggu sebentar agar user bisa melihat notifikasi error
       await Future.delayed(const Duration(seconds: 2));

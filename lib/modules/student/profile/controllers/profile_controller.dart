@@ -1,3 +1,4 @@
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/core/utils/cache_util.dart';
 import 'package:blessing/data/user/models/request/update_user_request.dart';
 import 'package:blessing/data/user/repository/user_repository_impl.dart';
@@ -196,15 +197,21 @@ class ProfileController extends GetxController {
       if (fullNameController.text.isEmpty || 
           selectedClass.value == null || 
           birthDateController.text.isEmpty) {
-        Get.snackbar('Error', 'Nama Lengkap, Kelas, dan Tanggal Lahir wajib diisi.',
-            backgroundColor: Colors.red, colorText: Colors.white);
+        CustomSnackbar.show(
+          title: 'Error',
+          message: 'Nama Lengkap, Kelas, dan Tanggal Lahir wajib diisi.',
+          isError: true,
+        );
         return;
       }
     } else {
       // Mode edit: hanya validasi nama lengkap
       if (fullNameController.text.isEmpty) {
-        Get.snackbar('Error', 'Nama Lengkap wajib diisi.',
-            backgroundColor: Colors.red, colorText: Colors.white);
+        CustomSnackbar.show(
+          title: 'Error',
+          message: 'Nama Lengkap wajib diisi.',
+          isError: true,
+        );
         return;
       }
     }
@@ -253,18 +260,24 @@ class ProfileController extends GetxController {
         }
 
         isEditMode.value = false;
-        Get.snackbar('Sukses', 'Profil berhasil diperbarui!');
+        CustomSnackbar.show(title: 'Sukses', message: 'Profil berhasil diperbarui!');
 
         if (mode == ProfileMode.initialSetup) {
           Get.offAllNamed(AppRoutes.studentMenu);
         }
       } else {
-        Get.snackbar('Gagal', 'Gagal memperbarui profil. Coba lagi.',
-            backgroundColor: Colors.orange, colorText: Colors.white);
+        CustomSnackbar.show(
+          title: 'Gagal',
+          message: 'Gagal memperbarui profil. Coba lagi.',
+          isError: true,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'Terjadi kesalahan: ${e.toString()}',
-          backgroundColor: Colors.red, colorText: Colors.white);
+      CustomSnackbar.show(
+        title: 'Error',
+        message: 'Terjadi kesalahan: ${e.toString()}',
+        isError: true,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -277,7 +290,11 @@ class ProfileController extends GetxController {
       await secureStorageUtil.deleteUserRole();
       Get.offAllNamed(AppRoutes.login);
     } else {
-      Get.snackbar('Logout Gagal', 'Terjadi kesalahan saat logout. Coba lagi.');
+      CustomSnackbar.show(
+        title: 'Logout Gagal',
+        message: 'Terjadi kesalahan saat logout. Coba lagi.',
+        isError: true,
+      );
     }
   }
 

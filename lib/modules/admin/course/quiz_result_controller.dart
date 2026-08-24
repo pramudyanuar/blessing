@@ -3,6 +3,7 @@ import 'package:blessing/data/report/model/response/quiz_report_user.dart';
 import 'package:blessing/data/report/model/response/quiz_report_statistics.dart';
 import 'package:blessing/data/report/model/response/quiz_report_data.dart';
 import 'package:blessing/data/report/repository/report_repository_impl.dart';
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -53,10 +54,10 @@ class AdminQuizResultController extends GetxController {
         _filterUsers(); // Initialize filtered list
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Gagal memuat data hasil kuis: $e',
-        snackPosition: SnackPosition.TOP,
+      CustomSnackbar.show(
+        title: 'Error',
+        message: 'Gagal memuat data hasil kuis: $e',
+        isError: true,
       );
     } finally {
       isLoading.value = false;

@@ -2,6 +2,7 @@ import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_confirmation_dialog.dart';
 import 'package:blessing/core/global_components/global_text.dart';
+import 'package:blessing/core/global_components/image_viewer_screen.dart';
 import 'package:blessing/core/global_components/search_bar.dart';
 import 'package:blessing/data/core/models/content_block.dart';
 import 'package:blessing/modules/admin/course/controllers/admin_detail_quiz_controller.dart';
@@ -148,25 +149,39 @@ class _DetailTab extends StatelessWidget {
                                       Theme.of(context).textTheme.bodyMedium),
                             );
                           } else if (c.type == "image" && c.data.isNotEmpty) {
+                            final heroTag = 'admin_question_image_${c.data}';
                             return Padding(
                               padding: const EdgeInsets.symmetric(vertical: 6),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: CachedNetworkImage(
-                                  imageUrl: c.data,
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => Container(
-                                    height: 150,
-                                    color: Colors.grey[200],
-                                    alignment: Alignment.center,
-                                    child: const CircularProgressIndicator(),
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      Container(
-                                    height: 150,
-                                    color: Colors.grey[200],
-                                    alignment: Alignment.center,
-                                    child: const Text("Gagal memuat gambar"),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Get.to(
+                                    () => ImageViewerScreen(
+                                        imageUrl: c.data, heroTag: heroTag),
+                                    transition: Transition.fadeIn,
+                                    duration: const Duration(milliseconds: 300),
+                                  );
+                                },
+                                child: Hero(
+                                  tag: heroTag,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: CachedNetworkImage(
+                                      imageUrl: c.data,
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) => Container(
+                                        height: 150,
+                                        color: Colors.grey[200],
+                                        alignment: Alignment.center,
+                                        child: const CircularProgressIndicator(),
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          Container(
+                                        height: 150,
+                                        color: Colors.grey[200],
+                                        alignment: Alignment.center,
+                                        child: const Text("Gagal memuat gambar"),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -240,24 +255,37 @@ class _DetailTab extends StatelessWidget {
           child: Text(block.data, style: Theme.of(context).textTheme.bodyMedium),
         );
       } else if (block.type == 'image' && block.data.isNotEmpty) {
+        final heroTag = 'admin_explanation_image_${block.data}';
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 6),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: CachedNetworkImage(
-              imageUrl: block.data,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => Container(
-                height: 150,
-                color: Colors.grey[200],
-                alignment: Alignment.center,
-                child: const CircularProgressIndicator(),
-              ),
-              errorWidget: (context, url, error) => Container(
-                height: 150,
-                color: Colors.grey[200],
-                alignment: Alignment.center,
-                child: const Text("Gagal memuat gambar"),
+          child: GestureDetector(
+            onTap: () {
+              Get.to(
+                () => ImageViewerScreen(imageUrl: block.data, heroTag: heroTag),
+                transition: Transition.fadeIn,
+                duration: const Duration(milliseconds: 300),
+              );
+            },
+            child: Hero(
+              tag: heroTag,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: CachedNetworkImage(
+                  imageUrl: block.data,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    height: 150,
+                    color: Colors.grey[200],
+                    alignment: Alignment.center,
+                    child: const CircularProgressIndicator(),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    height: 150,
+                    color: Colors.grey[200],
+                    alignment: Alignment.center,
+                    child: const Text("Gagal memuat gambar"),
+                  ),
+                ),
               ),
             ),
           ),

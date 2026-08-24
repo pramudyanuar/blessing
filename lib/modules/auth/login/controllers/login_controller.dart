@@ -1,3 +1,4 @@
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/core/utils/cache_util.dart';
 import 'package:blessing/data/user/models/request/login_user_request.dart';
@@ -19,23 +20,19 @@ class LoginController extends GetxController {
     final password = passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
-      Get.snackbar(
-        "Gagal",
-        "Email dan password tidak boleh kosong.",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withValues(alpha: 0.8),
-        colorText: Colors.white,
+      CustomSnackbar.show(
+        title: "Gagal",
+        message: "Email dan password tidak boleh kosong.",
+        isError: true,
       );
       return;
     }
 
     if (!GetUtils.isEmail(email)) {
-      Get.snackbar(
-        "Gagal",
-        "Format email yang Anda masukkan tidak valid.",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withValues(alpha: 0.8),
-        colorText: Colors.white,
+      CustomSnackbar.show(
+        title: "Gagal",
+        message: "Format email yang Anda masukkan tidak valid.",
+        isError: true,
       );
       return;
     }
@@ -68,17 +65,17 @@ class LoginController extends GetxController {
               Get.offAllNamed(AppRoutes.studentMenu);
               break;
             default:
-              Get.snackbar(
-                "Error",
-                "Role pengguna tidak dikenali.",
-                snackPosition: SnackPosition.BOTTOM,
+              CustomSnackbar.show(
+                title: "Error",
+                message: "Role pengguna tidak dikenali.",
+                isError: true,
               );
           }
         } else {
-          Get.snackbar(
-            "Error",
-            "Gagal memverifikasi data pengguna setelah login.",
-            snackPosition: SnackPosition.BOTTOM,
+          CustomSnackbar.show(
+            title: "Error",
+            message: "Gagal memverifikasi data pengguna setelah login.",
+            isError: true,
           );
         }
       } else {
@@ -88,10 +85,10 @@ class LoginController extends GetxController {
       }
     } catch (e) {
       Get.log("Login Error: $e");
-      Get.snackbar(
-        "Error",
-        "Terjadi kesalahan. Silakan coba lagi nanti.",
-        snackPosition: SnackPosition.BOTTOM,
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Terjadi kesalahan. Silakan coba lagi nanti.",
+        isError: true,
       );
     } finally {
       isLoading.value = false;

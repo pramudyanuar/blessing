@@ -1,5 +1,6 @@
 import 'package:blessing/data/subject/models/response/subject_response.dart';
 import 'package:blessing/data/subject/repository/subject_repository_impl.dart';
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/modules/student/main/widgets/birth_date_setup_dialog.dart';
 import 'package:get/get.dart';
@@ -31,13 +32,9 @@ class MainStudentController extends GetxController {
     if (_lastPressedAt == null ||
         now.difference(_lastPressedAt!) > const Duration(seconds: 2)) {
       _lastPressedAt = now;
-      Get.snackbar(
-        "Keluar Aplikasi",
-        "Tekan sekali lagi untuk keluar dari aplikasi.",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.black87,
-        colorText: Colors.white,
-        duration: const Duration(seconds: 2),
+      CustomSnackbar.show(
+        title: "Keluar Aplikasi",
+        message: "Tekan sekali lagi untuk keluar dari aplikasi.",
       );
       return false;
     }
@@ -194,7 +191,11 @@ class MainStudentController extends GetxController {
     } catch (e) {
       debugPrint("Error fetching subjects: $e");
       // Opsional: Tampilkan pesan error ke pengguna
-      Get.snackbar("Error", "Gagal memuat data mata pelajaran.");
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Gagal memuat data mata pelajaran.",
+        isError: true,
+      );
     } finally {
       isLoadingSubjects.value = false;
     }

@@ -1,5 +1,6 @@
 // lib/modules/student/course/controllers/course_list_controller.dart
 
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/data/course/models/response/course_with_quizzes_response.dart';
 import 'package:blessing/data/course/repository/course_repository_impl.dart';
 import 'package:blessing/data/report/model/response/quiz_report.dart';
@@ -59,7 +60,11 @@ class CourseListController extends GetxController {
       await _loadFromCache();
       await _fetchFromNetwork();
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memuat data: $e');
+      CustomSnackbar.show(
+        title: 'Error',
+        message: 'Gagal memuat data: $e',
+        isError: true,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -100,7 +105,11 @@ class CourseListController extends GetxController {
       }
     } catch (e) {
       // print('Error fetching from network: $e');
-      Get.snackbar('Error', 'Gagal memuat data dari server: $e');
+      CustomSnackbar.show(
+        title: 'Error',
+        message: 'Gagal memuat data dari server: $e',
+        isError: true,
+      );
     }
   }
 

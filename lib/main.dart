@@ -38,7 +38,7 @@ void main() async {
   // Gunakan SystemUIUtil untuk mengatur system UI
   SystemUIUtil.initializeAppSystemUI();
 
-  runApp(const MainApp());
+  runApp(const MainAppWrapper());
 
   WidgetsBinding.instance.addPostFrameCallback((_) {
     // Defer non-critical startup work to improve time-to-first-frame.

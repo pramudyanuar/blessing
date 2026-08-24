@@ -1,3 +1,4 @@
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/core/utils/cache_util.dart';
 import 'package:blessing/data/subject/models/response/subject_response.dart';
@@ -130,7 +131,11 @@ class AdminHomepageController extends GetxController {
       _filterSubjects(); // Panggil filter setelah fetch data
     } catch (e) {
       if (_allSubjects.isEmpty) {
-        Get.snackbar('Error', 'Gagal memuat data mata pelajaran: $e');
+        CustomSnackbar.show(
+          title: 'Error',
+          message: 'Gagal memuat data mata pelajaran: $e',
+          isError: true,
+        );
       }
       // print('Failed to fetch subjects from network: $e');
     } finally {
@@ -156,7 +161,11 @@ class AdminHomepageController extends GetxController {
       await secureStorageUtil.deleteUserRole();
       Get.offAllNamed(AppRoutes.login);
     } else {
-      Get.snackbar('Logout Gagal', 'Terjadi kesalahan saat logout. Coba lagi.');
+      CustomSnackbar.show(
+        title: 'Logout Gagal',
+        message: 'Terjadi kesalahan saat logout. Coba lagi.',
+        isError: true,
+      );
     }
   }
 }

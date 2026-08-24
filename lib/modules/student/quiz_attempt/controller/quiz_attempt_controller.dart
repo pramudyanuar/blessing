@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'package:no_screenshot/no_screenshot.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/core/global_components/global_confirmation_dialog.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/data/quiz/models/response/question_option_response.dart';
@@ -204,11 +205,9 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
 
       if (sessionResponse == null) {
         Get.back();
-        Get.snackbar(
-          "Info",
-          "Anda sudah pernah mengerjakan kuis ini.",
-          backgroundColor: Colors.orange,
-          colorText: Colors.white,
+        CustomSnackbar.show(
+          title: "Info",
+          message: "Anda sudah pernah mengerjakan kuis ini.",
         );
         throw Exception("Gagal memulai sesi kuis. Respons dari server kosong.");
       }
@@ -234,11 +233,9 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
         // Quiz sudah dikerjakan - set flag dan kembali ke halaman sebelumnya
         isQuizAlreadyAttempted.value = true;
         Get.back();
-        Get.snackbar(
-          "Info",
-          "Anda sudah pernah mengerjakan kuis ini.",
-          backgroundColor: Colors.orange,
-          colorText: Colors.white,
+        CustomSnackbar.show(
+          title: "Info",
+          message: "Anda sudah pernah mengerjakan kuis ini.",
         );
       } else {
         errorMessage.value = "Terjadi kesalahan: ${e.toString()}";
@@ -300,11 +297,9 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
         // Quiz sudah dikerjakan (conflict) - set flag dan kembali
         isQuizAlreadyAttempted.value = true;
         Get.back();
-        Get.snackbar(
-          "Info",
-          "Anda sudah pernah mengerjakan kuis ini.",
-          backgroundColor: Colors.orange,
-          colorText: Colors.white,
+        CustomSnackbar.show(
+          title: "Info",
+          message: "Anda sudah pernah mengerjakan kuis ini.",
         );
       } else {
         debugPrint("Error during quiz resume: $e. Fallback ke start baru.");
@@ -317,11 +312,9 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
           if (initErrorString.contains('conflict') || initErrorString.contains('409')) {
             isQuizAlreadyAttempted.value = true;
             Get.back();
-            Get.snackbar(
-              "Info",
-              "Anda sudah pernah mengerjakan kuis ini.",
-              backgroundColor: Colors.orange,
-              colorText: Colors.white,
+            CustomSnackbar.show(
+              title: "Info",
+              message: "Anda sudah pernah mengerjakan kuis ini.",
             );
           } else {
             errorMessage.value = "Gagal memulai kuis: ${initError.toString()}";
@@ -400,7 +393,7 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
     final options = optionsByQuestion[question.id];
 
     if (options == null || sessionId == null) {
-      Get.snackbar("Error", "Sesi atau opsi tidak valid.");
+      CustomSnackbar.show(title: "Error", message: "Sesi atau opsi tidak valid.", isError: true);
       return;
     }
 
@@ -464,14 +457,11 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
         } catch (e) {
           debugPrint("Gagal mensinkronkan jawaban untuk soal $questionId: $e");
           // Tampilkan snackbar peringatan sekali saja agar user tahu koneksi lambat
-          Get.snackbar(
-            "Koneksi Lambat",
-            "Jawaban tersimpan lokal. Akan dikirim otomatis jika jaringan stabil.",
-            backgroundColor: Colors.orange.withValues(alpha: 0.9),
-            colorText: Colors.white,
-            icon: const Icon(Icons.wifi_off, color: Colors.white),
-            duration: const Duration(seconds: 4),
-            snackPosition: SnackPosition.BOTTOM,
+          CustomSnackbar.show(
+            title: "Koneksi Lambat",
+            message: "Jawaban tersimpan lokal. Akan dikirim otomatis jika jaringan stabil.",
+            isError: true,
+            icon: Icons.wifi_off,
           );
           // Hentikan proses sinkronisasi, antrean tetap berada di pendingSyncAnswers
           break;
@@ -481,6 +471,9 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
       _isSyncing = false;
     }
   }
+
+  bool get isLastQuestion =>
+      questions.isNotEmpty && currentQuestionIndex.value == questions.length - 1;
 
   void nextPage() {
     if (currentQuestionIndex.value < questions.length - 1) {
@@ -557,7 +550,11 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
 
     if (sessionId == null) {
       Get.back();
-      Get.snackbar("Error", "Sesi tidak valid, tidak dapat mengirim jawaban.");
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Sesi tidak valid, tidak dapat mengirim jawaban.",
+        isError: true,
+      );
       return;
     }
 
@@ -615,9 +612,9 @@ class QuizAttemptController extends GetxController with WidgetsBindingObserver {
         'quizId': quizId,
         'sessionId': sessionId,
       });
-      Get.snackbar("Sukses", "Kuis berhasil diselesaikan!");
+      CustomSnackbar.show(title: "Sukses", message: "Kuis berhasil diselesaikan!");
     } else {
-      Get.snackbar("Gagal", "Gagal mengirimkan kuis. Coba lagi.");
+      CustomSnackbar.show(title: "Gagal", message: "Gagal mengirimkan kuis. Coba lagi.", isError: true);
       startTimer(); // Mulai ulang timer jika submit gagal
     }
   }

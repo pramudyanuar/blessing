@@ -1,3 +1,4 @@
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/data/course/models/response/course_response.dart';
 import 'package:blessing/data/course/repository/course_repository_impl.dart';
@@ -91,7 +92,11 @@ class AdminCourseDetailController extends GetxController {
       }
     } catch (e) {
       debugPrint('Error fetchQuizzesForCourse: $e');
-      Get.snackbar('Error', 'Gagal memuat data kuis');
+      CustomSnackbar.show(
+        title: 'Error',
+        message: 'Gagal memuat data kuis',
+        isError: true,
+      );
     } finally {
       isQuizLoading.value = false;
     }
@@ -128,7 +133,7 @@ class AdminCourseDetailController extends GetxController {
       isLoading.value = true;
       final success = await _courseRepository.adminDeleteCourse(courseId);
       if (success) {
-        Get.snackbar('Berhasil', 'Materi berhasil dihapus');
+        CustomSnackbar.show(title: 'Berhasil', message: 'Materi berhasil dihapus');
 
         // Tunggu sebentar agar user bisa melihat notifikasi sukses
         await Future.delayed(const Duration(seconds: 1));
@@ -141,11 +146,19 @@ class AdminCourseDetailController extends GetxController {
           onCourseDeleted!();
         }
       } else {
-        Get.snackbar('Gagal', 'Materi gagal dihapus');
+        CustomSnackbar.show(
+          title: 'Gagal',
+          message: 'Materi gagal dihapus',
+          isError: true,
+        );
       }
     } catch (e) {
       debugPrint('Error deleteCourse: $e');
-      Get.snackbar('Error', 'Terjadi kesalahan saat menghapus materi');
+      CustomSnackbar.show(
+        title: 'Error',
+        message: 'Terjadi kesalahan saat menghapus materi',
+        isError: true,
+      );
     } finally {
       isLoading.value = false;
     }

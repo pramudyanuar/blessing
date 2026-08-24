@@ -1,3 +1,4 @@
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/data/course/models/response/user_course_response.dart';
 import 'package:blessing/data/course/repository/course_repository_impl.dart';
@@ -96,11 +97,9 @@ class AdminManageAccessCourseController extends GetxController {
       // Terutama penting ketika user terakhir dihapus
       await fetchUserAccess();
 
-      Get.snackbar(
-        'Berhasil',
-        'Akses pengguna telah dihapus.',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
+      CustomSnackbar.show(
+        title: 'Berhasil',
+        message: 'Akses pengguna telah dihapus.',
       );
 
       // Tunggu sebentar agar user bisa melihat notifikasi
@@ -111,11 +110,10 @@ class AdminManageAccessCourseController extends GetxController {
         onAccessChanged!();
       }
     } else {
-      Get.snackbar(
-        'Gagal',
-        'Gagal menghapus akses pengguna.',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+      CustomSnackbar.show(
+        title: 'Gagal',
+        message: 'Gagal menghapus akses pengguna.',
+        isError: true,
       );
     }
   }

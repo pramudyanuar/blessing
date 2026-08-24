@@ -1,6 +1,7 @@
 import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_text.dart';
+import 'package:blessing/core/global_components/image_viewer_screen.dart';
 import 'package:blessing/modules/admin/report_card/controller/admin_answer_review_controller.dart';
 import 'package:blessing/modules/student/quiz_attempt/quiz_review_screen.dart'
     show YoutubeExplanationPlayer;
@@ -498,20 +499,33 @@ class AdminAnswerReviewScreen extends StatelessWidget {
                 ),
               );
             } else if (block.type == 'image' && block.data.isNotEmpty) {
+              final heroTag = 'answer_review_explanation_image_${block.data}';
               return Padding(
                 padding: EdgeInsets.only(bottom: 6.h),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(6.r),
-                  child: CachedNetworkImage(
-                    imageUrl: block.data,
-                    placeholder: (context, url) => const Center(
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                child: GestureDetector(
+                  onTap: () {
+                    Get.to(
+                      () => ImageViewerScreen(imageUrl: block.data, heroTag: heroTag),
+                      transition: Transition.fadeIn,
+                      duration: const Duration(milliseconds: 300),
+                    );
+                  },
+                  child: Hero(
+                    tag: heroTag,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(6.r),
+                      child: CachedNetworkImage(
+                        imageUrl: block.data,
+                        placeholder: (context, url) => const Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => const Icon(Icons.error),
                       ),
                     ),
-                    errorWidget: (context, url, error) => const Icon(Icons.error),
                   ),
                 ),
               );

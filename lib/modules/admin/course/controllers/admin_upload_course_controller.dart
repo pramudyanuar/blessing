@@ -70,18 +70,15 @@ class AdminUploadCourseController extends GetxController {
           'data': link,
         });
         linkController.clear();
-        Get.snackbar(
-          'Berhasil',
-          'Link berhasil ditambahkan',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
+        CustomSnackbar.show(
+          title: 'Berhasil',
+          message: 'Link berhasil ditambahkan',
         );
       } else {
-        Get.snackbar(
-          'Error',
-          'Format link tidak valid. Pastikan dimulai dengan http:// atau https://',
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+        CustomSnackbar.show(
+          title: 'Error',
+          message: 'Format link tidak valid. Pastikan dimulai dengan http:// atau https://',
+          isError: true,
         );
       }
     }
@@ -95,7 +92,11 @@ class AdminUploadCourseController extends GetxController {
   /// [DIUBAH TOTAL] Logika upload yang sesuai dengan arsitektur baru.
   Future<void> uploadCourse() async {
     if (titleController.text.isEmpty) {
-      Get.snackbar('Error', 'Judul materi tidak boleh kosong');
+      CustomSnackbar.show(
+        title: 'Error',
+        message: 'Judul materi tidak boleh kosong',
+        isError: true,
+      );
       return;
     }
 

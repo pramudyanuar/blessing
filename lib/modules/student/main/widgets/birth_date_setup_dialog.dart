@@ -1,3 +1,4 @@
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/core/global_components/global_button.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/data/user/models/request/update_user_request.dart';
@@ -58,11 +59,10 @@ class _BirthDateSetupDialogState extends State<BirthDateSetupDialog> {
 
   Future<void> saveBirthDate() async {
     if (birthDateController.text.isEmpty) {
-      Get.snackbar(
-        'Error',
-        'Tanggal lahir harus diisi',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+      CustomSnackbar.show(
+        title: 'Error',
+        message: 'Tanggal lahir harus diisi',
+        isError: true,
       );
       return;
     }
@@ -90,19 +90,17 @@ class _BirthDateSetupDialogState extends State<BirthDateSetupDialog> {
           Get.back();
         }
       } else {
-        Get.snackbar(
-          'Error',
-          'Gagal menyimpan tanggal lahir',
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+        CustomSnackbar.show(
+          title: 'Error',
+          message: 'Gagal menyimpan tanggal lahir',
+          isError: true,
         );
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Terjadi kesalahan: ${e.toString()}',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+      CustomSnackbar.show(
+        title: 'Error',
+        message: 'Terjadi kesalahan: ${e.toString()}',
+        isError: true,
       );
     } finally {
       setState(() {

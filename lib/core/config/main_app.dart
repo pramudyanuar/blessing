@@ -1,5 +1,6 @@
 import 'package:blessing/core/constants/string.dart';
 import 'package:blessing/core/constants/color.dart';
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/core/utils/app_pages.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/modules/error/not_found_screen.dart';
@@ -8,7 +9,6 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:no_screenshot/no_screenshot.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 final _noScreenshot = NoScreenshot.instance;
 
@@ -33,10 +33,9 @@ class _MainAppWrapperState extends State<MainAppWrapper> {
         debugPrint('Screenshot path: ${value.screenshotPath}');
       }
 
-      Fluttertoast.showToast(
-        msg: "Screenshot detected!",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
+      CustomSnackbar.show(
+        title: 'Screenshot',
+        message: 'Screenshot detected!',
       );
     });
   }
@@ -60,6 +59,8 @@ class MainApp extends StatelessWidget {
         return GetMaterialApp(
           title: StringText.appName,
           debugShowCheckedModeBanner: false,
+          builder: (context, routedChild) =>
+              AppNotificationHost(child: routedChild ?? const SizedBox.shrink()),
           initialRoute: AppRoutes.initial,
           getPages: AppPages.routes,
           unknownRoute: GetPage(

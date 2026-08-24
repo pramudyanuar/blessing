@@ -2,8 +2,10 @@ import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
 import 'package:blessing/core/global_components/global_button.dart';
 import 'package:blessing/core/global_components/global_text.dart';
+import 'package:blessing/core/global_components/image_viewer_screen.dart';
 import 'package:blessing/core/utils/app_routes.dart';
 import 'package:blessing/data/core/models/content_block.dart';
+import 'package:blessing/modules/student/quiz_attempt/controller/quiz_attempt_controller.dart';
 import 'package:blessing/modules/student/quiz_attempt/controller/quiz_review_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -208,6 +210,14 @@ class QuizReviewScreen extends StatelessWidget {
                         fontSize: 15.sp,
                         color: Colors.orange.shade700,
                         onPressed: () {
+                          // The previous attempt's QuizAttemptController (with its
+                          // now-already-submitted sessionId) can otherwise survive
+                          // this navigation via GetX's lazy singleton and get reused,
+                          // making the re-attempt submit against a stale session and
+                          // fail with "Quiz already submitted".
+                          if (Get.isRegistered<QuizAttemptController>()) {
+                            Get.delete<QuizAttemptController>(force: true);
+                          }
                           Get.offNamed(
                             AppRoutes.quizAttempt,
                             arguments: {
@@ -447,34 +457,47 @@ class QuizReviewScreen extends StatelessWidget {
         for (int i = 0; i < images.length; i++) {
           final imageUrl = images[i] as String?;
           if (imageUrl != null && imageUrl.isNotEmpty) {
+            final heroTag = 'question_review_image_${imageUrl}_$i';
             widgets.add(
               Padding(
                 padding: EdgeInsets.only(bottom: 8.h),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(6.r),
-                  child: CachedNetworkImage(
-                    imageUrl: imageUrl,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      width: double.infinity,
-                      height: 150.h,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(6.r),
-                      ),
-                      child: const Center(child: CircularProgressIndicator()),
-                    ),
-                    errorWidget: (context, url, error) => Container(
-                      width: double.infinity,
-                      height: 150.h,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(6.r),
-                      ),
-                      child: Center(
-                        child: Icon(Icons.broken_image,
-                            color: Colors.grey.shade400),
+                child: GestureDetector(
+                  onTap: () {
+                    Get.to(
+                      () => ImageViewerScreen(imageUrl: imageUrl, heroTag: heroTag),
+                      transition: Transition.fadeIn,
+                      duration: const Duration(milliseconds: 300),
+                    );
+                  },
+                  child: Hero(
+                    tag: heroTag,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(6.r),
+                      child: CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          width: double.infinity,
+                          height: 150.h,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(6.r),
+                          ),
+                          child: const Center(child: CircularProgressIndicator()),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          width: double.infinity,
+                          height: 150.h,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(6.r),
+                          ),
+                          child: Center(
+                            child: Icon(Icons.broken_image,
+                                color: Colors.grey.shade400),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -583,20 +606,33 @@ class QuizReviewScreen extends StatelessWidget {
                   ),
                 );
               } else if (type == 'image' && data != null && data.trim().isNotEmpty) {
+                final heroTag = 'explanation_image_$data';
                 return Padding(
                   padding: EdgeInsets.only(bottom: 6.h),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(6.r),
-                    child: CachedNetworkImage(
-                      imageUrl: data,
-                      placeholder: (context, url) => const Center(
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                  child: GestureDetector(
+                    onTap: () {
+                      Get.to(
+                        () => ImageViewerScreen(imageUrl: data, heroTag: heroTag),
+                        transition: Transition.fadeIn,
+                        duration: const Duration(milliseconds: 300),
+                      );
+                    },
+                    child: Hero(
+                      tag: heroTag,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(6.r),
+                        child: CachedNetworkImage(
+                          imageUrl: data,
+                          placeholder: (context, url) => const Center(
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => const Icon(Icons.error),
                         ),
                       ),
-                      errorWidget: (context, url, error) => const Icon(Icons.error),
                     ),
                   ),
                 );

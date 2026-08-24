@@ -1,5 +1,6 @@
 import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/core/global_components/global_button.dart';
 import 'package:blessing/core/global_components/global_confirmation_dialog.dart';
 import 'package:blessing/core/global_components/global_text.dart';
@@ -21,10 +22,10 @@ class ProfileScreen extends StatelessWidget {
       canPop: controller.mode != ProfileMode.initialSetup,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop && controller.mode == ProfileMode.initialSetup) {
-          Get.snackbar(
-            'Penting',
-            'Anda harus mengisi data diri terlebih dahulu',
-            snackPosition: SnackPosition.BOTTOM,
+          CustomSnackbar.show(
+            title: 'Penting',
+            message: 'Anda harus mengisi data diri terlebih dahulu',
+            isError: true,
           );
         }
       },
@@ -79,8 +80,10 @@ class ProfileScreen extends StatelessWidget {
                       Obx(() => controller.isEditMode.value
                           ? InkWell(
                               onTap: () {
-                                Get.snackbar(
-                                    'Info', 'Fitur ganti foto belum tersedia');
+                                CustomSnackbar.show(
+                                  title: 'Info',
+                                  message: 'Fitur ganti foto belum tersedia',
+                                );
                               },
                               child: Container(
                                 padding: const EdgeInsets.all(6),

@@ -1,5 +1,6 @@
 import 'package:blessing/core/constants/color.dart';
 import 'package:blessing/core/global_components/base_widget_container.dart';
+import 'package:blessing/core/global_components/custom_snackbar.dart';
 import 'package:blessing/core/global_components/global_confirmation_dialog.dart';
 import 'package:blessing/core/global_components/global_text.dart';
 import 'package:blessing/core/global_components/image_viewer_screen.dart';
@@ -1126,19 +1127,17 @@ class AdminCourseDetailScreen extends StatelessWidget {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        Get.snackbar(
-          'Error',
-          'Tidak dapat membuka link',
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+        CustomSnackbar.show(
+          title: 'Error',
+          message: 'Tidak dapat membuka link',
+          isError: true,
         );
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Link tidak valid',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+      CustomSnackbar.show(
+        title: 'Error',
+        message: 'Link tidak valid',
+        isError: true,
       );
     }
   }

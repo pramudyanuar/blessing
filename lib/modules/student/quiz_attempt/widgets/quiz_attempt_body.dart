@@ -36,11 +36,20 @@
                         color: Colors.white,
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.arrow_forward_ios),
-                      onPressed: controller.nextPage,
-                      color: AppColors.c2,
-                    ),
+                    controller.isLastQuestion
+                        ? TextButton.icon(
+                            onPressed: controller.confirmAndSubmitQuiz,
+                            icon: const Icon(Icons.check_circle_outline, size: 18),
+                            label: const Text('Selesaikan'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppColors.c2,
+                            ),
+                          )
+                        : IconButton(
+                            icon: const Icon(Icons.arrow_forward_ios),
+                            onPressed: controller.nextPage,
+                            color: AppColors.c2,
+                          ),
                   ],
                 )),
           ),
